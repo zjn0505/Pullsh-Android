@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">TicTacToe</string>
+
+    <string name="tag_index">index</string>
+    <string name="tag_taken">taken</string>
+    <string name="hint_default">Have FUN !!!</string>
+    <string name="player_one_win">Player One Win! Click to rematch</string>
+    <string name="player_two_win">Player Two Win! Click to rematch</string>
+    <string name="draw">Draw! Click to rematch</string>
+
+</resources>
