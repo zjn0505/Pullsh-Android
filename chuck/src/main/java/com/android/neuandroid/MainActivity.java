@@ -15,7 +15,7 @@ import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String API_QUERY = "http://api.icndb.com/jokes/random?limitTo=[nerdy]";
+    private static final String API_QUERY = "http://api.icndb.com/jokes/random?limitTo=[nerdy]&escape=javascript";
 
     private TextView chuckText;
     private ProgressBar progressBar;
