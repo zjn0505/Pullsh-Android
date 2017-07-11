@@ -1,9 +1,11 @@
 package com.android.neuandroid;
 
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -11,6 +13,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
@@ -19,6 +22,8 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView chuckText;
     private ProgressBar progressBar;
+    private EditText editFirst;
+    private EditText editLast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,11 +39,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        progressBar = (ProgressBar) findViewById(R.id.loadingIndicator);
+        progressBar = (ProgressBar) findViewById(R.id.loading_indicator);
+        editFirst = (EditText) findViewById(R.id.edit_first);
+        editLast = (EditText) findViewById(R.id.edit_last);
     }
 
     private void loadChuckJoke(){
-        new ChuckJokeTask().execute(API_QUERY);
+        new ChuckJokeTask().execute(API_QUERY, editFirst.getText().toString(), editLast.getText().toString());
     }
 
     private class ChuckJokeTask extends AsyncTask<String, Object, String>{
@@ -47,7 +54,18 @@ public class MainActivity extends AppCompatActivity {
         protected String doInBackground(String... params) {
             String result = null;
             try{
-                URL url = new URL(params[0]);
+                //URL url = new URL(params[0]);
+                URL url = null;
+                Uri uri = Uri.parse(params[0]).buildUpon()
+                        .appendQueryParameter("firstName", params[1])
+                        .appendQueryParameter("lastName", params[2]).build();
+
+                try{
+                    String myStr = uri.toString();
+                    url = new URL(myStr);
+                } catch (MalformedURLException e){
+                    e.printStackTrace();
+                }
                 result = NetworkUtils.getResponseFromHttpUrl(url);
             } catch (IOException e){
                 e.printStackTrace();

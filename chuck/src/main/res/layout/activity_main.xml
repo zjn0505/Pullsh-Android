@@ -12,6 +12,7 @@
         android:columnCount="2"
         android:rowCount="1">
         <EditText
+            android:id="@+id/edit_first"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="20dp"
@@ -20,8 +21,9 @@
             android:layout_column="0"
             android:layout_row="0"
             android:inputType="text"
-            android:hint="Enter a first name"/>
+            android:hint="Chuck"/>
         <EditText
+            android:id="@+id/edit_last"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="20dp"
@@ -30,7 +32,7 @@
             android:layout_column="1"
             android:layout_row="0"
             android:inputType="text"
-            android:hint="Enter a last name"/>
+            android:hint="Norris"/>
     </GridLayout>
 
     <FrameLayout
@@ -52,7 +54,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone"
-            android:id="@+id/loadingIndicator"/>
+            android:id="@+id/loading_indicator"/>
     </FrameLayout>
 
 
