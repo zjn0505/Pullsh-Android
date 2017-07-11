@@ -6,9 +6,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import java.io.IOException;
+import java.net.URL;
+
 public class MainActivity extends AppCompatActivity {
 
     private TextView chuckText;
+    private static final String API_QUERY = "http://api.icndb.com/jokes/random?limitTo=[explicit]";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,19 +30,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadChuckJoke(){
-        new ChuckJokeTask().execute();
+        new ChuckJokeTask().execute(API_QUERY);
     }
 
-    private class ChuckJokeTask extends AsyncTask<Void, Object, String>{
+    private class ChuckJokeTask extends AsyncTask<String, Object, String>{
 
         @Override
-        protected String doInBackground(Void... params) {
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
+        protected String doInBackground(String... params) {
+            String result = null;
+            try{
+                URL url = new URL(params[0]);
+                result = NetworkUtils.getResponseFromHttpUrl(url);
+            } catch (IOException e){
                 e.printStackTrace();
             }
-            String result = "Joke.";
             return result;
         }
 
