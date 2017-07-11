@@ -17,7 +17,7 @@ import java.util.Scanner;
 
 public class NetworkUtils {
 
-    private static final String CHUCK_QUERY_BASE_URL = "http://api.icndb.com/jokes/random?limitTo=[nerdy]";
+    private static final String CHUCK_QUERY_BASE_URL = "http://api.icndb.com/jokes/random?limitTo=[nerdy]&escape=javascript";
 
 
     private final static String PARAM_FIRST_NAME = "firstName";
