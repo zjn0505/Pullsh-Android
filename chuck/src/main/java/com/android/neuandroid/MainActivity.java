@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.net.URL;
 
@@ -54,7 +57,21 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String s) {
-            chuckText.setText(s);
+
+            String joke = "";
+            try{
+                joke = extractJokeFromJson(s);
+            } catch (JSONException e){
+                e.printStackTrace();
+            }
+
+            chuckText.setText(joke);
         }
+    }
+
+    private String extractJokeFromJson(String json) throws JSONException{
+        JSONObject jsonObject = new JSONObject(json);
+        JSONObject value = jsonObject.optJSONObject("value");
+        return value.optString("joke");
     }
 }
