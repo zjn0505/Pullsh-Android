@@ -1,13 +1,22 @@
 package com.neuandroid.tictactoe;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -26,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
     List<Button> btnViews;
     @BindView(R.id.tv_hint)
     TextView tvHint;
+    @BindView(R.id.container)
+    LinearLayout container;
 
     private Boolean playerOneTurn = true;
     private Boolean inGame = true;
@@ -131,6 +142,56 @@ public class MainActivity extends AppCompatActivity {
         playerOneStatus =  new ArrayList<Integer>();
         playerTwoStatus = new ArrayList<Integer>();
         tvHint.setText(getString(R.string.hint_default));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_share:
+//                View rootView = getWindow().getDecorView().getRootView(); // this is screenshot
+                View rootView = container;
+                if (rootView != null) {
+                    Bitmap screenshot = screenShot(rootView);
+                    showImage(screenshot);
+                }
+        }
+        return true;
+    }
+
+    private Bitmap screenShot(View view) {
+        Bitmap bitmap = Bitmap.createBitmap(view.getWidth(),
+                view.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        view.draw(canvas);
+        return bitmap;
+    }
+
+    private void showImage(Bitmap bitmap) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        ImageView imageView = new ImageView(this);
+        imageView.setImageBitmap(bitmap);
+        imageView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        builder.setView(imageView)
+                .setTitle(R.string.btn_share).setPositiveButton(R.string.btn_share, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //
+            }
+        }).setNegativeButton(R.string.btn_cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //
+            }
+        });
+
+        builder.show();
     }
 
 }
