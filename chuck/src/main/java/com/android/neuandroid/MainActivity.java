@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.json.JSONException;
@@ -14,8 +15,10 @@ import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String API_QUERY = "http://api.icndb.com/jokes/random?limitTo=[nerdy]";
+
     private TextView chuckText;
-    private static final String API_QUERY = "http://api.icndb.com/jokes/random?limitTo=[explicit]";
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
                 loadChuckJoke();
             }
         });
+
+        progressBar = (ProgressBar) findViewById(R.id.loadingIndicator);
     }
 
     private void loadChuckJoke(){
@@ -53,11 +58,13 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             chuckText.setText("Loading...");
+            progressBar.setVisibility(View.VISIBLE);
         }
 
         @Override
         protected void onPostExecute(String s) {
 
+            progressBar.setVisibility(View.GONE);
             String joke = "";
             try{
                 joke = extractJokeFromJson(s);
