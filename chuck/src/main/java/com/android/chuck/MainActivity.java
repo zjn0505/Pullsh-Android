@@ -1,4 +1,4 @@
-package com.android.neuandroid;
+package com.android.chuck;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;

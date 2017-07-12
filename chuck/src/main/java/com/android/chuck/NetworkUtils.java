@@ -1,4 +1,4 @@
-package com.android.neuandroid;
+package com.android.chuck;
 
 import java.io.IOException;
 import java.io.InputStream;
