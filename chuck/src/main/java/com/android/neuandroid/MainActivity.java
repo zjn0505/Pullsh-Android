@@ -138,14 +138,20 @@ public class MainActivity extends AppCompatActivity {
 
             progressBar.setVisibility(View.GONE);
             String joke = "";
-            try{
-                joke = extractJokeFromJson(s);
-            } catch (JSONException e){
-                e.printStackTrace();
+            if(!TextUtils.isEmpty(s)){
+                try{
+                    joke = extractJokeFromJson(s);
+                } catch (JSONException e){
+                    e.printStackTrace();
+                }
+
+                chuckText.setText(joke);
+            } else {
+                chuckText.setText(R.string.query_error);
             }
 
-            chuckText.setText(joke);
             crossfade(loadingText, chuckText);
+            String t = chuckText.getText().toString();
         }
     }
 
@@ -190,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
      * @param infadeView the view that should appear
      * @see View
      */
-    private void crossfade(final View outfadeView, View infadeView){
+    private void crossfade(final View outfadeView, final View infadeView){
 
 
         outfadeView.animate()
@@ -203,11 +209,23 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-        infadeView.setVisibility(View.VISIBLE);
         infadeView.animate()
                 .alpha(1f)
                 .setDuration(mShortAnimationDuration)
-                .setListener(null);
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+                        infadeView.setVisibility(View.VISIBLE);
+                    }
+
+                    // this is in case the fade in animation starts before
+                    // a previous faded out animation ends. This will guarantee
+                    // that after finishing it will definitely be visible
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        infadeView.setVisibility(View.VISIBLE);
+                    }
+                });
 
 
     }
