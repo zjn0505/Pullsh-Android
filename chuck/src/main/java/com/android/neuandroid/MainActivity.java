@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -45,7 +46,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadChuckJoke(){
-        new ChuckJokeTask().execute(API_QUERY, editFirst.getText().toString(), editLast.getText().toString());
+
+        String firstName = editFirst.getText().toString();
+        firstName = TextUtils.isEmpty(firstName)?"Chuck":firstName;
+        String lastName = editFirst.getText().toString();
+        lastName = TextUtils.isEmpty(lastName)?"Norris":lastName;
+        new ChuckJokeTask().execute(API_QUERY, firstName, lastName);
     }
 
     private class ChuckJokeTask extends AsyncTask<String, Object, String>{
