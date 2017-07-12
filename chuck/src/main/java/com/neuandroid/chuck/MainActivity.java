@@ -110,12 +110,15 @@ public class MainActivity extends AppCompatActivity implements ShakeDetector.Lis
                 } catch (JSONException e) {
                     e.printStackTrace();
                     tvChuck.setText(getString(R.string.result_empty));
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
+                    tvChuck.setText(getString(R.string.result_empty));
                 }
             }
             tvChuck.setText(getString(R.string.result_empty));
         }
 
-        private String extractJokeFromJson(String json) throws JSONException {
+        private String extractJokeFromJson(String json) throws JSONException, NullPointerException {
             JSONObject jsonObject = new JSONObject(json);
             JSONObject value = jsonObject.optJSONObject("value");
             String joke = value.optString("joke");
