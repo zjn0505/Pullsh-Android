@@ -1,5 +1,7 @@
 package com.android.neuandroid;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -23,10 +25,13 @@ public class MainActivity extends AppCompatActivity {
     private static final String API_QUERY = "http://api.icndb.com/jokes/random?escape=javascript";
 
     private TextView chuckText;
+    private TextView loadingText;
     private ProgressBar progressBar;
     private EditText editFirst;
     private EditText editLast;
     private CheckBox[] checkboxes;
+    private int mShortAnimationDuration;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +55,9 @@ public class MainActivity extends AppCompatActivity {
                 (CheckBox) findViewById(R.id.explicit_checkbox),
                 (CheckBox) findViewById(R.id.nerdy_checkbox)
         };
+        loadingText = (TextView) findViewById(R.id.loading_text);
+        mShortAnimationDuration = getResources().getInteger(
+                android.R.integer.config_shortAnimTime);
     }
 
     private void loadChuckJoke(){
@@ -94,7 +102,8 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPreExecute() {
-            chuckText.setText("Loading...");
+            //chuckText.setText("Loading...");
+            crossfade(chuckText, loadingText);
             progressBar.setVisibility(View.VISIBLE);
         }
 
@@ -110,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             chuckText.setText(joke);
+            crossfade(loadingText, chuckText);
         }
     }
 
@@ -133,5 +143,27 @@ public class MainActivity extends AppCompatActivity {
         }
         str.append("]");
         return str.toString();
+    }
+
+    private void crossfade(final View outfadeView, View infadeView){
+
+
+        outfadeView.animate()
+                .alpha(0f)
+                .setDuration(mShortAnimationDuration)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        outfadeView.setVisibility(View.GONE);
+                    }
+                });
+
+        infadeView.setVisibility(View.VISIBLE);
+        infadeView.animate()
+                .alpha(1f)
+                .setDuration(mShortAnimationDuration)
+                .setListener(null);
+
+
     }
 }
