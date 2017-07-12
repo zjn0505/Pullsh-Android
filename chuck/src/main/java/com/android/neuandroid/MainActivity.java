@@ -26,8 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private EditText editFirst;
     private EditText editLast;
-    private CheckBox checkboxExplicit;
-    private CheckBox checkboxNerdy;
+    private CheckBox[] checkboxes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +46,10 @@ public class MainActivity extends AppCompatActivity {
         editFirst = (EditText) findViewById(R.id.edit_first);
         editLast = (EditText) findViewById(R.id.edit_last);
 
-        checkboxExplicit = (CheckBox) findViewById(R.id.explicit_checkbox);
-        checkboxNerdy = (CheckBox) findViewById(R.id.nerdy_checkbox);
+        checkboxes = new CheckBox[]{
+                (CheckBox) findViewById(R.id.explicit_checkbox),
+                (CheckBox) findViewById(R.id.nerdy_checkbox)
+        };
     }
 
     private void loadChuckJoke(){
@@ -120,19 +121,17 @@ public class MainActivity extends AppCompatActivity {
 
     private String getFilters(){
         StringBuilder str = new StringBuilder();
-        boolean explicit = checkboxExplicit.isChecked();
-        boolean nerdy = checkboxNerdy.isChecked();
 
-        if(explicit && nerdy){
-            return "";
+        str.append("[");
+        for(int i = 0; i < checkboxes.length; i++){
+            if(!checkboxes[i].isChecked()){
+                if(!(str.charAt(str.length() - 1) == '[')){
+                    str.append(", ");
+                }
+                str.append(checkboxes[i].getTag());
+            }
         }
-        if(!nerdy && explicit){
-            str.append("[nerdy]");
-        } else if (!explicit && nerdy){
-            str.append("[explicit]");
-        } else if (!explicit && !nerdy){
-            str.append("[explicit, nerdy]");
-        }
+        str.append("]");
         return str.toString();
     }
 }
