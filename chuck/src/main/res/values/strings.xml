@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">NeuAndroid</string>
+    <string name="app_name">Chuck Norris Jokes</string>
     <string name="default_text">Click to load joke</string>
     <string name="loading_text">Loading...</string>
     <string name="firstname_hint">Chuck</string>
