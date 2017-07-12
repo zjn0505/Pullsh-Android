@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -19,12 +20,14 @@ import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String API_QUERY = "http://api.icndb.com/jokes/random?limitTo=[nerdy]&escape=javascript";
+    private static final String API_QUERY = "http://api.icndb.com/jokes/random?escape=javascript";
 
     private TextView chuckText;
     private ProgressBar progressBar;
     private EditText editFirst;
     private EditText editLast;
+    private CheckBox checkboxExplicit;
+    private CheckBox checkboxNerdy;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +46,9 @@ public class MainActivity extends AppCompatActivity {
         progressBar = (ProgressBar) findViewById(R.id.loading_indicator);
         editFirst = (EditText) findViewById(R.id.edit_first);
         editLast = (EditText) findViewById(R.id.edit_last);
+
+        checkboxExplicit = (CheckBox) findViewById(R.id.explicit_checkbox);
+        checkboxNerdy = (CheckBox) findViewById(R.id.nerdy_checkbox);
     }
 
     private void loadChuckJoke(){
@@ -62,10 +68,16 @@ public class MainActivity extends AppCompatActivity {
             try{
                 //URL url = new URL(params[0]);
                 URL url = null;
-                Uri uri = Uri.parse(params[0]).buildUpon()
+                Uri.Builder uribuilder = Uri.parse(params[0]).buildUpon()
                         .appendQueryParameter("firstName", params[1])
-                        .appendQueryParameter("lastName", params[2]).build();
+                        .appendQueryParameter("lastName", params[2]);
+                String filter = getFilters();
+                if(!TextUtils.isEmpty(filter)){
+                    uribuilder.appendQueryParameter("exclude", filter);
+                }
 
+                Uri uri = uribuilder.build();
+                System.out.println(uri.toString());
                 try{
                     String myStr = uri.toString();
                     url = new URL(myStr);
@@ -104,5 +116,23 @@ public class MainActivity extends AppCompatActivity {
         JSONObject jsonObject = new JSONObject(json);
         JSONObject value = jsonObject.optJSONObject("value");
         return value.optString("joke");
+    }
+
+    private String getFilters(){
+        StringBuilder str = new StringBuilder();
+        boolean explicit = checkboxExplicit.isChecked();
+        boolean nerdy = checkboxNerdy.isChecked();
+
+        if(explicit && nerdy){
+            return "";
+        }
+        if(!nerdy && explicit){
+            str.append("[nerdy]");
+        } else if (!explicit && nerdy){
+            str.append("[explicit]");
+        } else if (!explicit && !nerdy){
+            str.append("[explicit, nerdy]");
+        }
+        return str.toString();
     }
 }
