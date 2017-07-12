@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Departify</string>
+
+    <string name="action_share">Share</string>
+    <string name="action_camera">Camera</string>
+    <string name="action_gallery">Gallery</string>
+</resources>
