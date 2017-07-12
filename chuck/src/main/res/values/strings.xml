@@ -2,4 +2,8 @@
     <string name="app_name">NeuAndroid</string>
     <string name="default_text">Click to load joke</string>
     <string name="loading_text">Loading...</string>
+    <string name="firstname_hint">Chuck</string>
+    <string name="lastname_hint">Norris</string>
+    <string name="explicit">Explicit</string>
+    <string name="nerdy">Nerdy</string>
 </resources>

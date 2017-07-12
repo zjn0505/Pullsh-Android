@@ -21,7 +21,7 @@
             android:layout_column="0"
             android:layout_row="0"
             android:inputType="text"
-            android:hint="Chuck"/>
+            android:hint="@string/firstname_hint"/>
         <EditText
             android:id="@+id/edit_last"
             android:layout_width="wrap_content"
@@ -32,7 +32,7 @@
             android:layout_column="1"
             android:layout_row="0"
             android:inputType="text"
-            android:hint="Norris"/>
+            android:hint="@string/lastname_hint"/>
     </GridLayout>
 
     <LinearLayout
@@ -52,7 +52,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"
-            android:text="Explicit"/>
+            android:text="@string/explicit"/>
 
         <CheckBox
             android:id="@+id/explicit_checkbox"
@@ -67,7 +67,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"
-            android:text="Nerdy"/>
+            android:text="@string/nerdy"/>
 
         <CheckBox
             android:id="@+id/nerdy_checkbox"
@@ -91,7 +91,8 @@
             android:background="#11000000"
             android:text="@string/default_text"
             android:textColor="@color/colorPrimary"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            android:padding="5dp"/>
         <TextView
             android:id="@+id/loading_text"
             android:layout_width="300dp"
