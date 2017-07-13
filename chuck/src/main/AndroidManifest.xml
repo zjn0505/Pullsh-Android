@@ -10,7 +10,8 @@
         android:roundIcon="@drawable/chuck_norris_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.android.chuck.MainActivity">
+        <activity android:name="com.android.chuck.MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
