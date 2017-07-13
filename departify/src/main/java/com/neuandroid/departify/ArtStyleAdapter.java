@@ -46,6 +46,11 @@ public class ArtStyleAdapter extends RecyclerView.Adapter<ArtStyleAdapter.ViewHo
         }
     }
 
+    public void updateStyles(Styles styles) {
+        this.mStyles = styles;
+        notifyDataSetChanged();
+    }
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(mContext).inflate(R.layout.item_style, parent, false);
@@ -59,12 +64,24 @@ public class ArtStyleAdapter extends RecyclerView.Adapter<ArtStyleAdapter.ViewHo
 
     }
 
+
+    @Override
+    public int getItemViewType(int position) {
+        int size = getItemCount();
+        if (size % 2 == 1 && position == 1){
+            return 1;
+        }
+        return super.getItemViewType(position);
+    }
+
+
     @Override
     public int getItemCount() {
-        return mStyles.size();
+        return mStyles == null ? 0 : mStyles.size();
     }
 
     public interface IClickListener {
         void onClick(String styleId);
     }
+
 }
