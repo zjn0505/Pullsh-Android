@@ -5,21 +5,28 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amazonaws.auth.AWSCredentials;
@@ -38,11 +45,14 @@ import com.deeparteffects.sdk.android.model.UploadResponse;
 
 import java.io.ByteArrayOutputStream;
 import java.net.SocketTimeoutException;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import butterknife.BindView;
+import butterknife.BindViews;
 import butterknife.ButterKnife;
+import butterknife.OnLongClick;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -73,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
     private ArtStyleAdapter styleAdapter;
 
     private boolean isProcessing = false;
+    private String currentUrl = null;
 
 
     @Override
@@ -237,6 +248,8 @@ public class MainActivity extends AppCompatActivity {
                     mImageBitmap = ImageHelper.loadSizeLimitedBitmapFromUri(data.getData(),
                             this.getContentResolver(), IMAGE_MAX_SIDE_LENGTH);
                     ivDepartifiedPic.setImageBitmap(mImageBitmap);
+                    currentUrl = null;
+
                 }
                 break;
             default:
@@ -257,6 +270,7 @@ public class MainActivity extends AppCompatActivity {
         public void run() {
             try {
                 final Result result = deepArtEffectsClient.resultGet(mSubmissionId);
+                currentUrl = result.getUrl();
                 String submissionStatus = result.getStatus();
                 Log.d(TAG, String.format("Submission status is %s", submissionStatus));
                 if (submissionStatus.equals(SubmissionStatus.FINISHED)) {
@@ -303,4 +317,95 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+
+    @OnLongClick(R.id.iv_departified_pic)
+    boolean onImgLongClick(ImageView imgView) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                createPaletteAsync(mImageBitmap);
+            }
+        }).start();
+        return true;
+    }
+
+    public void createPaletteAsync(Bitmap bitmap) {
+        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+            public void onGenerated(Palette p) {
+                // Use generated instance
+                Log.d("Zjn", "!!!!!!");
+                View view = LayoutInflater.from(mContext).inflate(R.layout.dialog_palette, null);
+                palette = p;
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext).setView(view);
+                DialogViews dialogViews = new DialogViews();
+                ButterKnife.bind(dialogViews, view);
+                ButterKnife.apply(dialogViews.paletteImages, setColor);
+                if (TextUtils.isEmpty(currentUrl)) {
+                    dialogViews.ivDialogPic.setImageBitmap(mImageBitmap);
+                } else {
+                    Glide.with(mContext).load(currentUrl).centerCrop().into(dialogViews.ivDialogPic);
+                }
+                Palette.Swatch dominantSwatch = palette.getDominantSwatch();
+                if (dominantSwatch != null) {
+                    int color = dominantSwatch.getRgb();
+                    dialogViews.tvDominant.setText(String.format("#%06X", 0xFFFFFF & color));
+                    dialogViews.tvDominant.setTextColor(color);
+                }
+
+                builder.show();
+            }
+        });
+    }
+
+    private Palette palette;
+
+    class DialogViews {
+        @BindViews ({R.id.iv_palette_1, R.id.iv_palette_2, R.id.iv_palette_3, R.id.iv_palette_4, R.id.iv_palette_5, R.id.iv_palette_6})
+        List<SquareView> paletteImages;
+        @BindView(R.id.iv_dialog_pic)
+        ImageView ivDialogPic;
+        @BindView(R.id.tv_dominant_color)
+        TextView tvDominant;
+    }
+
+
+    ButterKnife.Action<SquareView> setColor = new ButterKnife.Action<SquareView>() {
+
+        @Override
+        public void apply(@NonNull SquareView view, int index) {
+            if (palette != null) {
+                Palette.Swatch swatch = null;
+                switch (index) {
+                    case 0:
+                        swatch = palette.getLightMutedSwatch();
+                        break;
+                    case 1:
+                        swatch = palette.getVibrantSwatch();
+                        break;
+                    case 2:
+                        swatch = palette.getDarkVibrantSwatch();
+                        break;
+                    case 3:
+                        swatch = palette.getLightMutedSwatch();
+                        break;
+                    case 4:
+                        swatch = palette.getMutedSwatch();
+                        break;
+                    case 5:
+                        swatch = palette.getDarkMutedSwatch();
+                        break;
+
+                }
+                if (swatch != null) {
+                    int i = swatch.getRgb();
+                    String strColor = String.format("#%06X", 0xFFFFFF & i);
+                    view.setText(strColor);
+                    view.setTextColor(swatch.getTitleTextColor());
+                    view.setBackgroundColor(swatch.getRgb());
+                }
+            }
+
+        }
+    };
 }
