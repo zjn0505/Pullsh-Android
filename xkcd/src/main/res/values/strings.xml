@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">XKCD Viewer</string>
+    <string name="random_button">Load Random Image</string>
+</resources>
