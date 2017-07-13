@@ -1,5 +1,6 @@
 package com.android.xkcd;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -19,6 +20,8 @@ public class MainActivity extends AppCompatActivity {
     public static final String XKCD_QUERY_BASE_URL = "https://xkcd.com/info.0.json";
     public static final String XKCD_QUERY_BY_ID_URL = "https://xkcd.com/%s/info.0.json";
 
+    private XKCDPic currentPic;
+
     private TextView titleText;
     private TextView creationDateText;
     private ImageView imageView;
@@ -33,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onPostExecute(Serializable result) {
             if(result instanceof XKCDPic){
+                MainActivity.this.currentPic = (XKCDPic) result;
                 renderXKCDPic((XKCDPic) result);
             }
 
@@ -70,7 +74,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                loadRandomXKCDPic();
+                launchDetailActivity();
+                //loadRandomXKCDPic();
             }
         });
 
@@ -108,9 +113,23 @@ public class MainActivity extends AppCompatActivity {
 
     private void renderXKCDPic(XKCDPic pic){
         titleText.setText(pic.num + ": " + pic.title);
-        Glide.with(this).load(pic.img).into(imageView);
+        /* override is necessary to ensure picture fills up screen
+         * otherwise the images would get smaller and smaller because
+         * Glide uses the current size of the imageview as default bounds
+         * for the new image
+         */
+        Glide.with(this)
+                .load(pic.img)
+                .override(2000, 2000)
+                .into(imageView);
         creationDateText.setText(pic.day + "/" + pic.month + "/" + pic.year);
 
+    }
+
+    private void launchDetailActivity(){
+        Intent intent = new Intent(MainActivity.this, ImageDetailActivity.class);
+        intent.putExtra("URL", currentPic.img);
+        startActivity(intent);
     }
 
 }
