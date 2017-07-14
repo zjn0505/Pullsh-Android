@@ -1,4 +1,4 @@
-package com.android.xkcd;
+package com.android.xkcd.model;
 
 import java.io.Serializable;
 

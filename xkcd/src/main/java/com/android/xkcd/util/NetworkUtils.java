@@ -1,4 +1,4 @@
-package com.android.xkcd;
+package com.android.xkcd.util;
 
 import java.io.IOException;
 import java.io.InputStream;

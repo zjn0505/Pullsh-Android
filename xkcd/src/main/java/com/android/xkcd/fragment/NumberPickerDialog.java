@@ -1,4 +1,4 @@
-package com.android.xkcd;
+package com.android.xkcd.fragment;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -8,6 +8,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.view.View;
 import android.widget.NumberPicker;
+
+import com.android.xkcd.R;
 
 /**
  * Created by max on 14/07/17.

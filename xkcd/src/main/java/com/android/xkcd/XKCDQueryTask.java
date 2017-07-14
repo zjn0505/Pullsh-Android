@@ -1,11 +1,10 @@
 package com.android.xkcd;
 
 import android.os.AsyncTask;
-import android.text.TextUtils;
 
+import com.android.xkcd.model.XKCDPic;
+import com.android.xkcd.util.NetworkUtils;
 import com.google.gson.Gson;
-
-import org.json.JSONException;
 
 import java.io.IOException;
 import java.net.URL;

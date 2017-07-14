@@ -1,9 +1,10 @@
-package com.android.xkcd;
+package com.android.xkcd.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
+import com.android.xkcd.R;
 import com.bumptech.glide.Glide;
 import com.github.chrisbanes.photoview.PhotoView;
 

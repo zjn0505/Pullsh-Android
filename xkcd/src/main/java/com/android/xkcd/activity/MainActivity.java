@@ -1,6 +1,5 @@
-package com.android.xkcd;
+package com.android.xkcd.activity;
 
-import android.app.DialogFragment;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
@@ -9,10 +8,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.NumberPicker;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.android.xkcd.IAsyncTaskListener;
+import com.android.xkcd.R;
+import com.android.xkcd.model.XKCDPic;
+import com.android.xkcd.XKCDQueryTask;
+import com.android.xkcd.fragment.AltTextDialog;
+import com.android.xkcd.fragment.NumberPickerDialog;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
