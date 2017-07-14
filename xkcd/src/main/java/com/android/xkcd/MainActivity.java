@@ -91,6 +91,13 @@ public class MainActivity extends AppCompatActivity {
                 //loadRandomXKCDPic();
             }
         });
+        imageView.setOnLongClickListener(new View.OnLongClickListener(){
+            @Override
+            public boolean onLongClick(View v) {
+                launchAltDialog();
+                return false;
+            }
+        });
 
         loadXKCDpic();
     }
@@ -125,21 +132,7 @@ public class MainActivity extends AppCompatActivity {
                 gotoExplainXKCD();
                 break;
             case R.id.view_alt:
-                AltTextDialog altFragment = new AltTextDialog();
-                altFragment.setAltText(currentPic.alt);
-                altFragment.setTitle(currentPic.title);
-                altFragment.setListener(new AltTextDialog.IAltTextInterfaceListener() {
-                    @Override
-                    public void onPositiveClick() {
-
-                    }
-
-                    @Override
-                    public void onNegativeClick() {
-                        gotoExplainXKCD();
-                    }
-                });
-                altFragment.show(getSupportFragmentManager(), "DialogFragment");
+                launchAltDialog();
                 break;
             case R.id.goto_num_action:
                 NumberPickerDialog dialog = new NumberPickerDialog();
@@ -228,6 +221,24 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, ImageDetailActivity.class);
         intent.putExtra("URL", currentPic.img);
         startActivity(intent);
+    }
+
+    private void launchAltDialog(){
+        AltTextDialog altFragment = new AltTextDialog();
+        altFragment.setAltText(currentPic.alt);
+        altFragment.setTitle(currentPic.title);
+        altFragment.setListener(new AltTextDialog.IAltTextInterfaceListener() {
+            @Override
+            public void onPositiveClick() {
+
+            }
+
+            @Override
+            public void onNegativeClick() {
+                gotoExplainXKCD();
+            }
+        });
+        altFragment.show(getSupportFragmentManager(), "DialogFragment");
     }
 
 }
