@@ -1,5 +1,6 @@
 package com.android.xkcd;
 
+import android.app.DialogFragment;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
@@ -120,11 +121,32 @@ public class MainActivity extends AppCompatActivity {
                 loadXKCDpicById(newId);
                 break;
             case R.id.goto_explain:
-                Intent browserIntent =
-                        new Intent(Intent.ACTION_VIEW, Uri.parse(EXPLAIN_XKCD_BASEURL + currentPic.num));
-                startActivity(browserIntent);
+                gotoExplainXKCD();
+                break;
+            case R.id.view_alt:
+                AltTextDialog altFragment = new AltTextDialog();
+                altFragment.setAltText(currentPic.alt);
+                altFragment.setTitle(currentPic.title);
+                altFragment.setListener(new AltTextDialog.IAltTextInterfaceListener() {
+                    @Override
+                    public void onPositiveClick() {
+
+                    }
+
+                    @Override
+                    public void onNegativeClick() {
+                        gotoExplainXKCD();
+                    }
+                });
+                altFragment.show(getSupportFragmentManager(), "DialogFragment");
         }
         return true;
+    }
+
+    private void gotoExplainXKCD(){
+        Intent browserIntent =
+                new Intent(Intent.ACTION_VIEW, Uri.parse(EXPLAIN_XKCD_BASEURL + currentPic.num));
+        startActivity(browserIntent);
     }
 
     private void loadXKCDpic(){
