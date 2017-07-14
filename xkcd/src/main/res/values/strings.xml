@@ -3,4 +3,6 @@
     <string name="random_button">Load random image</string>
     <string name="goto_specific">Go to a specific XKCD</string>
     <string name="goto_explain">Explain XKCD</string>
+    <string name="goto_previous">Previous</string>
+    <string name="goto_next">Next</string>
 </resources>

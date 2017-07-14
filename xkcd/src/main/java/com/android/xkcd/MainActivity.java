@@ -3,6 +3,8 @@ package com.android.xkcd;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -21,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String XKCD_QUERY_BY_ID_URL = "https://xkcd.com/%s/info.0.json";
 
     private XKCDPic currentPic;
+    private int mostRecent = 0;
 
     private TextView titleText;
     private TextView creationDateText;
@@ -37,6 +40,9 @@ public class MainActivity extends AppCompatActivity {
         public void onPostExecute(Serializable result) {
             if(result instanceof XKCDPic){
                 MainActivity.this.currentPic = (XKCDPic) result;
+                if(mostRecent < currentPic.num){
+                    mostRecent = currentPic.num;
+                }
                 renderXKCDPic((XKCDPic) result);
             }
 
@@ -80,6 +86,36 @@ public class MainActivity extends AppCompatActivity {
         });
 
         loadXKCDpic();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.load_rand_action:
+                loadRandomXKCDPic();
+                break;
+            case R.id.goto_prev:
+                int newId = currentPic.num - 1;
+                if (newId < 1){
+                    break;
+                }
+                loadXKCDpicById(newId);
+                break;
+            case R.id.goto_next:
+                newId = currentPic.num + 1;
+                if (newId > mostRecent){
+                    break;
+                }
+                loadXKCDpicById(newId);
+                break;
+        }
+        return true;
     }
 
     private void loadXKCDpic(){
