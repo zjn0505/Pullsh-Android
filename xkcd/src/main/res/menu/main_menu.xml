@@ -7,6 +7,10 @@
     <item android:id="@+id/goto_next"
         android:title="@string/goto_next"
         app:showAsAction="always"/>
+    <item android:id="@+id/view_alt"
+        android:title="@string/alt_text"
+        app:showAsAction="always"
+        android:icon="@drawable/toolbar_get_info" />
     <item android:id="@+id/load_rand_action"
         android:title="@string/random_button"/>
     <item android:id="@+id/goto_num_action"

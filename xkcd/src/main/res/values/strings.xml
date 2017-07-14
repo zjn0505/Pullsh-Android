@@ -5,4 +5,5 @@
     <string name="goto_explain">Explain XKCD</string>
     <string name="goto_previous">Previous</string>
     <string name="goto_next">Next</string>
+    <string name="alt_text">Show alt text</string>
 </resources>

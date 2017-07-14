@@ -1,6 +1,7 @@
 package com.android.xkcd;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String XKCD_QUERY_BASE_URL = "https://xkcd.com/info.0.json";
     public static final String XKCD_QUERY_BY_ID_URL = "https://xkcd.com/%s/info.0.json";
+    public static final String EXPLAIN_XKCD_BASEURL = "http://www.explainxkcd.com/wiki/index.php/";
 
     private XKCDPic currentPic;
     private int mostRecent = 0;
@@ -117,6 +119,10 @@ public class MainActivity extends AppCompatActivity {
                 }
                 loadXKCDpicById(newId);
                 break;
+            case R.id.goto_explain:
+                Intent browserIntent =
+                        new Intent(Intent.ACTION_VIEW, Uri.parse(EXPLAIN_XKCD_BASEURL + currentPic.num));
+                startActivity(browserIntent);
         }
         return true;
     }
