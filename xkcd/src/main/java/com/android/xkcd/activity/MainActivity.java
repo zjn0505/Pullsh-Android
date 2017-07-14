@@ -199,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void renderXKCDPic(XKCDPic pic){
-        titleText.setText(pic.num + ": " + pic.title);
+        titleText.setText(pic.num + ": " + pic.safe_title);
         altText.setText(pic.alt);
         /* override is necessary to ensure picture fills up screen
          * otherwise the images would get smaller and smaller because
@@ -236,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
     private void launchAltDialog(){
         AltTextDialog altFragment = new AltTextDialog();
         altFragment.setAltText(currentPic.alt);
-        altFragment.setTitle(currentPic.title);
+        altFragment.setTitle(currentPic.safe_title);
         altFragment.setListener(new AltTextDialog.IAltTextInterfaceListener() {
             @Override
             public void onPositiveClick() {
