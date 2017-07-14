@@ -7,4 +7,6 @@
     <string name="goto_next">Next</string>
     <string name="alt_text">Show alt text</string>
     <string name="confirm">Ok</string>
+    <string name="cancel">Cancel</string>
+    <string name="choose_specific_title">Select which XKCD to view</string>
 </resources>

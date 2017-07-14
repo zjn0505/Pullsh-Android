@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.NumberPicker;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -139,6 +140,23 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
                 altFragment.show(getSupportFragmentManager(), "DialogFragment");
+                break;
+            case R.id.goto_num_action:
+                NumberPickerDialog dialog = new NumberPickerDialog();
+                dialog.setTitle(getResources().getString(R.string.choose_specific_title));
+                dialog.setRange(1, mostRecent);
+                dialog.setListener(new NumberPickerDialog.INumberPickerDialogListener() {
+                    @Override
+                    public void onPositiveClick(int number) {
+                        loadXKCDpicById(number);
+                    }
+
+                    @Override
+                    public void onNegativeClick() {
+
+                    }
+                });
+                dialog.show(getSupportFragmentManager(), "DialogFragment");
         }
         return true;
     }
