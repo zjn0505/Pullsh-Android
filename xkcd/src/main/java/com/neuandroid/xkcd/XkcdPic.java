@@ -13,4 +13,5 @@ public class XkcdPic implements Serializable{
     public String title;
     public String img;
     public String alt;
+    public String safe_title;
 }
