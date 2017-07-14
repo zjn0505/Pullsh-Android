@@ -11,6 +11,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 
 import java.io.Serializable;
 import java.net.MalformedURLException;
@@ -46,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
                 renderXKCDPic((XKCDPic) result);
             }
 
-            progressBar.setVisibility(View.GONE);
+            //progressBar.setVisibility(View.GONE);
         }
     };
 
@@ -154,8 +157,21 @@ public class MainActivity extends AppCompatActivity {
          * Glide uses the current size of the imageview as default bounds
          * for the new image
          */
+
         Glide.with(this)
                 .load(pic.img)
+                .listener(new RequestListener<String, GlideDrawable>() {
+                    @Override
+                    public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                        MainActivity.this.progressBar.setVisibility(View.GONE);
+                        return false;
+                    }
+                })
                 .override(2000, 2000)
                 .into(imageView);
         creationDateText.setText(pic.day + "/" + pic.month + "/" + pic.year);
