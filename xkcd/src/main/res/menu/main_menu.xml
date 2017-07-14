@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/load_rand_action"
+        android:title="@string/random_button"/>
+    <item android:id="@+id/goto_num_action"
+        android:title="@string/goto_specific"/>
+    <item android:id="@+id/goto_explain"
+        android:title="@string/goto_explain"/>
+</menu>
