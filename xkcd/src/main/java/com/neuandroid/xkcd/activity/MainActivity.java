@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
                 pbLoading.setVisibility(View.GONE);
-                tvTitle.setText(xPic.num + ". " + xPic.title);
+                tvTitle.setText(xPic.num + ". " + xPic.safe_title);
                 tvCreateDate.setText("created on " + xPic.year + "." + xPic.month + "." + xPic.day);
                 return false;
 
