@@ -2,6 +2,7 @@ package com.android.xkcd.activity;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -105,7 +106,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        loadXKCDpic();
+        if(savedInstanceState==null){
+            loadXKCDpic();
+        }
     }
 
     @Override
@@ -248,4 +251,22 @@ public class MainActivity extends AppCompatActivity {
         altFragment.show(getSupportFragmentManager(), "DialogFragment");
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putInt("pic_number", currentPic.num);
+        outState.putInt("most_recent", mostRecent);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        this.mostRecent = savedInstanceState.getInt("most_recent");
+        int lastImg = savedInstanceState.getInt("pic_number");
+        if(lastImg != 0){
+            loadXKCDpicById(lastImg);
+        }
+    }
 }
