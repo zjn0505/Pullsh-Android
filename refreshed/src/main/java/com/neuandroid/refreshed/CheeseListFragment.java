@@ -18,83 +18,136 @@ package com.neuandroid.refreshed;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
-import java.util.ArrayList;
+import java.io.Serializable;
+import java.net.URL;
 import java.util.List;
-import java.util.Random;
 
-public class CheeseListFragment extends Fragment {
+public class CheeseListFragment extends Fragment implements NewsQueryTask.IAsyncTaskListener, SwipeRefreshLayout.OnRefreshListener {
+
+    private SwipeRefreshLayout refreshLayout;
+    private String newsSource;
+    private NewsAdapter mAdapter;
+    private ProgressBar pbLoading;
+
+
+    public void setSource(String source) {
+        newsSource = source;
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         FrameLayout layout = (FrameLayout)  inflater.inflate(
                 R.layout.fragment_cheese_list, container, false);
+        refreshLayout = (SwipeRefreshLayout) layout.findViewById(R.id.swipe_refresh_list);
+        refreshLayout.setOnRefreshListener(this);
+        pbLoading = (ProgressBar) layout.findViewById(R.id.pb_loading);
         RecyclerView rv = (RecyclerView) layout.findViewById(R.id.recyclerview);
         setupRecyclerView(rv);
+        loadData();
+        pbLoading.setVisibility(View.VISIBLE);
         return layout;
     }
 
     private void setupRecyclerView(RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-        recyclerView.setAdapter(new SimpleStringRecyclerViewAdapter(getActivity(),
-                getRandomSublist(Cheeses.sCheeseStrings, 30)));
+        mAdapter = new NewsAdapter(getActivity(), null);
+        recyclerView.setAdapter(mAdapter);
     }
 
-    private List<String> getRandomSublist(String[] array, int amount) {
-        ArrayList<String> list = new ArrayList<>(amount);
-        Random random = new Random();
-        while (list.size() < amount) {
-            list.add(array[random.nextInt(array.length)]);
+
+    private void loadData() {
+        URL url = NetworkUtils.buildUrl(newsSource, "top");
+        new NewsQueryTask(this).execute(url);
+    }
+
+    @Override
+    public void onPreExecute() {
+    }
+
+    @Override
+    public void onPostExecute(Serializable result) {
+        pbLoading.setVisibility(View.GONE);
+        refreshLayout.setRefreshing(false);
+        Log.d("zjn", "done");
+        if (result instanceof NewsListBean) {
+            NewsListBean newsList = (NewsListBean) result;
+            if ("ok".equals(newsList.getStatus())) {
+                List<NewsListBean.ArticlesBean> articles = newsList.getArticles();
+                if (articles != null && articles.size() > 0) {
+                    mAdapter.updateList(newsList.getArticles());
+                }
+            }
         }
-        return list;
     }
 
-    public static class SimpleStringRecyclerViewAdapter
-            extends RecyclerView.Adapter<SimpleStringRecyclerViewAdapter.ViewHolder> {
+    @Override
+    public void onRefresh() {
+        refreshLayout.setRefreshing(true);
+        loadData();
+    }
+
+    @Override
+    public void onDetach() {
+        refreshLayout.setRefreshing(false);
+        super.onDetach();
+    }
+
+
+    private static class NewsAdapter
+            extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
         private final TypedValue mTypedValue = new TypedValue();
         private int mBackground;
-        private List<String> mValues;
+        private List<NewsListBean.ArticlesBean> mArticles;
 
         public static class ViewHolder extends RecyclerView.ViewHolder {
-            public String mBoundString;
 
             public final View mView;
-            public final ImageView mImageView;
-            public final TextView mTextView;
+            public final ImageView mIvThumbnail;
+            public final TextView mTvTitle;
+            public final TextView mTvDescription;
+            public final TextView mTvPublishTime;
 
             public ViewHolder(View view) {
                 super(view);
                 mView = view;
-                mImageView = (ImageView) view.findViewById(R.id.avatar);
-                mTextView = (TextView) view.findViewById(android.R.id.text1);
+                mIvThumbnail = (ImageView) view.findViewById(R.id.iv_thumbnails);
+                mTvTitle = (TextView) view.findViewById(R.id.tv_title);
+                mTvDescription = (TextView) view.findViewById(R.id.tv_description);
+                mTvPublishTime = (TextView) view.findViewById(R.id.tv_publish_time);
             }
 
-            @Override
-            public String toString() {
-                return super.toString() + " '" + mTextView.getText();
-            }
         }
 
-        public SimpleStringRecyclerViewAdapter(Context context, List<String> items) {
+        public NewsAdapter(Context context, List<NewsListBean.ArticlesBean> items) {
             context.getTheme().resolveAttribute(R.attr.selectableItemBackground, mTypedValue, true);
             mBackground = mTypedValue.resourceId;
-            mValues = items;
+            mArticles = items;
+        }
+
+        public void updateList(List<NewsListBean.ArticlesBean> articles) {
+            mArticles = articles;
+            notifyDataSetChanged();
         }
 
         @Override
@@ -107,29 +160,29 @@ public class CheeseListFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder.mBoundString = mValues.get(position);
-            holder.mTextView.setText(mValues.get(position));
+            final NewsListBean.ArticlesBean article = mArticles.get(position);
+            holder.mTvTitle.setText(article.getTitle());
+            holder.mTvDescription.setText(article.getDescription());
+            holder.mTvPublishTime.setText(TimeUtils.convertTimeToString(article.getPublishedAt()));
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Context context = v.getContext();
-                    Intent intent = new Intent(context, CheeseDetailActivity.class);
-                    intent.putExtra(CheeseDetailActivity.EXTRA_NAME, holder.mBoundString);
 
-                    context.startActivity(intent);
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(article.getUrl()));
+                    context.startActivity(browserIntent);
                 }
             });
 
-            Glide.with(holder.mImageView.getContext())
-                    .load(Cheeses.getRandomCheeseDrawable())
-                    .fitCenter()
-                    .into(holder.mImageView);
+            Glide.with(holder.mIvThumbnail.getContext())
+                    .load(article.getUrlToImage())
+                    .into(holder.mIvThumbnail);
         }
 
         @Override
         public int getItemCount() {
-            return mValues.size();
+            return mArticles == null ? 0 : mArticles.size();
         }
     }
 }
