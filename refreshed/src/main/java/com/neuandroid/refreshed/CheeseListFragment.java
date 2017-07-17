@@ -58,14 +58,21 @@ public class CheeseListFragment extends Fragment implements NewsQueryTask.IAsync
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         FrameLayout layout = (FrameLayout)  inflater.inflate(
                 R.layout.fragment_cheese_list, container, false);
+        if (savedInstanceState != null) {
+            newsSource = savedInstanceState.getString("source");
+        }
         refreshLayout = (SwipeRefreshLayout) layout.findViewById(R.id.swipe_refresh_list);
         refreshLayout.setOnRefreshListener(this);
         pbLoading = (ProgressBar) layout.findViewById(R.id.pb_loading);
         RecyclerView rv = (RecyclerView) layout.findViewById(R.id.recyclerview);
         setupRecyclerView(rv);
-        loadData();
-        pbLoading.setVisibility(View.VISIBLE);
         return layout;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("source", newsSource);
     }
 
     private void setupRecyclerView(RecyclerView recyclerView) {
@@ -74,6 +81,12 @@ public class CheeseListFragment extends Fragment implements NewsQueryTask.IAsync
         recyclerView.setAdapter(mAdapter);
     }
 
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        loadData();
+        pbLoading.setVisibility(View.VISIBLE);
+    }
 
     private void loadData() {
         URL url = NetworkUtils.buildUrl(newsSource, "top");

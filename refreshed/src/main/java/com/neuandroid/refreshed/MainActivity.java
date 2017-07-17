@@ -35,6 +35,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+        viewPager.setOffscreenPageLimit(3);
         if (viewPager != null) {
             setupViewPager(viewPager);
         }
@@ -160,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    static class Adapter extends FragmentPagerAdapter {
+    private class Adapter extends FragmentPagerAdapter {
         private final List<Fragment> mFragments = new ArrayList<>();
         private final List<String> mFragmentTitles = new ArrayList<>();
 
