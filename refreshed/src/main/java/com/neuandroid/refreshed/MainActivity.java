@@ -66,11 +66,7 @@ public class MainActivity extends AppCompatActivity {
             setupDrawerContent(navigationView);
         }
 
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-        viewPager.setOffscreenPageLimit(3);
-        if (viewPager != null) {
-            setupViewPager(viewPager);
-        }
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -82,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.setVisibility(View.GONE);
     }
 
     @Override
@@ -140,54 +136,44 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void setupViewPager(ViewPager viewPager) {
-        Adapter adapter = new Adapter(getSupportFragmentManager());
-        for (String source : SourcesList.sources) {
-            CheeseListFragment fragment = new CheeseListFragment();
-            fragment.setSource(source);
-            adapter.addFragment(fragment, source);
-        }
-        viewPager.setAdapter(adapter);
-    }
+
 
     private void setupDrawerContent(NavigationView navigationView) {
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
-                menuItem.setChecked(true);
-                mDrawerLayout.closeDrawers();
+
+                selectDrawerItem(menuItem);
+
                 return true;
             }
         });
     }
 
-    private class Adapter extends FragmentPagerAdapter {
-        private final List<Fragment> mFragments = new ArrayList<>();
-        private final List<String> mFragmentTitles = new ArrayList<>();
-
-        public Adapter(FragmentManager fm) {
-            super(fm);
+    private void selectDrawerItem(MenuItem menuItem) {
+        Fragment fragment = null;
+        Class fragmentClass = null;
+        switch (menuItem.getItemId()) {
+            case R.id.nav_home:
+                fragmentClass = RefreshedFragment.class;
+                break;
+        }
+        try {
+            fragment = (Fragment) fragmentClass.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (fragment == null) {
+            return;
         }
 
-        public void addFragment(Fragment fragment, String title) {
-            mFragments.add(fragment);
-            mFragmentTitles.add(title);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            return mFragments.get(position);
-        }
-
-        @Override
-        public int getCount() {
-            return mFragments.size();
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return mFragmentTitles.get(position);
-        }
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
+        menuItem.setChecked(true);
+        mDrawerLayout.closeDrawers();
+        setTitle(menuItem.getTitle());
     }
+
+
 }
