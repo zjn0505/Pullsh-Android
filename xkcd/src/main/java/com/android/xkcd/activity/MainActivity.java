@@ -164,9 +164,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void gotoExplainXKCD(){
-        Intent browserIntent =
-                new Intent(Intent.ACTION_VIEW, Uri.parse(EXPLAIN_XKCD_BASEURL + currentPic.num));
-        startActivity(browserIntent);
+        if(currentPic != null){
+            Intent browserIntent =
+                    new Intent(Intent.ACTION_VIEW, Uri.parse(EXPLAIN_XKCD_BASEURL + currentPic.num));
+            startActivity(browserIntent);
+        } else {
+            launchAltDialog();
+        }
     }
 
     private void loadXKCDpic(){
@@ -235,8 +239,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void launchAltDialog(){
         AltTextDialog altFragment = new AltTextDialog();
-        altFragment.setAltText(currentPic.alt);
-        altFragment.setTitle(currentPic.safe_title);
+        if(currentPic != null){
+            altFragment.setAltText(currentPic.alt);
+            altFragment.setTitle(currentPic.safe_title);
+        } else {
+            altFragment.setTitle(getResources().getString(R.string.waiting_for_download_message));
+        }
+
         altFragment.setListener(new AltTextDialog.IAltTextInterfaceListener() {
             @Override
             public void onPositiveClick() {
