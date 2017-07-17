@@ -124,19 +124,30 @@ public class MainActivity extends AppCompatActivity {
                 loadRandomXKCDPic();
                 break;
             case R.id.goto_prev:
-                int newId = currentPic.num - 1;
-                if (newId < 1){
+                if(currentPic != null){
+                    int newId = currentPic.num - 1;
+                    if (newId < 1){
+                        break;
+                    }
+                    loadXKCDpicById(newId);
+                    break;
+                } else {
+                    launchAltDialog();
                     break;
                 }
-                loadXKCDpicById(newId);
-                break;
+
             case R.id.goto_next:
-                newId = currentPic.num + 1;
-                if (newId > mostRecent){
+                if(currentPic != null){
+                    int newId = currentPic.num + 1;
+                    if (newId > mostRecent){
+                        break;
+                    }
+                    loadXKCDpicById(newId);
+                    break;
+                } else {
+                    launchAltDialog();
                     break;
                 }
-                loadXKCDpicById(newId);
-                break;
             case R.id.goto_explain:
                 gotoExplainXKCD();
                 break;

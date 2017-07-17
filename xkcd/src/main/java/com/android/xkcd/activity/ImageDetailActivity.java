@@ -3,6 +3,7 @@ package com.android.xkcd.activity;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.View;
 
 import com.android.xkcd.R;
 import com.bumptech.glide.Glide;
@@ -23,5 +24,13 @@ public class ImageDetailActivity extends Activity {
 
         PhotoView photoView = (PhotoView) findViewById(R.id.photo_view);
         Glide.with(this).load(url).into(photoView);
+
+        photoView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
+
 }
