@@ -6,7 +6,7 @@
     <string name="goto_previous">Previous</string>
     <string name="goto_next">Next</string>
     <string name="alt_text">Show alt text</string>
-    <string name="confirm">Ok</string>
+    <string name="confirm">OK</string>
     <string name="cancel">Cancel</string>
     <string name="choose_specific_title">Select which XKCD to view</string>
     <string name="waiting_for_download_message">Please wait for the image to be downloaded!</string>
