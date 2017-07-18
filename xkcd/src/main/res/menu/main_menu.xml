@@ -13,6 +13,10 @@
         android:title="@string/alt_text"
         app:showAsAction="always"
         android:icon="@drawable/ic_info_outline_black_24dp" />
+    <item android:id="@+id/share_action"
+        android:title="@string/share_menu_entry"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_share_black_24dp"/>
     <item android:id="@+id/load_rand_action"
         android:title="@string/random_button"/>
     <item android:id="@+id/goto_num_action"

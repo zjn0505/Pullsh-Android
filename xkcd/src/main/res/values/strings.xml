@@ -10,4 +10,5 @@
     <string name="cancel">Cancel</string>
     <string name="choose_specific_title">Select which XKCD to view</string>
     <string name="waiting_for_download_message">Please wait for the image to be downloaded!</string>
+    <string name="share_menu_entry">Share this xkcd</string>
 </resources>
