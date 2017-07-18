@@ -1,14 +1,14 @@
 <resources>
     <string name="app_name" translatable="false">xkcd</string>
-    <string name="random_button">Load random image</string>
-    <string name="goto_specific">Go to a specific XKCD</string>
-    <string name="goto_explain">Explain XKCD</string>
+    <string name="random_button">Load random xkcd</string>
+    <string name="goto_specific">Go to a specific xkcd</string>
+    <string name="goto_explain">Explain xkcd</string>
     <string name="goto_previous">Previous</string>
     <string name="goto_next">Next</string>
     <string name="alt_text">Show alt text</string>
     <string name="confirm">OK</string>
     <string name="cancel">Cancel</string>
-    <string name="choose_specific_title">Select which XKCD to view</string>
+    <string name="choose_specific_title">Select which xkcd to view</string>
     <string name="waiting_for_download_message">Please wait for the image to be downloaded!</string>
     <string name="share_menu_entry">Share this xkcd</string>
 </resources>

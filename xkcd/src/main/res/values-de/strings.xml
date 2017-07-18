@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">xkcd</string>
+    <string name="alt_text">Alt text anzeigen</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="choose_specific_title">Wähle xkcd zum Ansehen aus</string>
+    <string name="confirm">OK</string>
+    <string name="goto_explain">xkcd Erklärung</string>
+    <string name="goto_next">Nächster</string>
+    <string name="goto_previous">Vorheriger</string>
+    <string name="goto_specific">Zu einem bestimmten xkcd wechseln</string>
+    <string name="random_button">Zufälligen xkcd laden</string>
+    <string name="share_menu_entry">Diesen xkcd teilen</string>
+    <string name="waiting_for_download_message">Bitte warten bis das Bild fertig vollständig runtergeladen ist!</string>
 </resources>
