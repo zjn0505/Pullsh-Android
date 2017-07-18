@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="alt_text"></string>
+    <string name="cancel">Twamu</string>
+    <string name="choose_specific_title">Yi xkcd na wo pɛ</string>
+    <string name="confirm">Ɛyɛ</string>
+    <string name="goto_explain">Kyirɛ saa xkcd yi mu</string>
+    <string name="goto_next">Deɛ edisoɔ</string>
+    <string name="goto_previous"></string>
+    <string name="share_menu_entry">Kye kye ma</string>
+    <string name="waiting_for_download_message">Mpaatwoɔ kyɛn kakra</string>
+    <string name="goto_specific">Kɔ xkcd pɔtii na wo pɛ</string>
+</resources>

@@ -13,11 +13,13 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.android.xkcd.IAsyncTaskListener;
+import com.android.xkcd.OnSwipeTouchListener;
 import com.android.xkcd.R;
 import com.android.xkcd.model.XKCDPic;
 import com.android.xkcd.XKCDQueryTask;
@@ -50,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
     private ImageView imageView;
     private ProgressBar progressBar;
     private TextView altText;
+
+    private FrameLayout mainLayout;
 
     private IAsyncTaskListener iAsyncTaskListener = new IAsyncTaskListener() {
         @Override
@@ -97,7 +101,8 @@ public class MainActivity extends AppCompatActivity {
         imageView = (ImageView) findViewById(R.id.image_view);
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         altText = (TextView) findViewById(R.id.alt_text);
-
+        mainLayout = (FrameLayout) findViewById(R.id.main_layout);
+        /*
         imageView.setOnClickListener(new View.OnClickListener(){
 
             @Override
@@ -106,11 +111,25 @@ public class MainActivity extends AppCompatActivity {
                 //loadRandomXKCDPic();
             }
         });
+        */
         imageView.setOnLongClickListener(new View.OnLongClickListener(){
             @Override
             public boolean onLongClick(View v) {
-                launchAltDialog();
+                //launchAltDialog();
+                launchDetailActivity();
                 return false;
+            }
+        });
+
+        mainLayout.setOnTouchListener(new OnSwipeTouchListener(MainActivity.this){
+            @Override
+            public void onSwipeLeft() {
+                loadNext();
+            }
+
+            @Override
+            public void onSwipeRight() {
+                loadPrev();
             }
         });
 
@@ -133,11 +152,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.goto_prev:
                 if(currentPic != null){
-                    int newId = currentPic.num - 1;
-                    if (newId < 1){
-                        break;
-                    }
-                    loadXKCDpicById(newId);
+                    loadPrev();
                     break;
                 } else {
                     launchAltDialog();
@@ -146,11 +161,7 @@ public class MainActivity extends AppCompatActivity {
 
             case R.id.goto_next:
                 if(currentPic != null){
-                    int newId = currentPic.num + 1;
-                    if (newId > mostRecent){
-                        break;
-                    }
-                    loadXKCDpicById(newId);
+                    loadNext();
                     break;
                 } else {
                     launchAltDialog();
@@ -194,6 +205,22 @@ public class MainActivity extends AppCompatActivity {
 
         }
         return true;
+    }
+
+    private void loadNext() {
+        int newId = currentPic.num + 1;
+        if (newId > mostRecent){
+            return;
+        }
+        loadXKCDpicById(newId);
+    }
+
+    private void loadPrev() {
+        int newId = currentPic.num - 1;
+        if (newId < 1){
+            return;
+        }
+        loadXKCDpicById(newId);
     }
 
     private void gotoExplainXKCD(){
