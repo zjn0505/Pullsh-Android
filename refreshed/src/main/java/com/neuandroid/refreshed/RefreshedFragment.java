@@ -40,7 +40,7 @@ public class RefreshedFragment extends Fragment {
     private void setupViewPager(ViewPager viewPager) {
         Adapter adapter = new Adapter(getChildFragmentManager());
         for (String source : SourcesList.sources) {
-            CheeseListFragment fragment = new CheeseListFragment();
+            NewsListFragment fragment = new NewsListFragment();
             fragment.setSource(source);
             adapter.addFragment(fragment, source);
         }
