@@ -37,6 +37,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.neuandroid.chuck.ChuckFragment;
+import com.neuandroid.xkcd.XKCDFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -158,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
                 fragmentClass = ChuckFragment.class;
                 break;
             case R.id.nav_xkcd:
-                // TODO: set xkcd fragment class
+                fragmentClass = XKCDFragment.class;
         }
 
         try {
