@@ -1,4 +1,4 @@
-package com.neuandroid.refreshed;
+package com.neuandroid.news;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.neuandroid.refreshed.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +20,7 @@ import java.util.List;
  * Created by max on 19/07/2017.
  */
 
-public class RefreshedFragment extends Fragment {
+public class NewsFragment extends Fragment {
 
     private TabLayout tabLayout;
 

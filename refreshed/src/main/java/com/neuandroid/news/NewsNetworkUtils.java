@@ -1,4 +1,4 @@
-package com.neuandroid.refreshed;
+package com.neuandroid.news;
 
 import android.util.Log;
 
@@ -11,7 +11,7 @@ import java.net.URL;
  * Created by max on 19/07/17.
  */
 
-public class RefreshedNetworkUtils extends NetworkUtils {
+public class NewsNetworkUtils extends NetworkUtils {
 
     private static final String NEWS_API_BASE_URL = "https://newsapi.org/v1/articles?source=%1$s&sortBy=%2$s&apiKey=%3$s";
 
@@ -20,7 +20,7 @@ public class RefreshedNetworkUtils extends NetworkUtils {
     private final static String PARAMS_TOP = "top";
     private final static String PARAMS_LATEST = "latest";
 
-    private final static String TAG = "RefreshedNetworkUtils";
+    private final static String TAG = "NewsNetworkUtils";
 
     /**
      * Builds the URL used to query news api.

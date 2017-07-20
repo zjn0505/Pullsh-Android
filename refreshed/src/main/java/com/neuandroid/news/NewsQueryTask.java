@@ -1,4 +1,4 @@
-package com.neuandroid.refreshed;
+package com.neuandroid.news;
 
 import android.os.AsyncTask;
 

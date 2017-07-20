@@ -24,9 +24,7 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -37,6 +35,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.neuandroid.chuck.ChuckFragment;
+import com.neuandroid.news.NewsFragment;
 import com.neuandroid.xkcd.XKCDFragment;
 
 /**
@@ -150,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
         Class fragmentClass = null;
         switch (menuItem.getItemId()) {
             case R.id.nav_news:
-                fragmentClass = RefreshedFragment.class;
+                fragmentClass = NewsFragment.class;
                 break;
             case R.id.nav_chuck:
                 fragmentClass = ChuckFragment.class;

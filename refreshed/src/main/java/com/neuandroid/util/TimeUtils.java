@@ -1,4 +1,4 @@
-package com.neuandroid.refreshed;
+package com.neuandroid.util;
 
 /**
  * Created by max on 19/07/17.

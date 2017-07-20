@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.neuandroid.refreshed;
+package com.neuandroid.news;
 
 import android.content.Context;
 import android.content.Intent;
@@ -39,6 +39,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.neuandroid.refreshed.R;
+import com.neuandroid.util.TimeUtils;
 
 import java.io.Serializable;
 import java.net.URL;
@@ -109,7 +111,7 @@ public class NewsListFragment extends Fragment
     }
 
     private void loadData() {
-        URL url = RefreshedNetworkUtils.buildUrl(newsSource, "top");
+        URL url = NewsNetworkUtils.buildUrl(newsSource, "top");
         new NewsQueryTask(this).execute(url);
     }
 
