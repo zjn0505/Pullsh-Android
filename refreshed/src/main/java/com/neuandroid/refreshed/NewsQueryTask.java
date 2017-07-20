@@ -1,9 +1,9 @@
 package com.neuandroid.refreshed;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.google.gson.Gson;
+import com.neuandroid.util.NetworkUtils;
 
 import java.io.IOException;
 import java.io.Serializable;

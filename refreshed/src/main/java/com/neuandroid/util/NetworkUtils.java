@@ -1,4 +1,4 @@
-package com.neuandroid.refreshed;
+package com.neuandroid.util;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -2,6 +2,8 @@ package com.neuandroid.refreshed;
 
 import android.util.Log;
 
+import com.neuandroid.util.NetworkUtils;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 

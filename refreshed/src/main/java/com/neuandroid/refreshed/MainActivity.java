@@ -36,6 +36,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.neuandroid.chuck.ChuckFragment;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -153,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
                 fragmentClass = RefreshedFragment.class;
                 break;
             case R.id.nav_chuck:
-                // TODO: set chuck fragment class
+                fragmentClass = ChuckFragment.class;
                 break;
             case R.id.nav_xkcd:
                 // TODO: set xkcd fragment class

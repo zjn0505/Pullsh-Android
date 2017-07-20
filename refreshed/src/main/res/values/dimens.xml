@@ -9,4 +9,7 @@
     <dimen name="list_item_avatar_size">40dp</dimen>
     <dimen name="news_thumbnails_width">120dp</dimen>
     <dimen name="news_thumbnails_height">80dp</dimen>
+
+    <!--Chuck Norris dimensions-->
+    <dimen name="textview_margin">20dp</dimen>
 </resources>
