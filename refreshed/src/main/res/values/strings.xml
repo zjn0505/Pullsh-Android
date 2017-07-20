@@ -24,4 +24,16 @@
     <string name="nerdy">Nerdy</string>
     <string name="query_error">If you try to make jokes about Chuck Norris, he comes to your house and cuts the internet.</string>
 
+    <!--xkcd strings-->
+    <string name="random_button">Load random xkcd</string>
+    <string name="goto_specific">Go to a specific xkcd</string>
+    <string name="goto_explain">Explain xkcd</string>
+    <string name="goto_previous">Previous</string>
+    <string name="goto_next">Next</string>
+    <string name="alt_text">Show alt text</string>
+    <string name="confirm">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="choose_specific_title">Select which xkcd to view</string>
+    <string name="waiting_for_download_message">Please wait for the image to be downloaded!</string>
+    <string name="share_menu_entry">Share this xkcd</string>
 </resources>
