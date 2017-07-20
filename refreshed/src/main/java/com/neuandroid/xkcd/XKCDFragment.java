@@ -98,6 +98,13 @@ public class XKCDFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        if(savedInstanceState != null){
+            this.mostRecent = savedInstanceState.getInt("most_recent");
+            int lastImg = savedInstanceState.getInt("pic_number");
+            if(lastImg != 0){
+                loadXKCDpicById(lastImg);
+            }
+        }
     }
 
     @Nullable
