@@ -42,9 +42,7 @@ import com.bumptech.glide.Glide;
 
 import java.io.Serializable;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class NewsListFragment extends Fragment
         implements NewsQueryTask.IAsyncTaskListener, SwipeRefreshLayout.OnRefreshListener {
@@ -75,7 +73,7 @@ public class NewsListFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         FrameLayout layout = (FrameLayout)  inflater.inflate(
-                R.layout.fragment_cheese_list, container, false);
+                R.layout.fragment_news_list, container, false);
         if (savedInstanceState != null) {
             newsSource = savedInstanceState.getString("source");
         }
@@ -159,15 +157,15 @@ public class NewsListFragment extends Fragment
         private int mBackground;
         private List<NewsListBean.ArticlesBean> mArticles;
 
-        public static class ViewHolder extends RecyclerView.ViewHolder {
+        static class ViewHolder extends RecyclerView.ViewHolder {
 
-            public final View mView;
-            public final ImageView mIvThumbnail;
-            public final TextView mTvTitle;
-            public final TextView mTvDescription;
-            public final TextView mTvPublishTime;
+            final View mView;
+            final ImageView mIvThumbnail;
+            final TextView mTvTitle;
+            final TextView mTvDescription;
+            final TextView mTvPublishTime;
 
-            public ViewHolder(View view) {
+            ViewHolder(View view) {
                 super(view);
                 mView = view;
                 mIvThumbnail = (ImageView) view.findViewById(R.id.iv_thumbnails);

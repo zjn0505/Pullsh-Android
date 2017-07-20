@@ -20,6 +20,8 @@ import java.util.List;
 
 public class RefreshedFragment extends Fragment {
 
+    private TabLayout tabLayout;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -29,7 +31,7 @@ public class RefreshedFragment extends Fragment {
         if (viewPager != null) {
             setupViewPager(viewPager);
         }
-        TabLayout tabLayout = (TabLayout) getActivity().findViewById(R.id.tabs);
+        tabLayout = (TabLayout) getActivity().findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.setVisibility(View.VISIBLE);
         return view;
@@ -74,5 +76,11 @@ public class RefreshedFragment extends Fragment {
         public CharSequence getPageTitle(int position) {
             return mFragmentTitles.get(position);
         }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        tabLayout.setVisibility(View.GONE);
     }
 }

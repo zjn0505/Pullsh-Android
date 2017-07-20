@@ -28,11 +28,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".CheeseDetailActivity"
-            android:parentActivityName=".MainActivity">
-            <meta-data android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
-        </activity>
         <activity android:name="com.neuandroid.xkcd.ImageDetailActivity" android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
     </application>
 
