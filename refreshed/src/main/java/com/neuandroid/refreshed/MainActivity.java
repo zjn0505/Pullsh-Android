@@ -149,9 +149,14 @@ public class MainActivity extends AppCompatActivity {
         Fragment fragment = null;
         Class fragmentClass = null;
         switch (menuItem.getItemId()) {
-            case R.id.nav_home:
+            case R.id.nav_news:
                 fragmentClass = RefreshedFragment.class;
                 break;
+            case R.id.nav_chuck:
+                // TODO: set chuck fragment class
+                break;
+            case R.id.nav_xkcd:
+                // TODO: set xkcd fragment class
         }
 
         try {
