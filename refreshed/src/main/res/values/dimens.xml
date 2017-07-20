@@ -8,4 +8,6 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="news_thumbnails_width">120dp</dimen>
     <dimen name="news_thumbnails_height">80dp</dimen>
+
+    <dimen name="textview_margin">20dp</dimen>
 </resources>

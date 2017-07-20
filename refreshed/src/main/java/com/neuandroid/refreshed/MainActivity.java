@@ -66,8 +66,6 @@ public class MainActivity extends AppCompatActivity {
             setupDrawerContent(navigationView);
         }
 
-
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -155,8 +153,11 @@ public class MainActivity extends AppCompatActivity {
         Fragment fragment = null;
         Class fragmentClass = null;
         switch (menuItem.getItemId()) {
-            case R.id.nav_home:
+            case R.id.nav_refreshed:
                 fragmentClass = RefreshedFragment.class;
+                break;
+            case R.id.nav_chuck:
+                fragmentClass = ChuckFragment.class;
                 break;
         }
         try {
