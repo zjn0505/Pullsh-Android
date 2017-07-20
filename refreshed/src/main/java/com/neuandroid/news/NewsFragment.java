@@ -2,6 +2,7 @@ package com.neuandroid.news;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -23,11 +24,12 @@ import java.util.List;
 public class NewsFragment extends Fragment {
 
     private TabLayout tabLayout;
+    private AppBarLayout appbar;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_refreshed, container, false);
+        View view = inflater.inflate(R.layout.fragment_news, container, false);
         ViewPager viewPager = (ViewPager) view.findViewById(R.id.viewpager);
         viewPager.setOffscreenPageLimit(3);
         if (viewPager != null) {
@@ -36,6 +38,8 @@ public class NewsFragment extends Fragment {
         tabLayout = (TabLayout) getActivity().findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.setVisibility(View.VISIBLE);
+
+        appbar = (AppBarLayout) getActivity().findViewById(R.id.appbar);
         return view;
 
 
@@ -84,5 +88,6 @@ public class NewsFragment extends Fragment {
     public void onStop() {
         super.onStop();
         tabLayout.setVisibility(View.GONE);
+        appbar.setExpanded(true, true);
     }
 }
