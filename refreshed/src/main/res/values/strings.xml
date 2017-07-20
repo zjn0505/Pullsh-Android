@@ -19,6 +19,7 @@
     <string name="loading_text">Loading...</string>
     <string name="firstname_hint">Chuck</string>
     <string name="lastname_hint">Norris</string>
+    <string name="filters">Filters:</string>
     <string name="explicit">Explicit</string>
     <string name="nerdy">Nerdy</string>
     <string name="query_error">If you try to make jokes about Chuck Norris, he comes to your house and cuts the internet.</string>
