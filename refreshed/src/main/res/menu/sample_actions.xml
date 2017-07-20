@@ -17,6 +17,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/action_sources"
+        android:title="@string/action_sources"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_night"
         android:title="@string/menu_night_mode"
         app:showAsAction="never">
