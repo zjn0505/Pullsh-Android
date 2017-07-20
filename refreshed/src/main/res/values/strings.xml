@@ -9,4 +9,8 @@
     <string name="menu_night_mode_day">Day (always)</string>
     <string name="menu_night_mode_night">Night (always)</string>
     <string name="menu_night_mode_auto">Auto</string>
+
+    <string name="nav_menu_news">News</string>
+    <string name="nav_menu_chuck">Chuck Norris Jokes</string>
+    <string name="nav_menu_xkcd">xkcd</string>
 </resources>
