@@ -39,9 +39,6 @@ import android.view.View;
 import com.neuandroid.chuck.ChuckFragment;
 import com.neuandroid.xkcd.XKCDFragment;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * TODO
  */

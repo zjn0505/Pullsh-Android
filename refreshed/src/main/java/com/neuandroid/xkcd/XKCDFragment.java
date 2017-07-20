@@ -9,8 +9,10 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -90,7 +92,14 @@ public class XKCDFragment extends Fragment {
             }
         }
     };
-    
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -132,15 +141,11 @@ public class XKCDFragment extends Fragment {
     }
 
 
-    /*
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu, menu);
-        return true;
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_xkcd, menu);
     }
-    */
 
-    /*
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
@@ -186,7 +191,7 @@ public class XKCDFragment extends Fragment {
 
                         }
                     });
-                    dialog.show(getSupportFragmentManager(), "DialogFragment");
+                    dialog.show(getFragmentManager(), "DialogFragment");
                     break;
                 } else {
                     launchAltDialog();
@@ -203,7 +208,7 @@ public class XKCDFragment extends Fragment {
         }
         return true;
     }
-    */
+
 
     private void loadNext() {
         int newId = currentPic.num + 1;
@@ -286,23 +291,6 @@ public class XKCDFragment extends Fragment {
                 })
                 .override(2000, 2000)
                 .into(imageView);
-                /*
-                .listener(new RequestListener<String, GlideDrawable>() {
-
-                    @Override
-                    public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                        XKCDFragment.this.progressBar.setVisibility(View.GONE);
-                        return false;
-                    }
-                })
-                .override(2000, 2000)
-                .into(imageView);
-                */
         creationDateText.setText(pic.day + "/" + pic.month + "/" + pic.year);
 
     }
@@ -336,26 +324,25 @@ public class XKCDFragment extends Fragment {
         altFragment.show(getFragmentManager(), "DialogFragment");
     }
 
-    /*
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
         outState.putInt("pic_number", currentPic.num);
         outState.putInt("most_recent", mostRecent);
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
 
-        this.mostRecent = savedInstanceState.getInt("most_recent");
-        int lastImg = savedInstanceState.getInt("pic_number");
-        if(lastImg != 0){
-            loadXKCDpicById(lastImg);
+        if(savedInstanceState != null){
+            this.mostRecent = savedInstanceState.getInt("most_recent");
+            int lastImg = savedInstanceState.getInt("pic_number");
+            if(lastImg != 0){
+                loadXKCDpicById(lastImg);
+            }
         }
     }
-    */
 
     public Uri getLocalBitmapUri(ImageView imageView) {
         // Extract Bitmap from ImageView drawable
@@ -371,14 +358,18 @@ public class XKCDFragment extends Fragment {
         try {
             File file = new File(getContext().getApplicationContext()
                     .getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),
-                    "share_image_" + System.currentTimeMillis() + "png");
+                    "share_image_" + System.currentTimeMillis() + ".png");
             //File file =  new File(Environment.getExternalStoragePublicDirectory(
             //        Environment.DIRECTORY_DOWNLOADS), "share_image_" + System.currentTimeMillis() + ".png");
             file.getParentFile().mkdirs();
             FileOutputStream out = new FileOutputStream(file);
             bmp.compress(Bitmap.CompressFormat.PNG, 90, out);
             out.close();
-            bmpUri = Uri.fromFile(file);
+            //bmpUri = Uri.fromFile(file);
+            bmpUri = FileProvider.getUriForFile(getContext(),
+                    getContext().getApplicationContext().getPackageName() +
+                            ".com.neuandroid.util.fileprovider",
+                    file);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/goto_prev"
+        android:title="@string/goto_previous"
+        android:icon="@drawable/ic_arrow_back_black_24dp"
+        app:showAsAction="always"/>
+    <item android:id="@+id/goto_next"
+        android:title="@string/goto_next"
+        android:icon="@drawable/ic_arrow_forward_black_24dp"
+        app:showAsAction="always"/>
+    <item android:id="@+id/view_alt"
+        android:title="@string/alt_text"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_info_outline_black_24dp" />
+    <item android:id="@+id/share_action"
+        android:title="@string/share_menu_entry"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_share_black_24dp"/>
+    <item android:id="@+id/load_rand_action"
+        android:title="@string/random_button"/>
+    <item android:id="@+id/goto_num_action"
+        android:title="@string/goto_specific"/>
+    <item android:id="@+id/goto_explain"
+        android:title="@string/goto_explain"/>
+</menu>
