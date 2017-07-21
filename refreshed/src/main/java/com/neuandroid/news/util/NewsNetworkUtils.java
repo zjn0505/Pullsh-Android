@@ -1,4 +1,4 @@
-package com.neuandroid.news;
+package com.neuandroid.news.util;
 
 import android.util.Log;
 

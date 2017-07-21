@@ -1,8 +1,9 @@
-package com.neuandroid.news;
+package com.neuandroid.news.util;
 
 import android.os.AsyncTask;
 
 import com.google.gson.Gson;
+import com.neuandroid.news.model.NewsListBean;
 import com.neuandroid.util.NetworkUtils;
 
 import java.io.IOException;

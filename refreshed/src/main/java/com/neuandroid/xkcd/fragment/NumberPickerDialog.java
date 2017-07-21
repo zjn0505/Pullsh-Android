@@ -1,4 +1,4 @@
-package com.neuandroid.xkcd;
+package com.neuandroid.xkcd.fragment;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

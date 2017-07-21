@@ -1,4 +1,4 @@
-package com.neuandroid.xkcd;
+package com.neuandroid.xkcd.util;
 
 import android.os.AsyncTask;
 

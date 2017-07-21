@@ -35,8 +35,8 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.neuandroid.chuck.ChuckFragment;
-import com.neuandroid.news.NewsFragment;
-import com.neuandroid.xkcd.XKCDFragment;
+import com.neuandroid.news.fragment.NewsFragment;
+import com.neuandroid.xkcd.fragment.XKCDFragment;
 
 public class MainActivity extends AppCompatActivity {
 

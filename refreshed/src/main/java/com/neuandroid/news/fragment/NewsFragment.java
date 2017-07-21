@@ -1,4 +1,4 @@
-package com.neuandroid.news;
+package com.neuandroid.news.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.neuandroid.news.model.SourcesList;
 import com.neuandroid.refreshed.R;
 
 import java.util.ArrayList;

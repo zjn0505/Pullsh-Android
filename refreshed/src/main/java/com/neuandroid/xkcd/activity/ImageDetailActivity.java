@@ -1,4 +1,4 @@
-package com.neuandroid.xkcd;
+package com.neuandroid.xkcd.activity;
 
 import android.app.Activity;
 import android.os.Bundle;

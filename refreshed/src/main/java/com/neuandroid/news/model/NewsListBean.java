@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-package com.neuandroid.news;
+package com.neuandroid.news.model;
 
 
 import java.io.Serializable;

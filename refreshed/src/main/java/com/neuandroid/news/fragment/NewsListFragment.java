@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.neuandroid.news;
+package com.neuandroid.news.fragment;
 
 import android.content.Context;
 import android.content.Intent;
@@ -39,6 +39,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.neuandroid.news.model.NewsListBean;
+import com.neuandroid.news.util.NewsNetworkUtils;
+import com.neuandroid.news.util.NewsQueryTask;
 import com.neuandroid.refreshed.R;
 import com.neuandroid.util.TimeUtils;
 

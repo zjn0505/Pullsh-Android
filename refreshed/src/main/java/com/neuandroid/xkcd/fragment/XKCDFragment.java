@@ -1,4 +1,4 @@
-package com.neuandroid.xkcd;
+package com.neuandroid.xkcd.fragment;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -25,6 +25,10 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.neuandroid.refreshed.R;
+import com.neuandroid.xkcd.util.IAsyncTaskListener;
+import com.neuandroid.xkcd.activity.ImageDetailActivity;
+import com.neuandroid.xkcd.util.OnSwipeTouchListener;
+import com.neuandroid.xkcd.util.XKCDQueryTask;
 import com.neuandroid.xkcd.model.XKCDPic;
 
 import java.io.File;
