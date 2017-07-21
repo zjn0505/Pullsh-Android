@@ -48,6 +48,22 @@ public class ChuckFragment extends Fragment {
         setHasOptionsMenu(true);
     }
 
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+
+        if(savedInstanceState != null){
+            editFirst.setText(savedInstanceState.getString("firstName"));
+            editLast.setText(savedInstanceState.getString("lastName"));
+            chuckText.setText(savedInstanceState.getString("joke"));
+            boolean[] chkbox = savedInstanceState.getBooleanArray("checkboxes");
+            for(int i = 0; i < chkbox.length; i++){
+                checkboxes[i].setChecked(chkbox[i]);
+            }
+        }
+
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -236,7 +252,19 @@ public class ChuckFragment extends Fragment {
                         infadeView.setVisibility(View.VISIBLE);
                     }
                 });
+    }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
 
+        outState.putString("joke", chuckText.getText().toString());
+        outState.putString("firstName", editFirst.getText().toString());
+        outState.putString("lastName", editLast.getText().toString());
+        boolean [] chkBox = new boolean[checkboxes.length];
+        for (int i = 0; i < checkboxes.length; i++){
+            chkBox[i] = checkboxes[i].isChecked();
+        }
+        outState.putBooleanArray("checkboxes", chkBox);
     }
 }
