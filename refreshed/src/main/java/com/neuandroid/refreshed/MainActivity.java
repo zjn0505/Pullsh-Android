@@ -38,9 +38,6 @@ import com.neuandroid.chuck.ChuckFragment;
 import com.neuandroid.news.NewsFragment;
 import com.neuandroid.xkcd.XKCDFragment;
 
-/**
- * TODO
- */
 public class MainActivity extends AppCompatActivity {
 
     private DrawerLayout mDrawerLayout;

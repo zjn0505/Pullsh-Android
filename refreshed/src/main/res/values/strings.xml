@@ -3,6 +3,7 @@
     <string name="action_settings">Settings</string>
     <string name="action_sources">Select sources</string>
     <string name="checkin">Checkin</string>
+    <string name="news_attribution">News from newsapi.org</string>
 
     <string name="menu_night_mode">Night mode</string>
     <string name="menu_night_mode_system">Follow system</string>

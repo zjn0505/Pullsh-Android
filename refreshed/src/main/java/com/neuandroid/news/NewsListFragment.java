@@ -159,6 +159,9 @@ public class NewsListFragment extends Fragment
         private int mBackground;
         private List<NewsListBean.ArticlesBean> mArticles;
 
+        private final int ARTICLE = 0;
+        private final int ATTRIBUTION = 1;
+
         static class ViewHolder extends RecyclerView.ViewHolder {
 
             final View mView;
@@ -189,16 +192,31 @@ public class NewsListFragment extends Fragment
             notifyDataSetChanged();
         }
 
-            @Override
+        @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.list_item, parent, false);
-            view.setBackgroundResource(mBackground);
+            View view;
+            switch(viewType){
+                case ARTICLE:
+                    view = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.list_item, parent, false);
+                    view.setBackgroundResource(mBackground);
+                    break;
+                case ATTRIBUTION:
+                    view = LayoutInflater.from(parent.getContext())
+                            .inflate(R.layout.list_item_attribution, parent, false);
+                    view.setBackgroundResource(mBackground);
+                    break;
+                default:
+                    view = null;
+            }
             return new ViewHolder(view);
         }
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
+            if(position == mArticles.size()){
+                return;
+            }
             final NewsListBean.ArticlesBean article = mArticles.get(position);
             holder.mTvTitle.setText(article.getTitle());
             holder.mTvDescription.setText(article.getDescription());
@@ -225,7 +243,16 @@ public class NewsListFragment extends Fragment
 
         @Override
         public int getItemCount() {
-            return mArticles == null ? 0 : mArticles.size();
+            return mArticles == null ? 0 : mArticles.size() + 1;
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            if(position < mArticles.size()){
+                return ARTICLE;
+            } else {
+                return ATTRIBUTION;
+            }
         }
     }
 }
