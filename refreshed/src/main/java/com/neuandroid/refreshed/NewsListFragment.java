@@ -25,6 +25,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -41,7 +42,7 @@ import java.io.Serializable;
 import java.net.URL;
 import java.util.List;
 
-public class CheeseListFragment extends Fragment implements NewsQueryTask.IAsyncTaskListener, SwipeRefreshLayout.OnRefreshListener {
+public class NewsListFragment extends Fragment implements NewsQueryTask.IAsyncTaskListener, SwipeRefreshLayout.OnRefreshListener {
 
     private SwipeRefreshLayout refreshLayout;
     private String newsSource;
@@ -63,6 +64,7 @@ public class CheeseListFragment extends Fragment implements NewsQueryTask.IAsync
         }
         refreshLayout = (SwipeRefreshLayout) layout.findViewById(R.id.swipe_refresh_list);
         refreshLayout.setOnRefreshListener(this);
+        refreshLayout.setEnabled(false);
         pbLoading = (ProgressBar) layout.findViewById(R.id.pb_loading);
         RecyclerView rv = (RecyclerView) layout.findViewById(R.id.recyclerview);
         setupRecyclerView(rv);
@@ -100,6 +102,7 @@ public class CheeseListFragment extends Fragment implements NewsQueryTask.IAsync
     @Override
     public void onPostExecute(Serializable result) {
         pbLoading.setVisibility(View.GONE);
+        refreshLayout.setEnabled(true);
         refreshLayout.setRefreshing(false);
         Log.d("zjn", "done");
         if (result instanceof NewsListBean) {
@@ -188,9 +191,15 @@ public class CheeseListFragment extends Fragment implements NewsQueryTask.IAsync
                 }
             });
 
-            Glide.with(holder.mIvThumbnail.getContext())
-                    .load(article.getUrlToImage())
-                    .into(holder.mIvThumbnail);
+            String imgUrl = article.getUrlToImage();
+            if (TextUtils.isEmpty(imgUrl)) {
+                holder.mIvThumbnail.setVisibility(View.GONE);
+            } else {
+                Glide.with(holder.mIvThumbnail.getContext())
+                        .load(article.getUrlToImage())
+                        .into(holder.mIvThumbnail);
+            }
+
         }
 
         @Override
