@@ -16,9 +16,12 @@ public class NewsQueryTask extends AsyncTask<URL, Object, String> {
         void onPostExecute(Serializable result);
     }
 
+    private Class beanClass;
+
     private IAsyncTaskListener listener;
 
-    public NewsQueryTask(IAsyncTaskListener listener) {
+    public NewsQueryTask(IAsyncTaskListener listener, Class bean) {
+        beanClass = bean;
         this.listener = listener;
     }
 
@@ -43,8 +46,7 @@ public class NewsQueryTask extends AsyncTask<URL, Object, String> {
 
     @Override
     protected void onPostExecute(String result) {
-        NewsListBean newsList = new Gson().fromJson(result, NewsListBean.class);
-        listener.onPostExecute(newsList);
+        listener.onPostExecute((Serializable) new Gson().fromJson(result, beanClass));
     }
 
 }

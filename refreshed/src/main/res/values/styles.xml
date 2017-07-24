@@ -36,4 +36,8 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_margin">20dp</item>
     </style>
+
+    <style name="tab_text_style" parent="android:TextAppearance.Widget.TabWidget">
+        <item name="android:textStyle">bold</item>
+    </style>
 </resources>

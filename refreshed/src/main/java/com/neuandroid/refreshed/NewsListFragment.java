@@ -91,8 +91,8 @@ public class NewsListFragment extends Fragment implements NewsQueryTask.IAsyncTa
     }
 
     private void loadData() {
-        URL url = NetworkUtils.buildUrl(newsSource, "top");
-        new NewsQueryTask(this).execute(url);
+        URL url = NetworkUtils.buildUrlForSource(newsSource, "top");
+        new NewsQueryTask(this, NewsListBean.class).execute(url);
     }
 
     @Override
