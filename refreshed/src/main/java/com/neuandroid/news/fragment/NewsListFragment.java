@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -90,6 +91,15 @@ public class NewsListFragment extends Fragment
         refreshLayout.setEnabled(false);
         pbLoading = (ProgressBar) layout.findViewById(R.id.pb_loading);
 
+        FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                refreshLayout.setRefreshing(true);
+            }
+        });
+
         return layout;
     }
 
@@ -130,7 +140,6 @@ public class NewsListFragment extends Fragment
         pbLoading.setVisibility(View.GONE);
         refreshLayout.setEnabled(true);
         refreshLayout.setRefreshing(false);
-        Log.d("zjn", "done");
         if (result instanceof NewsListBean) {
             NewsListBean newsList = (NewsListBean) result;
             if ("ok".equals(newsList.getStatus())) {
