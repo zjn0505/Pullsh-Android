@@ -31,15 +31,4 @@
             android:title="@string/nav_menu_xkcd" />
     </group>
 
-    <item android:title="Sub items">
-        <menu>
-            <item
-                android:icon="@drawable/ic_menu"
-                android:title="Sub item 1" />
-            <item
-                android:icon="@drawable/ic_menu"
-                android:title="Sub item 2" />
-        </menu>
-    </item>
-
 </menu>
