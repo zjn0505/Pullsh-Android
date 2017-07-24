@@ -97,6 +97,7 @@ public class NewsListFragment extends Fragment
             @Override
             public void onClick(View view) {
                 refreshLayout.setRefreshing(true);
+                loadData();
             }
         });
 
@@ -153,12 +154,14 @@ public class NewsListFragment extends Fragment
 
     @Override
     public void onRefresh() {
+        //Log.d("NewsListFragment", "onRefresh called");
         refreshLayout.setRefreshing(true);
         loadData();
     }
 
     @Override
     public void onDetach() {
+        //Log.d("NewsListFragment", "onDetach called");
         refreshLayout.setRefreshing(false);
         super.onDetach();
     }
