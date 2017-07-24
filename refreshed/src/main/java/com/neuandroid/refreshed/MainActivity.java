@@ -151,7 +151,6 @@ public class MainActivity extends AppCompatActivity {
         Bundle bundle = null;
         switch (menuItem.getItemId()) {
             case R.id.nav_engadget:
-            case R.id.nav_news:
                 fragmentClass = NewsFragment.class;
                 newsIndex = 0;
                 break;
