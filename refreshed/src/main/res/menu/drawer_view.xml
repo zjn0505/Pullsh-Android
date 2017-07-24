@@ -20,7 +20,26 @@
         <item
             android:id="@+id/nav_news"
             android:icon="@drawable/ic_menu"
-            android:title="@string/nav_menu_news" />
+            android:title="@string/nav_menu_news" >
+            <menu>
+                <item
+                    android:id="@+id/nav_engadget"
+                    android:title="@string/engadget"
+                    android:icon="@drawable/ic_menu"/>
+                <item
+                    android:id="@+id/nav_ign"
+                    android:title="@string/ign"
+                    android:icon="@drawable/ic_menu"/>
+                <item
+                    android:id="@+id/nav_polygon"
+                    android:title="@string/polygon"
+                    android:icon="@drawable/ic_menu"/>
+                <item
+                    android:id="@+id/nav_techcrunch"
+                    android:title="@string/techcrunch"
+                    android:icon="@drawable/ic_menu"/>
+            </menu>
+        </item>
         <item
             android:id="@+id/nav_chuck"
             android:icon="@drawable/ic_menu"

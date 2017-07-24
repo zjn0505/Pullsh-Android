@@ -4,6 +4,10 @@
     <string name="action_sources">Select sources</string>
     <string name="checkin">Checkin</string>
     <string name="news_attribution">News from newsapi.org</string>
+    <string name="engadget">Engadget</string>
+    <string name="ign">IGN</string>
+    <string name="polygon">Polygon</string>
+    <string name="techcrunch">Techcrunch</string>
 
     <string name="menu_night_mode">Night mode</string>
     <string name="menu_night_mode_system">Follow system</string>
