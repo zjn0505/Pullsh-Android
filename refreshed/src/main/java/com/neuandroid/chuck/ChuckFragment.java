@@ -2,6 +2,7 @@ package com.neuandroid.chuck;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -91,6 +92,14 @@ public class ChuckFragment extends Fragment {
          };
          loadingText = (TextView) view.findViewById(R.id.loading_text);
          mShortAnimationDuration = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+        FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                loadChuckJoke();
+            }
+        });
         return view;
     }
 

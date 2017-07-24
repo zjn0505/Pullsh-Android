@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
 import android.view.LayoutInflater;
@@ -115,6 +116,15 @@ public class XKCDFragment extends Fragment {
         progressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
         altText = (TextView) view.findViewById(R.id.alt_text);
         mainLayout = (FrameLayout) view.findViewById(R.id.main_layout);
+
+        FloatingActionButton fab = (FloatingActionButton) getActivity().findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View view) {
+                loadRandomXKCDPic();
+            }
+        });
 
         imageView.setOnLongClickListener(new View.OnLongClickListener(){
             @Override
