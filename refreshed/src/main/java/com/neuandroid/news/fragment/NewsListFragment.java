@@ -42,8 +42,8 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.neuandroid.news.model.NewsListBean;
 import com.neuandroid.news.util.NewsNetworkUtils;
-import com.neuandroid.news.util.NewsQueryTask;
 import com.neuandroid.refreshed.R;
+import com.neuandroid.util.DownloadTask;
 import com.neuandroid.util.TimeUtils;
 
 import java.io.Serializable;
@@ -51,7 +51,7 @@ import java.net.URL;
 import java.util.List;
 
 public class NewsListFragment extends Fragment
-        implements NewsQueryTask.IAsyncTaskListener, SwipeRefreshLayout.OnRefreshListener {
+        implements DownloadTask.IAsyncTaskListener, SwipeRefreshLayout.OnRefreshListener {
 
     private SwipeRefreshLayout refreshLayout;
     private String newsSource;
@@ -126,7 +126,7 @@ public class NewsListFragment extends Fragment
 
     private void loadData() {
         URL url = NewsNetworkUtils.buildUrl(newsSource, "top");
-        new NewsQueryTask(this).execute(url);
+        new DownloadTask(this, new NewsListBean()).execute(url);
     }
 
 

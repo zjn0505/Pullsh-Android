@@ -26,10 +26,9 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.neuandroid.refreshed.R;
-import com.neuandroid.xkcd.util.IAsyncTaskListener;
+import com.neuandroid.util.DownloadTask;
 import com.neuandroid.xkcd.activity.ImageDetailActivity;
 import com.neuandroid.xkcd.util.OnSwipeTouchListener;
-import com.neuandroid.xkcd.util.XKCDQueryTask;
 import com.neuandroid.xkcd.model.XKCDPic;
 
 import java.io.File;
@@ -65,7 +64,7 @@ public class XKCDFragment extends Fragment {
 
     private FrameLayout mainLayout;
 
-    private IAsyncTaskListener iAsyncTaskListener = new IAsyncTaskListener() {
+    private DownloadTask.IAsyncTaskListener iAsyncTaskListener = new DownloadTask.IAsyncTaskListener() {
         @Override
         public void onPreExecute() {
             progressBar.setVisibility(View.VISIBLE);
@@ -284,7 +283,7 @@ public class XKCDFragment extends Fragment {
     private void loadXKCDpic(){
         try{
             URL url = new URL(XKCD_QUERY_BASE_URL);
-            new XKCDQueryTask(iAsyncTaskListener).execute(url);
+            new DownloadTask(iAsyncTaskListener, new XKCDPic()).execute(url);
         } catch (MalformedURLException e){
             e.printStackTrace();
         }
@@ -299,7 +298,7 @@ public class XKCDFragment extends Fragment {
         try{
             String formatted = String.format(XKCD_QUERY_BY_ID_URL, id);
             URL url = new URL(formatted);
-            new XKCDQueryTask(iAsyncTaskListener).execute(url);
+            new DownloadTask(iAsyncTaskListener, new XKCDPic()).execute(url);
         } catch (MalformedURLException e){
             e.printStackTrace();
         }
