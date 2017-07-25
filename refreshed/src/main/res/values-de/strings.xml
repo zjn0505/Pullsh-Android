@@ -16,4 +16,17 @@
     <string name="goto_specific">Zu einem speziellem xkcd</string>
     <string name="loading_text">Lädt...</string>
     <string name="menu_night_mode">Nacht</string>
+    <string name="menu_night_mode_auto">Automatisch</string>
+    <string name="menu_night_mode_day">Tag (immer)</string>
+    <string name="menu_night_mode_night">Nacht (immer)</string>
+    <string name="menu_night_mode_system">System folgen</string>
+    <string name="nav_menu_chuck">Chuck Norris Witze</string>
+    <string name="nav_menu_news">Nachrichten</string>
+    <string name="nav_menu_xkcd"></string>
+    <string name="news_attribution">Nachrichten von newsapi.org</string>
+    <string name="query_error">Chuck Norris hat überall Netz, prüf deine Verbindung.</string>
+    <string name="random_button">Zufällig xkcd laden</string>
+    <string name="techcrunch"></string>
+    <string name="share_menu_entry">xkcd teilen</string>
+    <string name="waiting_for_download_message">Bitte warte bis das Bild fertig geladen wurde!</string>
 </resources>

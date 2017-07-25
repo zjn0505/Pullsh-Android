@@ -4,8 +4,8 @@
     <string name="news_attribution">News from newsapi.org</string>
     <string name="engadget" translatable="false">Engadget</string>
     <string name="ign" translatable="false">IGN</string>
-    <string name="polygon">Polygon</string>
-    <string name="techcrunch">Techcrunch</string>
+    <string name="polygon" translatable="false">Polygon</string>
+    <string name="techcrunch" translatable="false">Techcrunch</string>
 
     <string name="menu_night_mode">Night mode</string>
     <string name="menu_night_mode_system">Follow system</string>
@@ -15,7 +15,7 @@
 
     <string name="nav_menu_news">News</string>
     <string name="nav_menu_chuck">Chuck Norris Jokes</string>
-    <string name="nav_menu_xkcd">xkcd</string>
+    <string name="nav_menu_xkcd" translatable="false">xkcd</string>
 
     <!--Chuck Norris jokes strings-->
     <string name="default_text">Click to load joke</string>
@@ -24,8 +24,8 @@
     <string name="lastname_hint" translatable="false">Norris</string>
     <string name="filters">Filters:</string>
     <string name="explicit">Explicit</string>
-    <string name="nerdy">Nerdy</string>
-    <string name="query_error">If you try to make jokes about Chuck Norris, he comes to your house and cuts the internet.</string>
+    <string name="nerdy" translatable="false">Nerdy</string>
+    <string name="query_error">Chuck Norris never loses connectivity, check your connection.</string>
 
     <!--xkcd strings-->
     <string name="random_button">Load random xkcd</string>
