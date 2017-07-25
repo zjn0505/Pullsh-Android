@@ -1,16 +1,18 @@
-package com.neuandroid.news.util;
+package com.neuandroid.util;
 
 import android.os.AsyncTask;
 
 import com.google.gson.Gson;
-import com.neuandroid.news.model.NewsListBean;
-import com.neuandroid.util.NetworkUtils;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
 
-public class NewsQueryTask extends AsyncTask<URL, Object, String> {
+/**
+ * Created by max on 25/07/17.
+ */
+
+public class DownloadTask extends AsyncTask<URL, Object, String> {
 
     public interface IAsyncTaskListener {
         void onPreExecute();
@@ -18,9 +20,11 @@ public class NewsQueryTask extends AsyncTask<URL, Object, String> {
     }
 
     private IAsyncTaskListener listener;
+    private Serializable bean;
 
-    public NewsQueryTask(IAsyncTaskListener listener) {
+    public DownloadTask(IAsyncTaskListener listener, Serializable bean) {
         this.listener = listener;
+        this.bean = bean;
     }
 
     @Override
@@ -44,8 +48,7 @@ public class NewsQueryTask extends AsyncTask<URL, Object, String> {
 
     @Override
     protected void onPostExecute(String result) {
-        NewsListBean newsList = new Gson().fromJson(result, NewsListBean.class);
-        listener.onPostExecute(newsList);
+        Serializable resultBean = new Gson().fromJson(result, bean.getClass());
+        listener.onPostExecute(resultBean);
     }
-
 }
