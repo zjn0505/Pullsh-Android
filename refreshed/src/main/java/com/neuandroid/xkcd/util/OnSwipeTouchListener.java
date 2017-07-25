@@ -6,6 +6,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 
+/**
+ * Used to register left, up, right, down swipe gestures.
+ * Override methods onSwipeRight, onSwipeLeft, onSwipeTop, onSwipeBottom to handle.
+ */
 public class OnSwipeTouchListener implements OnTouchListener {
 
     private final GestureDetector gestureDetector;

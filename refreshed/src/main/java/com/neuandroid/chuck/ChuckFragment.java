@@ -31,6 +31,11 @@ import java.net.URL;
  * Created by max on 20/07/17.
  */
 
+/**
+ * This fragment is the adaption from the activity of the chuck app main activity.
+ * It gets random jokes from the ICNDB and optionally uses category filters and
+ * name substitution.
+ */
 public class ChuckFragment extends Fragment {
     private static final String API_QUERY = "http://api.icndb.com/jokes/random?escape=javascript";
 
@@ -46,9 +51,18 @@ public class ChuckFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        /*
+         The following line ensures that any previous menu is removed, even though ChuckFragment
+         does not use its own menu.
+          */
         setHasOptionsMenu(true);
     }
 
+    /**
+     * This method is called when the view is restored.
+     * This grabs data from the savedInstanceState bundle and repopulates the layout accordingly.
+     * @param savedInstanceState
+     */
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
@@ -65,6 +79,13 @@ public class ChuckFragment extends Fragment {
 
     }
 
+    /**
+     * This contains the code for initializing the layout and preparing the fragment for work.
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -263,6 +284,15 @@ public class ChuckFragment extends Fragment {
                 });
     }
 
+    /**
+     * Saves the content of the layout.
+     * "joke" is used to store the current joke
+     * "firstName" is used to store the name currently entered in the corresponding edit text
+     * "lastName" is used to store the name currently entered in the corresponding edit text
+     * "checkboxes" stores an array of boolean values corresponding to the currently checked
+     * checkboxes
+     * @param outState
+     */
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);

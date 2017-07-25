@@ -16,6 +16,10 @@ import com.neuandroid.refreshed.R;
  * Created by max on 14/07/17.
  */
 
+/**
+ * A generic number picker dialog. Requires a min and max int value to be created.
+ * Provides listener that the creator should implement.
+ */
 public class NumberPickerDialog extends DialogFragment {
 
     public interface INumberPickerDialogListener{

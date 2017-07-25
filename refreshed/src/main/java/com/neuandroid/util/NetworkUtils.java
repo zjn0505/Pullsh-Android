@@ -8,8 +8,13 @@ import java.util.Scanner;
 
 /**
  * Created by jienanzhang on 08/07/2017.
+ * Modified by max
  */
 
+/**
+ * This class provides the getResponseFromHttpUrl method to download something from a url and parse
+ * the response.
+ */
 public class NetworkUtils {
 
     public static String getResponseFromHttpUrl(URL url) throws IOException {
