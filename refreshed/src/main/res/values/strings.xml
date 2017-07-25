@@ -1,11 +1,9 @@
 <resources>
     <string name="app_name">Refreshed</string>
-    <string name="action_settings">Settings</string>
     <string name="action_sources">Select sources</string>
-    <string name="checkin">Checkin</string>
     <string name="news_attribution">News from newsapi.org</string>
-    <string name="engadget">Engadget</string>
-    <string name="ign">IGN</string>
+    <string name="engadget" translatable="false">Engadget</string>
+    <string name="ign" translatable="false">IGN</string>
     <string name="polygon">Polygon</string>
     <string name="techcrunch">Techcrunch</string>
 
@@ -22,8 +20,8 @@
     <!--Chuck Norris jokes strings-->
     <string name="default_text">Click to load joke</string>
     <string name="loading_text">Loading...</string>
-    <string name="firstname_hint">Chuck</string>
-    <string name="lastname_hint">Norris</string>
+    <string name="firstname_hint" translatable="false">Chuck</string>
+    <string name="lastname_hint" translatable="false">Norris</string>
     <string name="filters">Filters:</string>
     <string name="explicit">Explicit</string>
     <string name="nerdy">Nerdy</string>
