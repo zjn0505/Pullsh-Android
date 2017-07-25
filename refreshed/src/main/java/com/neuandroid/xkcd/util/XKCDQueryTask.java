@@ -13,6 +13,9 @@ import java.net.URL;
  * Created by max on 13/07/17.
  */
 
+/**
+ * Used to start a task to download a comic's json data from the xkcd website.
+ */
 public class XKCDQueryTask extends AsyncTask<URL, Object, String> {
 
     private IAsyncTaskListener listener;
@@ -40,6 +43,11 @@ public class XKCDQueryTask extends AsyncTask<URL, Object, String> {
         listener.onPreExecute();
     }
 
+    /**
+     * Returned result is serialized using Gson and the listeners onPostExecute method is called
+     * with the object as a parameter.
+     * @param s
+     */
     @Override
     protected void onPostExecute(String s) {
         XKCDPic xPic = new Gson().fromJson(s, XKCDPic.class);

@@ -12,6 +12,12 @@ import com.neuandroid.refreshed.R;
  * Created by max on 14/07/17.
  */
 
+/**
+ * A dialog which was intended for displaying the alt text of a comic, but can also be used to
+ * display other generic messages like errors or notices to the user.
+ * Provides a listener interface for the creating activity to react differently to a positive
+ * button click and a negative button click.
+ */
 public class AltTextDialog extends DialogFragment {
 
     public interface IAltTextInterfaceListener{

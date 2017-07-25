@@ -44,6 +44,9 @@ import java.util.Random;
  * Created by max on 20/07/17.
  */
 
+/**
+ * Fragment version of xkcd main activity.
+ */
 public class XKCDFragment extends Fragment {
 
 
@@ -82,6 +85,10 @@ public class XKCDFragment extends Fragment {
         }
     };
 
+    /*
+     * deprecated silentListener, which was used for getting a random xkcd pic before most recent
+     * was stored
+     *
     private IAsyncTaskListener silentListener = new IAsyncTaskListener() {
         @Override
         public void onPreExecute() {
@@ -97,6 +104,7 @@ public class XKCDFragment extends Fragment {
             }
         }
     };
+    */
 
 
     @Override
@@ -135,6 +143,8 @@ public class XKCDFragment extends Fragment {
             }
         });
 
+        // this swipe doesn't work on above the image scroll view at the moment, only on areas
+        // around the scroll view
         mainLayout.setOnTouchListener(new OnSwipeTouchListener(XKCDFragment.this.getActivity()){
             @Override
             public void onSwipeLeft() {
@@ -155,6 +165,11 @@ public class XKCDFragment extends Fragment {
     }
 
 
+    /**
+     * This creates the specific xkcd menu
+     * @param menu
+     * @param inflater
+     */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_xkcd, menu);
@@ -212,6 +227,8 @@ public class XKCDFragment extends Fragment {
                     break;
                 }
 
+                // sharing the image works by using the file provider to store the file locally
+                // and then sharing that file in an intent
             case R.id.share_action:
                 if(currentPic != null){
                     Intent shareIntent = new Intent(Intent.ACTION_SEND);
@@ -230,6 +247,8 @@ public class XKCDFragment extends Fragment {
     }
 
 
+    // limitation of the app here is that, if xkcd gets updated, the app only gets the new most
+    // comic after restarting the app, since xkcd only updates every few days, this seems reasonable
     private void loadNext() {
         int newId = currentPic.num + 1;
         if (newId > mostRecent){
@@ -246,6 +265,9 @@ public class XKCDFragment extends Fragment {
         loadXKCDpicById(newId);
     }
 
+    /**
+     * Launches a browser intent to open the explain xkcd website for the current comic
+     */
     private void gotoExplainXKCD(){
         if(currentPic != null){
             Intent browserIntent =
@@ -256,6 +278,9 @@ public class XKCDFragment extends Fragment {
         }
     }
 
+    /**
+     * Loads most recent xkcd comic
+     */
     private void loadXKCDpic(){
         try{
             URL url = new URL(XKCD_QUERY_BASE_URL);
@@ -266,6 +291,10 @@ public class XKCDFragment extends Fragment {
 
     }
 
+    /**
+     * Loads xkcd comic by a given id. Validity of the id is not checked here.
+     * @param id xkcd comic id
+     */
     private void loadXKCDpicById(int id){
         try{
             String formatted = String.format(XKCD_QUERY_BY_ID_URL, id);
@@ -276,15 +305,20 @@ public class XKCDFragment extends Fragment {
         }
     }
 
+
+    /**
+     * Requests a random xkcd comic based on the currently known most recent comic.
+     */
     private void loadRandomXKCDPic(){
-        try{
-            URL url = new URL(XKCD_QUERY_BASE_URL);
-            new XKCDQueryTask(silentListener).execute(url);
-        } catch (MalformedURLException e){
-            e.printStackTrace();
-        }
+        Random r = new Random();
+        int newNumber = r.nextInt(mostRecent - 1) + 1;
+        loadXKCDpicById(newNumber);
     }
 
+    /**
+     * Loads the picture using Glide and writes other dynamic parts of layout.
+     * @param pic the xkcd pic object to be rendered
+     */
     private void renderXKCDPic(XKCDPic pic){
         titleText.setText(pic.num + ": " + pic.safe_title);
         altText.setText(pic.alt);
@@ -294,6 +328,7 @@ public class XKCDFragment extends Fragment {
          * for the new image
          */
 
+        // storing as bitmap is necessary to share image later
         Glide.with(this)
                 .load(pic.img)
                 .asBitmap()
@@ -315,12 +350,18 @@ public class XKCDFragment extends Fragment {
 
     }
 
+    /**
+     * Launches the detail view activity for a picture
+     */
     private void launchDetailActivity(){
         Intent intent = new Intent(XKCDFragment.this.getActivity(), ImageDetailActivity.class);
         intent.putExtra("URL", currentPic.img);
         startActivity(intent);
     }
 
+    /**
+     * Launches the alt dialog displaying the alt text for the current comic or an error message.
+     */
     private void launchAltDialog(){
         AltTextDialog altFragment = new AltTextDialog();
         if(currentPic != null){
@@ -344,6 +385,10 @@ public class XKCDFragment extends Fragment {
         altFragment.show(getFragmentManager(), "DialogFragment");
     }
 
+    /**
+     * saves most recent pic number and current pic number
+     * @param outState
+     */
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -351,6 +396,10 @@ public class XKCDFragment extends Fragment {
         outState.putInt("most_recent", mostRecent);
     }
 
+    /**
+     * restores most recent pic number and current pic number
+     * @param savedInstanceState
+     */
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
@@ -364,6 +413,11 @@ public class XKCDFragment extends Fragment {
         }
     }
 
+    /**
+     * Writes a bitmap from an image view to a local file and returns the corresponding uri.
+     * @param imageView the image view to extract the bitmap from
+     * @return the uri of the saved bitmap, null if there was an error
+     */
     public Uri getLocalBitmapUri(ImageView imageView) {
         // Extract Bitmap from ImageView drawable
         Drawable drawable = imageView.getDrawable();

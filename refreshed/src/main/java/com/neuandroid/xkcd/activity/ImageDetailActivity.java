@@ -13,6 +13,9 @@ import com.neuandroid.refreshed.R;
  * Created by max on 13/07/17.
  */
 
+/**
+ * A fullscreen activity containing a photoview for looking at an image in more detail.
+ */
 public class ImageDetailActivity extends Activity {
 
     @Override

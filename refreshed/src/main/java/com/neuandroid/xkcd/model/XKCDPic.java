@@ -6,6 +6,9 @@ import java.io.Serializable;
  * Created by max on 13/07/17.
  */
 
+/**
+ * A serializable object to parse the xkcd json data
+ */
 public class XKCDPic implements Serializable {
 
     public String year;
