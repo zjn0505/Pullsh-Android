@@ -209,15 +209,21 @@ public class XKCDFragment extends Fragment {
                     break;
                 } else {
                     launchAltDialog();
+                    break;
                 }
 
             case R.id.share_action:
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.setType("image/png");
-                shareIntent.putExtra(Intent.EXTRA_STREAM, getLocalBitmapUri(imageView));
-                startActivity(Intent.createChooser(shareIntent, getResources()
-                        .getString(R.string.share_menu_entry)));
-                break;
+                if(currentPic != null){
+                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                    shareIntent.setType("image/png");
+                    shareIntent.putExtra(Intent.EXTRA_STREAM, getLocalBitmapUri(imageView));
+                    startActivity(Intent.createChooser(shareIntent, getResources()
+                            .getString(R.string.share_menu_entry)));
+                    break;
+                } else {
+                    launchAltDialog();
+                    break;
+                }
 
         }
         return true;

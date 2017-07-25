@@ -39,6 +39,9 @@ public class NewsFragment extends Fragment {
         }
         tabLayout = (TabLayout) getActivity().findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+
+        int newsIndex = getArguments().getInt("newsIndex");
+        viewPager.setCurrentItem(newsIndex);
         tabLayout.setVisibility(View.VISIBLE);
 
         appbar = (AppBarLayout) getActivity().findViewById(R.id.appbar);

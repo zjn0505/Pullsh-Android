@@ -147,9 +147,24 @@ public class MainActivity extends AppCompatActivity {
     private void selectDrawerItem(MenuItem menuItem) {
         Fragment fragment = null;
         Class fragmentClass = null;
+        int newsIndex = -1;
+        Bundle bundle = null;
         switch (menuItem.getItemId()) {
-            case R.id.nav_news:
+            case R.id.nav_engadget:
                 fragmentClass = NewsFragment.class;
+                newsIndex = 0;
+                break;
+            case R.id.nav_ign:
+                fragmentClass = NewsFragment.class;
+                newsIndex = 1;
+                break;
+            case R.id.nav_polygon:
+                fragmentClass = NewsFragment.class;
+                newsIndex = 2;
+                break;
+            case R.id.nav_techcrunch:
+                fragmentClass = NewsFragment.class;
+                newsIndex = 3;
                 break;
             case R.id.nav_chuck:
                 fragmentClass = ChuckFragment.class;
@@ -158,8 +173,16 @@ public class MainActivity extends AppCompatActivity {
                 fragmentClass = XKCDFragment.class;
         }
 
+        if(newsIndex >= 0){
+            bundle = new Bundle();
+            bundle.putInt("newsIndex", newsIndex);
+        }
+
         try {
             fragment = (Fragment) fragmentClass.newInstance();
+            if(bundle != null){
+                fragment.setArguments(bundle);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
