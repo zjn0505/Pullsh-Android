@@ -17,9 +17,6 @@ public class NewsNetworkUtils extends NetworkUtils {
 
 
     private final static String SAMPLE_TOKEN = "2a2736d38cc8461daf7af2a80f2e0ffe";
-    private final static String PARAMS_TOP = "top";
-    private final static String PARAMS_LATEST = "latest";
-
     private final static String TAG = "NewsNetworkUtils";
 
     /**
