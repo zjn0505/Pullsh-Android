@@ -75,6 +75,22 @@ public class MainActivity extends AppCompatActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setVisibility(View.GONE);
+
+        Fragment fragment = null;
+        Bundle bundle = new Bundle();
+        bundle.putInt("newsIndex", 0);
+        try {
+            fragment = (Fragment) NewsFragment.class.newInstance();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        fragment.setArguments(bundle);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
+        mDrawerLayout.closeDrawers();
+        setTitle(getResources().getString(R.string.nav_menu_news));
     }
 
     @Override
@@ -193,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
-        menuItem.setChecked(true);
+        //menuItem.setChecked(true);
         mDrawerLayout.closeDrawers();
         setTitle(menuItem.getTitle());
     }

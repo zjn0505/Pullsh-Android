@@ -20,22 +20,24 @@
         <item
             android:title="@string/nav_menu_news" >
             <menu>
-                <item
-                    android:id="@+id/nav_engadget"
-                    android:title="@string/engadget"
-                    android:icon="@drawable/ic_menu"/>
-                <item
-                    android:id="@+id/nav_ign"
-                    android:title="@string/ign"
-                    android:icon="@drawable/ic_menu"/>
-                <item
-                    android:id="@+id/nav_polygon"
-                    android:title="@string/polygon"
-                    android:icon="@drawable/ic_menu"/>
-                <item
-                    android:id="@+id/nav_techcrunch"
-                    android:title="@string/techcrunch"
-                    android:icon="@drawable/ic_menu"/>
+                <group android:checkableBehavior="single">
+                    <item
+                        android:id="@+id/nav_engadget"
+                        android:title="@string/engadget"
+                        android:icon="@drawable/ic_menu"/>
+                    <item
+                        android:id="@+id/nav_ign"
+                        android:title="@string/ign"
+                        android:icon="@drawable/ic_menu"/>
+                    <item
+                        android:id="@+id/nav_polygon"
+                        android:title="@string/polygon"
+                        android:icon="@drawable/ic_menu"/>
+                    <item
+                        android:id="@+id/nav_techcrunch"
+                        android:title="@string/techcrunch"
+                        android:icon="@drawable/ic_menu"/>
+                </group>
             </menu>
         </item>
         <item
