@@ -50,8 +50,25 @@ public class NewsListFragment extends Fragment implements NewsQueryTask.IAsyncTa
     private ProgressBar pbLoading;
 
 
-    public void setSource(String source) {
-        newsSource = source;
+    public static NewsListFragment newInstance(String source, String name){
+        NewsListFragment newsListFragment = new NewsListFragment();
+        Bundle args = new Bundle();
+        args.putString("source", source);
+        args.putString("name", name);
+        newsListFragment.setArguments(args);
+        return newsListFragment;
+    }
+
+    public void update() {
+        loadData();
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Bundle args = getArguments();
+        newsSource = args.getString("source");
+
     }
 
     @Nullable

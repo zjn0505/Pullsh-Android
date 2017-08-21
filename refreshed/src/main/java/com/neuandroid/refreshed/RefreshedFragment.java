@@ -79,10 +79,9 @@ public class RefreshedFragment extends Fragment {
     private void addSourcesToAdapter(Set<String> sourceList) {
 //        adapter.removeAllFragment();
         for (String source : sourceList) {
-            NewsListFragment fragment = new NewsListFragment();
             String[] sourcesSplit = source.split("\\|");
+            NewsListFragment fragment = NewsListFragment.newInstance(sourcesSplit[0], sourcesSplit[1]);
             Log.d("zjn", "sources added here " + source);
-            fragment.setSource(sourcesSplit[0]);
             adapter.addFragment(fragment, sourcesSplit[1]);
         }
         adapter.notifyDataSetChanged();
@@ -108,6 +107,15 @@ public class RefreshedFragment extends Fragment {
             mFragments.clear();
             mFragmentTitles.clear();
             notifyDataSetChanged();
+        }
+
+        @Override
+        public int getItemPosition(Object object) {
+            NewsListFragment fragment = (NewsListFragment) object;
+            if (fragment != null) {
+                fragment.update();
+            }
+            return super.getItemPosition(object);
         }
 
         @Override
