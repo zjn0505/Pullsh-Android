@@ -111,8 +111,9 @@ public class MainActivity extends AppCompatActivity implements ShakeDetector.Lis
                     e.printStackTrace();
                     tvChuck.setText(getString(R.string.result_empty));
                 }
+            } else {
+                tvChuck.setText(getString(R.string.result_empty));
             }
-            tvChuck.setText(getString(R.string.result_empty));
         }
 
         private String extractJokeFromJson(String json) throws JSONException {
