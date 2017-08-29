@@ -26,13 +26,17 @@
             android:icon="@drawable/ic_menu"
             android:title="Chuck" />
         <item
-            android:id="@+id/nav_friends"
+            android:id="@+id/nav_xkcd"
             android:icon="@drawable/ic_menu"
-            android:title="Friends" />
+            android:title="Xkcd" />
         <item
-            android:id="@+id/nav_discussion"
+            android:id="@+id/nav_tic_tac_toe"
             android:icon="@drawable/ic_menu"
-            android:title="Discussion" />
+            android:title="TicTacToe" />
+        <item
+            android:id="@+id/nav_tic_tac_toe"
+            android:icon="@drawable/ic_menu"
+            android:title="TicTacToe" />
     </group>
 
     <item android:title="Sub items">
