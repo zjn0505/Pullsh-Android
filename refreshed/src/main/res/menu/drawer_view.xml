@@ -34,10 +34,6 @@
             android:icon="@drawable/ic_menu"
             android:title="TicTacToe" />
         <item
-            android:id="@+id/nav_tic_tac_toe"
-            android:icon="@drawable/ic_menu"
-            android:title="TicTacToe" />
-        <item
             android:id="@+id/nav_departify"
             android:icon="@drawable/ic_menu"
             android:title="Departify" />

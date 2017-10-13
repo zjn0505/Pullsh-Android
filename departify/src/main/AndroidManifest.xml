@@ -16,15 +16,15 @@
         </activity>
 
 
-        <meta-data
-            android:name="DEEP_ART_EFFECT_API_KEY"
-            android:value="${DEEP_ART_EFFECT_API_KEY}" />
-        <meta-data
-            android:name="DEEP_ART_EFFECT_ACCESS_KEY"
-            android:value="${DEEP_ART_EFFECT_ACCESS_KEY}" />
-        <meta-data
-            android:name="DEEP_ART_EFFECT_SECRET_KEY"
-            android:value="${DEEP_ART_EFFECT_SECRET_KEY}" />
+        <!--<meta-data-->
+            <!--android:name="DEEP_ART_EFFECT_API_KEY"-->
+            <!--android:value="${DEEP_ART_EFFECT_API_KEY}" />-->
+        <!--<meta-data-->
+            <!--android:name="DEEP_ART_EFFECT_ACCESS_KEY"-->
+            <!--android:value="${DEEP_ART_EFFECT_ACCESS_KEY}" />-->
+        <!--<meta-data-->
+            <!--android:name="DEEP_ART_EFFECT_SECRET_KEY"-->
+            <!--android:value="${DEEP_ART_EFFECT_SECRET_KEY}" />-->
 
     </application>
 
