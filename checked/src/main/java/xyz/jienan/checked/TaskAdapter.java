@@ -3,6 +3,7 @@ package xyz.jienan.checked;
 import android.content.Context;
 import android.net.wifi.WifiManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,13 +76,16 @@ public class TaskAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
 
     @Override
     public void onItemMove(int fromPosition, int toPosition) {
+        if (toPosition == 0 || fromPosition == 0)
+            return;
         Collections.swap(tasks, fromPosition - 1, toPosition - 1);
         notifyItemMoved(fromPosition, toPosition);
     }
 
     @Override
     public void onItemDismiss(int position) {
-
+        tasks.remove(position -1);
+        notifyItemRemoved(position);
     }
 
     public class TaskViewHolder extends RecyclerView.ViewHolder {

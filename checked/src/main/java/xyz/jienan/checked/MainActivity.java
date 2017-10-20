@@ -8,9 +8,16 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
+import android.view.animation.LayoutAnimationController;
+
+import java.io.IOException;
+import java.net.SocketTimeoutException;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -51,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         ItemTouchHelper.Callback callback = new TaskItemTouchHelperCallback(adapter);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(rvTodo);
+        getTasksList();
     }
 
     @Override
@@ -59,9 +67,15 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
 
     private void prepareTodoService() {
+        OkHttpClient client = new OkHttpClient.Builder().connectTimeout(90, TimeUnit.SECONDS)
+                .readTimeout(90, TimeUnit.SECONDS)
+                .writeTimeout(90, TimeUnit.SECONDS)
+                .build();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
+                .client(client)
                 .build();
         todoService = retrofit.create(TodoService.class);
     }
@@ -74,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 Log.d(TAG, "onResponse: " + response.body().toString());
                 container.setRefreshing(false);
                 adapter.updateTasks(response.body().getTasks());
+                Log.d(TAG, "getTasksList result size " + response.body().getTasks().size());
             }
 
             @Override
@@ -151,5 +166,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             }
         });
     }
+
 }
 
