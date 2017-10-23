@@ -88,6 +88,10 @@ public class TaskAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         notifyItemRemoved(position);
     }
 
+    public List<TaskEntity> getTasks() {
+        return tasks;
+    }
+
     public class TaskViewHolder extends RecyclerView.ViewHolder {
 
         public View taskIndicator;
