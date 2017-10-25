@@ -1,6 +1,7 @@
 package xyz.jienan.checked;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.net.wifi.WifiManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -9,9 +10,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import xyz.jienan.checked.network.HttpModel;
 import xyz.jienan.checked.network.TaskEntity;
 
 /**
@@ -54,6 +57,9 @@ public class TaskAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
                 int posi = position -1;
                 TaskEntity task = tasks.get(posi);
                 taskViewHolder.tvTaskName.setText(task.getName());
+                String status = task.getStatus().get(0);
+                taskViewHolder.taskIndicator.setBackgroundColor(ColorUtils.getStatusColor(status));
+
                 break;
             default:
                 break;
@@ -86,6 +92,15 @@ public class TaskAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     public void onItemDismiss(int position) {
         tasks.remove(position -1);
         notifyItemRemoved(position);
+    }
+
+    @Override
+    public void onItemUpdate(int position, Status status) {
+        TaskEntity task  = tasks.get(position -1);
+        List<String> statusList = new ArrayList<String>();
+        statusList.add(status.toString());
+        task.setStatus(statusList);
+        HttpModel.getInstance().updateTask(task);
     }
 
     public List<TaskEntity> getTasks() {

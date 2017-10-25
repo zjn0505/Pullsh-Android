@@ -8,4 +8,5 @@ public interface TaskItemTouchHelperAdapter {
 
     void onItemMove(int fromPosition, int toPosition);
     void onItemDismiss(int position);
+    void onItemUpdate(int position, Status status);
 }

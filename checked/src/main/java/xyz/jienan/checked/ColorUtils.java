@@ -10,6 +10,17 @@ import java.security.InvalidParameterException;
 
 public class ColorUtils {
 
+    public static int getStatusColor(String status) {
+        if (Status.Ongoing.toString().equalsIgnoreCase(status)) {
+            return Color.GREEN;
+        } else if (Status.Pending.toString().equalsIgnoreCase(status)) {
+            return Color.YELLOW;
+        } else if (Status.Completed.toString().equalsIgnoreCase(status)) {
+            return Color.GRAY;
+        }
+        return Color.BLACK;
+    }
+
     public static int blendColor(int[] colors, float progress, float... positionRatios) {
         int len = colors.length;
         int fromColor = colors[0];
@@ -34,16 +45,37 @@ public class ColorUtils {
             int[] fromColorA = generateArgbArray(fromColor);
             int[] toColorA = generateArgbArray(toColor);
 
-            int a = (int)(fromColorA[0] - (fromColorA[0] - toColorA[0]) * progressConverted);
-            int r = (int)(fromColorA[1] - (fromColorA[1] - toColorA[1]) * progressConverted);
-            int g = (int)(fromColorA[2] - (fromColorA[2] - toColorA[2]) * progressConverted);
-            int b = (int)(fromColorA[3] - (fromColorA[3] - toColorA[3]) * progressConverted);
+            int a = (int)(fromColorA[0] - (fromColorA[0] - toColorA[0]) * converterA(progressConverted));
+            int r = (int)(fromColorA[1] - (fromColorA[1] - toColorA[1]) * converterA(progressConverted));
+            int g = (int)(fromColorA[2] - (fromColorA[2] - toColorA[2]) * converterA(progressConverted));
+            int b = (int)(fromColorA[3] - (fromColorA[3] - toColorA[3]) * converterA(progressConverted));
 
             return Color.argb(a,r,g,b);
         }
 
         return 0xFFFFFFFF;
     }
+
+    /**
+     * apply a converter to make the transition have longer retention on both of the endpoints.
+     * the curve is in the shape of "∫" between 0 and 1
+     * @param x
+     * @return
+     */
+    public static double converterA(float x) {
+        return 1 / (1 + Math.pow(10000,(-x+0.5)));
+    }
+
+    /**
+     * apply a converter to make the transition quickly raise on the left endpoint.
+     * the curve is in the shape of "/¯¯" between 0 and 1
+     * @param x
+     * @return
+     */
+    public static double converterB(float x) {
+        return Math.min(5 * x, 1);
+    }
+
 
     private static int[] generateArgbArray(int color) {
         int a = (color >> 24) & 0xFF;
