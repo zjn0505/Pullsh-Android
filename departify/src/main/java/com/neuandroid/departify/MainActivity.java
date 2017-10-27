@@ -32,6 +32,7 @@ import android.widget.Toast;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.mobileconnectors.apigateway.ApiClientException;
 import com.amazonaws.mobileconnectors.apigateway.ApiClientFactory;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
@@ -118,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         ApiClientFactory factory = new ApiClientFactory()
-                .apiKey(apiKey) //TODO
+                .apiKey(apiKey)
                 .region("eu-west-1")
                 .credentialsProvider(new AWSCredentialsProvider() {
                     @Override
@@ -139,37 +140,49 @@ public class MainActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                final Styles styles = deepArtEffectsClient.stylesGet();
 
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        styleAdapter = new ArtStyleAdapter(
-                                getApplicationContext(),
-                                styles,
-                                new ArtStyleAdapter.IClickListener() {
-                                    @Override
-                                    public void onClick(String styleId) {
-                                        if (!isProcessing) {
-                                            if (mImageBitmap != null) {
-                                                Log.d(TAG, String.format("Style with ID %s clicked.", styleId));
-                                                isProcessing = true;
-                                                pbLoading.setVisibility(View.VISIBLE);
-                                                uploadImage(styleId);
-                                            } else {
-                                                Toast.makeText(mContext, "Please choose a picture first",
-                                                        Toast.LENGTH_SHORT).show();
+                try {
+                    final Styles styles = deepArtEffectsClient.stylesGet();
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            styleAdapter = new ArtStyleAdapter(
+                                    getApplicationContext(),
+                                    styles,
+                                    new ArtStyleAdapter.IClickListener() {
+                                        @Override
+                                        public void onClick(String styleId) {
+                                            if (!isProcessing) {
+                                                if (mImageBitmap != null) {
+                                                    Log.d(TAG, String.format("Style with ID %s clicked.", styleId));
+                                                    isProcessing = true;
+                                                    pbLoading.setVisibility(View.VISIBLE);
+                                                    uploadImage(styleId);
+                                                } else {
+                                                    Toast.makeText(mContext, "Please choose a picture first",
+                                                            Toast.LENGTH_SHORT).show();
+                                                }
                                             }
                                         }
                                     }
-                                }
-                        );
-                        rvArtStyles.setAdapter(styleAdapter);
+                            );
+                            rvArtStyles.setAdapter(styleAdapter);
 //                        styleAdapter.updateStyles(styles);
-                        pbLoading.setVisibility(View.GONE);
+                            pbLoading.setVisibility(View.GONE);
 //                        mStatusText.setText("");
-                    }
-                });
+                        }
+                    });
+                } catch (ApiClientException e) {
+                    e.printStackTrace();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MainActivity.this, "Failed to connect to Deep Art Effects service", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
             }
         }).start();
     }

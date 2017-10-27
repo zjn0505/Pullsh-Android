@@ -7,14 +7,14 @@ android {
     defaultConfig {
         applicationId "com.neuandroid.departify"
         minSdkVersion 20
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         Properties properties = new Properties()
-        properties.load(project.rootProject.file('keystore.properties').newDataInputStream())
+        properties.load(project.rootProject.file('/departify/keystore.properties').newDataInputStream())
         manifestPlaceholders = [
                 DEEP_ART_EFFECT_API_KEY    : properties['DEEP_ART_EFFECT_API_KEY'],
                 DEEP_ART_EFFECT_ACCESS_KEY : properties['DEEP_ART_EFFECT_ACCESS_KEY'],
