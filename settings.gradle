@@ -1,1 +1,1 @@
-include ':chuck', ':xkcd', ':refreshed', ':tictactoe', ':departify', ':facerecognition', ':checked'
+include ':chuck', ':xkcd', ':refreshed', ':tictactoe', ':departify', ':checked', ':pushpull'
