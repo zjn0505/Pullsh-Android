@@ -17,4 +17,8 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="tab_text_style" parent="android:TextAppearance.Widget.TabWidget">
+        <item name="android:textStyle">bold</item>
+    </style>
+
 </resources>
