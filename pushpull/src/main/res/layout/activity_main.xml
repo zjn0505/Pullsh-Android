@@ -18,15 +18,16 @@
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
-        <android.support.design.widget.TabLayout
-            android:id="@+id/tabs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:tabTextAppearance="@style/tab_text_style"/>
-
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_main" />
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/fragment_pushpull"
+        android:name="xyz.jienan.pushpull.FragmentPushPull"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:context="xyz.jienan.pushpull.MainActivity"
+        tools:showIn="@layout/activity_main" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
@@ -35,6 +36,7 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@drawable/ic_add"
-        tools:ignore="VectorDrawableCompat" />
+        tools:ignore="VectorDrawableCompat"
+        android:visibility="gone"/>
 
 </android.support.design.widget.CoordinatorLayout>

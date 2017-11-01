@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bottom_sheet"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    app:behavior_hideable="false"
+    app:behavior_peekHeight="60dp"
+    app:layout_behavior="@string/bottom_sheet_behavior"
+    android:background="#c3c3c3"
+    android:visibility="gone">
+
+    <LinearLayout
+        android:id="@+id/header_btns"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:weightSum="2">
+
+        <TextView
+            android:id="@+id/btn_bottom_left"
+            android:text="add a PUSH"
+            style="@style/bottom_sheet_text" />
+
+        <TextView
+            android:id="@+id/btn_bottom_right"
+            style="@style/bottom_sheet_text"
+            android:text="add a PULL" />
+
+    </LinearLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/edt_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone">
+        <EditText
+            android:id="@+id/edt_memo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:textAlignment="center"
+            android:hint="enter your memo"/>
+    </android.support.v4.widget.NestedScrollView>
+
+
+</FrameLayout>
