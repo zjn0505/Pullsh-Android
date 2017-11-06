@@ -3,9 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="xyz.jienan.pushpull.MainActivity"
-    tools:showIn="@layout/activity_main">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"
@@ -21,13 +19,56 @@
 
     <include layout="@layout/bottom_sheet"/>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_action"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@drawable/ic_swipe"
-        tools:ignore="VectorDrawableCompat"/>
+        android:layout_gravity="bottom">
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="@dimen/fab_margin"
+            app:srcCompat="@drawable/ic_swipe"
+            tools:ignore="VectorDrawableCompat" />
+
+        <RelativeLayout
+            android:id="@+id/bottom_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="@color/gray">
+
+            <TextView
+                android:id="@+id/tv_swipe_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:padding="5dp"
+                android:text="Create a push"
+                android:textSize="20dp"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+        </RelativeLayout>
+
+
+        <EditText
+            android:id="@+id/edt_memo2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/bottom_header"
+            android:layout_margin="20dp"
+            android:hint="enter your memo"
+            android:inputType="textMultiLine"
+            android:maxLines="5"
+            android:textAlignment="center"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+    </RelativeLayout>
 
 </android.support.design.widget.CoordinatorLayout>

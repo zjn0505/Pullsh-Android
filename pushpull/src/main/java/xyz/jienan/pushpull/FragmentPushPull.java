@@ -1,10 +1,16 @@
 package xyz.jienan.pushpull;
 
 import android.animation.ObjectAnimator;
+import android.content.Context;
+import android.graphics.drawable.Animatable;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
@@ -16,14 +22,20 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -55,9 +67,12 @@ public class FragmentPushPull extends Fragment {
     private LinearLayout headerBtns;
     private NestedScrollView edtPanel;
     private EditText edtMemo;
+    private EditText edtMemo2;
+    private TextView tvSwipeHint;
     private final static int STATE_PUSH  = 1;
     private final static int STATE_PULL  = 2;
     private int state = 0;
+    private InputMethodManager imm;
 
     public class PushPullFabListener implements View.OnClickListener {
 
@@ -103,10 +118,13 @@ public class FragmentPushPull extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         View view = inflater.inflate(R.layout.fragment_pushpull, null, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         bottomLayout = view.findViewById(R.id.bottom_sheet);
         fabSwipe = view.findViewById(R.id.fab_action);
+        tvSwipeHint = view.findViewById(R.id.tv_swipe_hint);
+        edtMemo2 = view.findViewById(R.id.edt_memo2);
         mDetector = new GestureDetectorCompat(getActivity(), mFabGestureListener);
         setupView();
         setupService();
@@ -155,6 +173,7 @@ public class FragmentPushPull extends Fragment {
         edtPanel = bottomLayout.findViewById(R.id.edt_panel);
         edtMemo = bottomLayout.findViewById(R.id.edt_memo);
 
+
         fabSwipe.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -162,9 +181,10 @@ public class FragmentPushPull extends Fragment {
                 if (originX == 0) {
                     originX = v.getX();
                 }
-                return true;
+                return false;
             }
         });
+        fabSwipe.setOnClickListener(mClickListener);
     }
 
     private float originX = 0;
@@ -177,47 +197,139 @@ public class FragmentPushPull extends Fragment {
             Log.d(TAG, "onFling: " + e1.toString() + e2.toString());
             Log.d(TAG, "onFling: " + velocityX +" "+ velocityY);
             if (Math.abs(velocityX) > 500) {
-
                 int width = getActivity().getWindowManager().getDefaultDisplay().getWidth();
-                int distance = velocityX > 0 ? width / 3 : -(width/3);
+
+                if (velocityX > 0) {
+                    fabPosition = Math.min(++fabPosition, 1);
+                } else if (velocityX < 0) {
+                    fabPosition = Math.max(--fabPosition, -1);
+                }
+                swipeTo(fabPosition);
+                int distance = width / 3 * fabPosition;
                 ObjectAnimator animation = ObjectAnimator.ofFloat(fabSwipe, "translationX", distance);
                 animation.setDuration(500);
+                Log.d(TAG, "onFling: " + distance);
+                animation.setInterpolator(new DecelerateInterpolator());
                 animation.start();
             }
             return true;
         }
     };
+
+    private int fabPosition = 0;
+
+    private void swipeTo(int i) {
+        if (i == 0) {
+            tvSwipeHint.setVisibility(View.GONE);
+            edtMemo2.setVisibility(View.GONE);
+            final View view = getActivity().getCurrentFocus();
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (view != null) {
+
+                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                    }
+                }
+            }, 500);
+            fabSwipe.setImageResource(R.drawable.ic_swipe);
+        } else {
+            tvSwipeHint.setVisibility(View.VISIBLE);
+            RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) tvSwipeHint.getLayoutParams();
+            if (i == 1) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                    lp.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                }
+                lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+                tvSwipeHint.setText("Create a pull");
+                edtMemo2.setHint("Input the memo id");
+                fabSwipe.setImageResource(R.drawable.anim_swipe_to_add);
+            } else if (i == -1) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                    lp.removeRule(RelativeLayout.ALIGN_PARENT_LEFT);
+                }
+                lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                tvSwipeHint.setText("Create a push");
+                edtMemo2.setHint("Input your memo");
+                fabSwipe.setImageResource(R.drawable.anim_swipe_to_add);
+            }
+            tvSwipeHint.setLayoutParams(lp);
+            edtMemo2.setVisibility(View.VISIBLE);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    edtMemo2.requestFocus();
+                    imm.showSoftInput(edtMemo2, InputMethodManager.SHOW_IMPLICIT);
+                }
+            }, 500);
+
+            Drawable drawable = fabSwipe.getDrawable();
+            if (drawable instanceof Animatable) {
+                ((Animatable) drawable).start();
+            }
+        }
+    }
     
     private View.OnClickListener mClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
-                case R.id.btn_bottom_left:
-                    if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
-                        ViewGroup.LayoutParams lp = bottomLayout.getLayoutParams();
-                        lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
-                        bottomLayout.setLayoutParams(lp);
-                        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                        bottomLayout.requestLayout();
-                        fab.setVisibility(View.VISIBLE);
-                        state = STATE_PUSH;
+                case R.id.fab_action:
+                    if (fabPosition == -1) {
+                        pushMemo();
+                    } else if (fabPosition == 1) {
+                        pullMemo();
                     }
-                    break;
-                case R.id.btn_bottom_right:
-                    if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
-                        ViewGroup.LayoutParams lp = bottomLayout.getLayoutParams();
-                        lp.height = 600;
-                        bottomLayout.setLayoutParams(lp);
-                        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                        fab.setVisibility(View.VISIBLE);
-                        state = STATE_PULL;
-                    }
-                    break;
-
             }
 
         }
     };
+
+    private void pushMemo() {
+        String memoContent = edtMemo2.getText().toString();
+        if (TextUtils.isEmpty(memoContent)) {
+            Toast.makeText(getActivity(), "Please input some contents", Toast.LENGTH_SHORT).show();
+        } else {
+            MemoEntity entity = new MemoEntity();
+            entity.setMsg(memoContent);
+            entity.setExpiredOn("1day");
+            Call<CommonResponse> call = memoService.createMemo(entity);
+            call.enqueue(new Callback<CommonResponse>() {
+
+                @Override
+                public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+                    mAdapter.addMemo(response.body().getMemo());
+                }
+
+                @Override
+                public void onFailure(Call<CommonResponse> call, Throwable t) {
+
+                }
+            });
+        }
+    }
+
+    private void pullMemo() {
+        String memoId = edtMemo2.getText().toString();
+        if (TextUtils.isEmpty(memoId)) {
+            Toast.makeText(getActivity(), "Please input correct memo id", Toast.LENGTH_SHORT).show();
+        } else {
+            Call<CommonResponse> call = memoService.readMemo(memoId);
+            call.enqueue(new Callback<CommonResponse>() {
+
+                @Override
+                public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+                    mAdapter.addMemo(response.body().getMemo());
+                }
+
+                @Override
+                public void onFailure(Call<CommonResponse> call, Throwable t) {
+
+                }
+            });
+        }
+    }
+
 
     BottomSheetBehavior.BottomSheetCallback bottomSheetCallback =
             new BottomSheetBehavior.BottomSheetCallback() {
