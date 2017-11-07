@@ -51,4 +51,13 @@ public class MemoEntity implements Serializable {
     public void setExpiredOn(String expired_on) {
         this.expired_on = expired_on;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof MemoEntity) {
+            MemoEntity target = (MemoEntity) obj;
+            return target.getId().equals(this.getId());
+        }
+        return super.equals(obj);
+    }
 }

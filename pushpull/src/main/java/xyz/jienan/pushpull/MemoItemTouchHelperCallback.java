@@ -7,8 +7,15 @@ import android.support.v7.widget.helper.ItemTouchHelper;
  * Created by Jienan on 2017/10/13.
  */
 
-public class TaskItemTouchHelperCallback extends ItemTouchHelper.Callback {
+public class MemoItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
+    private TouchHelperAdapter mAdapter;
+
+    private MemoItemTouchHelperCallback(){}
+
+    public MemoItemTouchHelperCallback(TouchHelperAdapter adapter) {
+        mAdapter = adapter;
+    }
 
     @Override
     public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
@@ -19,10 +26,12 @@ public class TaskItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
     @Override
     public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+        mAdapter.onItemMove(viewHolder.getAdapterPosition(), target.getAdapterPosition());
         return true;
     }
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+        mAdapter.onItemDismiss(viewHolder.getAdapterPosition());
     }
 }
