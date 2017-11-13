@@ -1,4 +1,4 @@
-package xyz.jienan.pushpull;
+package xyz.jienan.pushpull.ui;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import xyz.jienan.pushpull.R;
 import xyz.jienan.pushpull.network.MemoEntity;
 
 /**

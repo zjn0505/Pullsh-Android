@@ -1,4 +1,4 @@
-package xyz.jienan.pushpull;
+package xyz.jienan.pushpull.ui;
 
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;

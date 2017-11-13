@@ -21,6 +21,7 @@ public class MemoEntity implements Serializable {
     private String msg;
     private int access_count;
     private String created_date;
+    private int max_access_count;
     private String expired_on;
 
     public String getId() {
@@ -43,6 +44,13 @@ public class MemoEntity implements Serializable {
         return created_date;
     }
 
+    public int getMaxAccessCount() {
+        return max_access_count;
+    }
+
+    public void setMaxAccessCount(int maxAccessCount) {
+        this.max_access_count = maxAccessCount;
+    }
 
     public String getExpiredOn() {
         return expired_on;

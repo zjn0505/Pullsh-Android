@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="xyz.jienan.pushpull.MainActivity">
+    tools:context="xyz.jienan.pushpull.ui.MainActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -24,9 +24,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/fragment_pushpull"
-        android:name="xyz.jienan.pushpull.FragmentPushPull"
+        android:name="xyz.jienan.pushpull.ui.FragmentPushPull"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:context="xyz.jienan.pushpull.MainActivity"
+        tools:context="xyz.jienan.pushpull.ui.MainActivity"
         tools:showIn="@layout/activity_main" />
 
     <android.support.design.widget.FloatingActionButton

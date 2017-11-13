@@ -1,4 +1,4 @@
-package xyz.jienan.pushpull;
+package xyz.jienan.pushpull.ui;
 
 /**
  * Created by Jienan on 2017/11/7.

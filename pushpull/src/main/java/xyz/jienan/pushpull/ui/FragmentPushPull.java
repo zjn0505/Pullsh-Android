@@ -1,7 +1,8 @@
-package xyz.jienan.pushpull;
+package xyz.jienan.pushpull.ui;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.ColorDrawable;
@@ -23,6 +24,9 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,11 +40,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.facebook.stetho.okhttp3.StethoInterceptor;
+
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import xyz.jienan.pushpull.BuildConfig;
+import xyz.jienan.pushpull.R;
 import xyz.jienan.pushpull.network.CommonResponse;
 import xyz.jienan.pushpull.network.MemoEntity;
 import xyz.jienan.pushpull.network.MemoService;
@@ -71,11 +80,15 @@ public class FragmentPushPull extends Fragment {
     private final static int STATE_PULL  = 2;
     private int state = 0;
     private InputMethodManager imm;
+    private SharedPreferences sharedPreferences;
+
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        this.setHasOptionsMenu(true);
+        sharedPreferences = getActivity().getSharedPreferences("MEMO_CONFIG", Context.MODE_PRIVATE);
         View view = inflater.inflate(R.layout.fragment_pushpull, null, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         bottomLayout = view.findViewById(R.id.bottom_sheet);
@@ -94,11 +107,37 @@ public class FragmentPushPull extends Fragment {
         super.onActivityCreated(savedInstanceState);
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_memo, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_push_config) {
+            PushConfigDialog dialog = new PushConfigDialog();
+            dialog.setContext(getActivity());
+            dialog.show(getFragmentManager(), null);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
     private void setupService() {
-        Retrofit retrofit = new Retrofit.Builder()
+        Retrofit.Builder builder = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+                .addConverterFactory(GsonConverterFactory.create());
+        if (BuildConfig.DEBUG) {
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .addNetworkInterceptor(new StethoInterceptor()).build();
+            builder.client(client);
+        }
+
+        Retrofit retrofit = builder.build();
         memoService = retrofit.create(MemoService.class);
     }
 
@@ -243,9 +282,29 @@ public class FragmentPushPull extends Fragment {
             Toast.makeText(getActivity(), "Please input some contents", Toast.LENGTH_SHORT).show();
         } else {
             fabSwipe.setClickable(false);
+            int time = sharedPreferences.getInt("EXPIRED_TIME", 0);
+            int type = sharedPreferences.getInt("EXPIRED_TYPE", 2);
+            int count = sharedPreferences.getInt("ACCESS_COUNT", 0);
+            String expiredArg = "";
+            if (time > 0)
+            switch (type) {
+                case 0:
+                    expiredArg = time + "min";
+                    break;
+                case 1:
+                    expiredArg = time + "hr";
+                    break;
+                case 2:
+                    expiredArg = time + "day";
+                    break;
+            }
+            if (type == 3) {
+                expiredArg = "";
+            }
             MemoEntity entity = new MemoEntity();
             entity.setMsg(memoContent);
-            entity.setExpiredOn("1day");
+            entity.setMaxAccessCount(count);
+            entity.setExpiredOn(expiredArg);
             Call<CommonResponse> call = memoService.createMemo(entity);
             call.enqueue(new Callback<CommonResponse>() {
 
