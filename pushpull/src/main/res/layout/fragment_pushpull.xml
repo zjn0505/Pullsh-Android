@@ -32,55 +32,63 @@
         android:layout_gravity="bottom">
 
         <RelativeLayout
-            android:id="@+id/bottom_header"
-            android:layout_width="match_parent"
+            android:id="@+id/bottom_wrapper"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:background="@color/gray">
+            android:layout_alignParentBottom="true">
 
-            <TextView
-                android:id="@+id/tv_swipe_hint"
-                android:layout_width="wrap_content"
-                android:layout_height="60dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:padding="5dp"
-                android:text="Create a push"
-                android:textSize="20dp"
+            <RelativeLayout
+                android:id="@+id/bottom_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:visibility="invisible"
+                android:background="@color/gray">
+
+                <TextView
+                    android:id="@+id/tv_swipe_hint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:padding="5dp"
+                    android:text="Create a push"
+                    android:textSize="20dp" />
+
+            </RelativeLayout>
+
+
+            <EditText
+                android:id="@+id/edt_memo2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/bottom_header"
+                android:background="#FFF"
+                android:hint="enter your memo"
+                android:inputType="textMultiLine|textNoSuggestions"
+                android:maxLines="5"
+                android:padding="20dp"
+                android:textAlignment="center"
                 android:visibility="gone"
-                tools:visibility="visible" />
-
+                tools:visibility="gone" />
         </RelativeLayout>
 
-
-        <EditText
-            android:id="@+id/edt_memo2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/bottom_header"
-            android:padding="20dp"
-            android:hint="enter your memo"
-            android:inputType="textMultiLine|textNoSuggestions"
-            android:maxLines="5"
-            android:textAlignment="center"
-            android:visibility="gone"
-            tools:visibility="visible"
-            android:background="#FFF"/>
 
         <com.github.jorgecastilloprz.FABProgressCircle
             android:id="@+id/fab_wrapper"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="15dp"
-            android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
+            android:layout_alignTop="@id/bottom_wrapper"
             app:arcWidth="3dp"
             app:reusable="true">
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fab_action"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                app:fabSize="normal"
                 app:borderWidth="0dp"
                 android:src="@drawable/ic_swipe"
                 android:padding="3dp"

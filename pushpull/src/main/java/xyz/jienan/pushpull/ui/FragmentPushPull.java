@@ -30,6 +30,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -72,7 +73,9 @@ public class FragmentPushPull extends Fragment {
     private FABProgressCircle fabWrapper;
     private TextView tvPush;
     private TextView tvPull;
+    private RelativeLayout bottomHeader;
     private LinearLayout headerBtns;
+    private RelativeLayout bottomWrapper;
     private NestedScrollView edtPanel;
     private EditText edtMemo;
     private EditText edtMemo2;
@@ -99,6 +102,8 @@ public class FragmentPushPull extends Fragment {
         tvSwipeHint = view.findViewById(R.id.tv_swipe_hint);
         edtMemo2 = view.findViewById(R.id.edt_memo2);
         foreground = view.findViewById(R.id.foreground);
+        bottomWrapper = view.findViewById(R.id.bottom_wrapper);
+        bottomHeader = view.findViewById(R.id.bottom_header);
         mDetector = new GestureDetectorCompat(getActivity(), mFabGestureListener);
         setupView();
         setupService();
@@ -203,6 +208,12 @@ public class FragmentPushPull extends Fragment {
                 Log.d(TAG, "onFling: " + distance);
                 animation.setInterpolator(new DecelerateInterpolator());
                 animation.start();
+                int from = fabPosition == 0 ? 1 : 0;
+                int to = fabPosition == 0 ? 0 : 1;
+                ObjectAnimator animatorBottom = ObjectAnimator.ofFloat(bottomWrapper, "alpha", from, to);
+                animatorBottom.setInterpolator(new AccelerateInterpolator());
+                animatorBottom.setDuration(500);
+                animatorBottom.start();
             }
             return true;
         }
@@ -212,7 +223,7 @@ public class FragmentPushPull extends Fragment {
 
     private void swipeTo(int i) {
         if (i == 0) {
-            tvSwipeHint.setVisibility(View.GONE);
+//            tvSwipeHint.setVisibility(View.GONE);
             edtMemo2.setVisibility(View.GONE);
             edtMemo2.setText("");
             edtMemo2.clearComposingText();
@@ -229,7 +240,7 @@ public class FragmentPushPull extends Fragment {
             }, 500);
             fabAnim(R.drawable.anim_add_to_swipe);
         } else {
-            tvSwipeHint.setVisibility(View.VISIBLE);
+            bottomHeader.setVisibility(View.VISIBLE);
             RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) tvSwipeHint.getLayoutParams();
             if (i == 1) {
                 lp.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
@@ -369,7 +380,11 @@ public class FragmentPushPull extends Fragment {
             @Override
             public void run() {
                 if (view != null) {
-                    tvSwipeHint.setVisibility(View.GONE);
+                    ObjectAnimator animatorBottom = ObjectAnimator.ofFloat(bottomWrapper, "alpha", 1, 0);
+                    animatorBottom.setInterpolator(new AccelerateInterpolator());
+                    animatorBottom.setDuration(500);
+                    animatorBottom.start();
+//                    tvSwipeHint.setVisibility(View.GONE);
                     edtMemo2.setVisibility(View.GONE);
                     edtMemo2.setText("");
                     edtMemo2.clearComposingText();

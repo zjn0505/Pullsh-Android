@@ -37,6 +37,7 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
     private Context mContext;
     private SharedPreferences.Editor editor;
     private Gson gson;
+    private RecyclerView recyclerView;
 
     PushPullAdapter(Context context) {
         mList = new LinkedList<MemoEntity>();
@@ -91,6 +92,11 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
         }
     }
 
+    @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        this.recyclerView = recyclerView;
+    }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -129,6 +135,7 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
             mList.add(0, memo);
             notifyItemInserted(0);
         }
+        recyclerView.scrollToPosition(0);
         saveToPreference();
     }
 
