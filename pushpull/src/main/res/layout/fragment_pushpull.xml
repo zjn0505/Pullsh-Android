@@ -31,16 +31,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom">
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_action"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="@dimen/fab_margin"
-            app:srcCompat="@drawable/ic_swipe"
-            tools:ignore="VectorDrawableCompat" />
-
         <RelativeLayout
             android:id="@+id/bottom_header"
             android:layout_width="match_parent"
@@ -76,6 +66,27 @@
             android:visibility="gone"
             tools:visibility="visible"
             android:background="#FFF"/>
+
+        <com.github.jorgecastilloprz.FABProgressCircle
+            android:id="@+id/fab_wrapper"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            app:arcWidth="3dp"
+            app:reusable="true">
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab_action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:borderWidth="0dp"
+                android:src="@drawable/ic_swipe"
+                android:padding="3dp"
+                android:layout_margin="10dp"
+                tools:ignore="VectorDrawableCompat" />
+        </com.github.jorgecastilloprz.FABProgressCircle>
 
     </RelativeLayout>
 

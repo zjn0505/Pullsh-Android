@@ -41,6 +41,7 @@ import android.widget.Toast;
 
 
 import com.facebook.stetho.okhttp3.StethoInterceptor;
+import com.github.jorgecastilloprz.FABProgressCircle;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
@@ -68,6 +69,7 @@ public class FragmentPushPull extends Fragment {
     private FrameLayout bottomLayout;
     private PushPullAdapter mAdapter;
     private FloatingActionButton fabSwipe;
+    private FABProgressCircle fabWrapper;
     private TextView tvPush;
     private TextView tvPull;
     private LinearLayout headerBtns;
@@ -93,6 +95,7 @@ public class FragmentPushPull extends Fragment {
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         bottomLayout = view.findViewById(R.id.bottom_sheet);
         fabSwipe = view.findViewById(R.id.fab_action);
+        fabWrapper = view.findViewById(R.id.fab_wrapper);
         tvSwipeHint = view.findViewById(R.id.tv_swipe_hint);
         edtMemo2 = view.findViewById(R.id.edt_memo2);
         foreground = view.findViewById(R.id.foreground);
@@ -195,7 +198,7 @@ public class FragmentPushPull extends Fragment {
                 }
                 swipeTo(fabPosition);
                 int distance = width / 3 * fabPosition;
-                ObjectAnimator animation = ObjectAnimator.ofFloat(fabSwipe, "translationX", distance);
+                ObjectAnimator animation = ObjectAnimator.ofFloat(fabWrapper, "translationX", distance);
                 animation.setDuration(500);
                 Log.d(TAG, "onFling: " + distance);
                 animation.setInterpolator(new DecelerateInterpolator());
@@ -301,6 +304,7 @@ public class FragmentPushPull extends Fragment {
             if (type == 3) {
                 expiredArg = "";
             }
+            fabWrapper.show();
             MemoEntity entity = new MemoEntity();
             entity.setMsg(memoContent);
             entity.setMaxAccessCount(count);
@@ -312,11 +316,14 @@ public class FragmentPushPull extends Fragment {
                 public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
                     mAdapter.addMemo(response.body().getMemo());
                     swipeBackFromCheck();
+                    fabWrapper.hide();
                 }
 
                 @Override
                 public void onFailure(Call<CommonResponse> call, Throwable t) {
                     fabSwipe.setClickable(true);
+                    fabWrapper.hide();
+                    Log.e("Request", t.getLocalizedMessage());
                 }
             });
         }
@@ -328,6 +335,7 @@ public class FragmentPushPull extends Fragment {
             Toast.makeText(getActivity(), "Please input correct memo id", Toast.LENGTH_SHORT).show();
         } else {
             fabSwipe.setClickable(false);
+            fabWrapper.show();
             Call<CommonResponse> call = memoService.readMemo(memoId);
             call.enqueue(new Callback<CommonResponse>() {
 
@@ -340,12 +348,14 @@ public class FragmentPushPull extends Fragment {
                         mAdapter.addMemo(response.body().getMemo());
                         swipeBackFromCheck();
                     }
-
+                    fabWrapper.hide();
                 }
 
                 @Override
                 public void onFailure(Call<CommonResponse> call, Throwable t) {
                     fabSwipe.setClickable(true);
+                    fabWrapper.hide();
+                    Log.e("Request", t.getLocalizedMessage());
                 }
             });
         }
@@ -372,7 +382,7 @@ public class FragmentPushPull extends Fragment {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                ObjectAnimator animation = ObjectAnimator.ofFloat(fabSwipe, "translationX", 0);
+                ObjectAnimator animation = ObjectAnimator.ofFloat(fabWrapper, "translationX", 0);
                 animation.setDuration(500);
                 animation.setInterpolator(new DecelerateInterpolator());
                 animation.start();

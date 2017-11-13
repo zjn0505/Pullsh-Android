@@ -30,7 +30,7 @@ dependencies {
     compile 'com.android.support:design:' + rootProject.supportLibVersion
     compile 'com.squareup.retrofit2:retrofit:2.0.0-beta4'
     compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta4'
-
+    compile 'com.github.jorgecastilloprz:fabprogresscircle:1.01@aar'
     compile 'com.facebook.stetho:stetho:1.5.0'
     compile 'com.facebook.stetho:stetho-okhttp3:1.5.0'
 }
