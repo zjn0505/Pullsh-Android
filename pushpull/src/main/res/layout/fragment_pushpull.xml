@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordi_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
@@ -17,19 +18,11 @@
         android:background="#AA000000"
         android:visibility="gone"/>
 
-    <ProgressBar
-        android:id="@+id/pb_loading"
-        android:layout_gravity="center"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"/>
-
-    <include layout="@layout/bottom_sheet"/>
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom">
+        android:layout_gravity="bottom"
+        app:layout_behavior="xyz.jienan.pushpull.ui.FloatingActionButtonBehavior">
 
         <RelativeLayout
             android:id="@+id/bottom_wrapper"
@@ -93,9 +86,20 @@
                 android:src="@drawable/ic_swipe"
                 android:padding="3dp"
                 android:layout_margin="10dp"
+                android:elevation="2dp"
                 tools:ignore="VectorDrawableCompat" />
         </com.github.jorgecastilloprz.FABProgressCircle>
 
     </RelativeLayout>
+
+    <View
+        android:id="@+id/bottom_sheet_shadow"
+        android:layout_width="match_parent"
+        android:layout_height="16dp"
+        android:background="@drawable/shape_gradient_top_shadow"
+        app:layout_anchor="@id/bottom_sheet"
+        android:visibility="gone"/>
+
+    <include layout="@layout/bottom_sheet"/>
 
 </android.support.design.widget.CoordinatorLayout>

@@ -2,4 +2,12 @@
     <string name="app_name">PushPull</string>
     <string name="action_push_config">Push Config</string>
     <string name="btn_confirm">Confirm</string>
+
+    <string name="memo_create">Created on :   %s</string>
+    <string name="memo_expire">Expire   on   :   %s</string>
+    <string name="memo_allowance_user">Access left :  %d</string>
+    <string name="memo_allowance_author">Access assigned :  %d</string>
+
+    <string name="snackbar_delete">One memo removed</string>
+    <string name="snackbar_undo">UNDO</string>
 </resources>

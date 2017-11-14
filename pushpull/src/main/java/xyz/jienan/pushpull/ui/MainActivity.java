@@ -10,6 +10,8 @@ import xyz.jienan.pushpull.R;
 
 public class MainActivity extends AppCompatActivity {
 
+    private OnBackPressedListener mListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -21,5 +23,23 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mListener != null && mListener.onBackPressed()) {
+
+        } else{
+            super.onBackPressed();
+        }
+
+    }
+
+    public void setBackPressListener(OnBackPressedListener listener) {
+        mListener = listener;
+    }
+
+    public interface OnBackPressedListener {
+        boolean onBackPressed();
     }
 }

@@ -23,6 +23,8 @@ public class MemoEntity implements Serializable {
     private String created_date;
     private int max_access_count;
     private String expired_on;
+    public boolean hasExpired = false;
+    public boolean createdFromPush = false;
 
     public String getId() {
         return _id;

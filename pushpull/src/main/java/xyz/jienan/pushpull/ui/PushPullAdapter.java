@@ -4,8 +4,10 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,9 +21,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
+import xyz.jienan.pushpull.DateUtils;
 import xyz.jienan.pushpull.R;
 import xyz.jienan.pushpull.network.MemoEntity;
 
@@ -38,8 +43,9 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
     private SharedPreferences.Editor editor;
     private Gson gson;
     private RecyclerView recyclerView;
+    private ItemInteractionCallback mCallback;
 
-    PushPullAdapter(Context context) {
+    PushPullAdapter(Context context, ItemInteractionCallback itemInteractionCallback) {
         mList = new LinkedList<MemoEntity>();
         mContext = context;
         if (clipboard == null) {
@@ -63,6 +69,7 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
 
         }
         editor = sharedPreferences.edit();
+        mCallback = itemInteractionCallback;
     }
 
     public void onItemMove(int from, int to) {
@@ -73,22 +80,55 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
 
     @Override
     public void onItemDismiss(int position) {
+        cache = mList.get(position);
         mList.remove(position);
         notifyItemRemoved(position);
         saveToPreference();
+        mCallback.onDismiss(position);
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    private MemoEntity cache;
 
-        public final TextView tvId;
-        public final TextView tvMsg;
-        public final ImageView ivCopy;
+    public void undoItemDismiss(int position) {
+        mList.add(position, cache);
+        notifyItemInserted(position);
+        saveToPreference();
+    }
+
+    public void expireItems() {
+        Iterator iterator = mList.iterator();
+        int i = 0;
+        while (iterator.hasNext()) {
+            MemoEntity entity = (MemoEntity) iterator.next();
+            if (entity.hasExpired && !entity.createdFromPush) {
+                iterator.remove();
+                i++;
+            }
+        }
+        if (i == 1) {
+            Toast.makeText(mContext, "One item has been removed from list", Toast.LENGTH_SHORT).show();
+        } else if (i > 1) {
+            Toast.makeText(mContext, i + " items have been removed from list", Toast.LENGTH_SHORT).show();
+        }
+        notifyDataSetChanged();
+        saveToPreference();
+    }
+
+    static class ViewHolder extends RecyclerView.ViewHolder {
+
+        final TextView tvId;
+        final TextView tvMsg;
+        final ImageView ivAction;
+        final ImageView ivNotice;
+        final View mView;
 
         public ViewHolder(View itemView) {
             super(itemView);
+            mView = itemView;
             tvId = itemView.findViewById(R.id.tv_push_short_id);
             tvMsg = itemView.findViewById(R.id.tv_push_content);
-            ivCopy = itemView.findViewById(R.id.iv_copy);
+            ivAction = itemView.findViewById(R.id.iv_action);
+            ivNotice = itemView.findViewById(R.id.iv_notice);
         }
     }
 
@@ -106,16 +146,53 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, int position) {
         final MemoEntity memo = mList.get(position);
         holder.tvId.setText(memo.getId());
         holder.tvMsg.setText(memo.getMsg());
-        holder.ivCopy.setOnClickListener(new View.OnClickListener() {
+        long lifeSpan = 0;
+        if (!TextUtils.isEmpty(memo.getExpiredOn())) {
+            lifeSpan = DateUtils.getTimeDiffFromNow(memo.getExpiredOn());
+            if (lifeSpan < 0) {
+                memo.hasExpired = true;
+            }
+        }
+        holder.ivAction.setEnabled(!memo.hasExpired);
+        holder.ivAction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ClipData clip = ClipData.newPlainText("id",memo.getId());
                 clipboard.setPrimaryClip(clip);
                 Toast.makeText(mContext, "id copied to clipboard", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        if (!memo.createdFromPush && memo.hasExpired) {
+            setItemExpiredView(holder);
+        }
+
+        if (lifeSpan > 0 && lifeSpan <= 1000 * 60 * 5){
+            holder.ivNotice.setVisibility(View.VISIBLE);
+        } else {
+            holder.ivNotice.setVisibility(View.GONE);
+        }
+
+        holder.mView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                long lifeSpanInClick = 0;
+                if (!TextUtils.isEmpty(memo.getExpiredOn())) {
+                    lifeSpanInClick = DateUtils.getTimeDiffFromNow(memo.getExpiredOn());
+                    if (lifeSpanInClick < 0) {
+                        memo.hasExpired = true;
+                    }
+                }
+                if (!memo.createdFromPush && memo.hasExpired) {
+                    Toast.makeText(mContext, "This memo has been expired", Toast.LENGTH_SHORT).show();
+                    setItemExpiredView(holder);
+                } else {
+                    mCallback.onClick(memo);
+                }
             }
         });
     }
@@ -139,6 +216,17 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
         saveToPreference();
     }
 
+    public boolean checkExistMeme(String id) {
+        for (int i = 0; i < mList.size(); i++) {
+            if (mList.get(i).getId().equals(id)) {
+                Toast.makeText(mContext, "item already in list", Toast.LENGTH_SHORT).show();
+                recyclerView.scrollToPosition(i);
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void saveToPreference() {
         JSONArray a = new JSONArray();
         for (MemoEntity entity : mList) {
@@ -147,5 +235,11 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
 
         editor.putString(MEMO_KEY, a.toString());
         editor.commit();
+    }
+
+    private void setItemExpiredView(ViewHolder holder) {
+        holder.ivNotice.setVisibility(View.GONE);
+        holder.ivAction.setEnabled(false);
+        holder.tvMsg.setPaintFlags(holder.tvMsg.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
     }
 }

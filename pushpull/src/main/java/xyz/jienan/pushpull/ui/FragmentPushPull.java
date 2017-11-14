@@ -1,6 +1,9 @@
 package xyz.jienan.pushpull.ui;
 
+import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
@@ -12,10 +15,11 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -35,14 +39,17 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.github.jorgecastilloprz.FABProgressCircle;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
@@ -51,6 +58,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import xyz.jienan.pushpull.BuildConfig;
+import xyz.jienan.pushpull.DateUtils;
 import xyz.jienan.pushpull.R;
 import xyz.jienan.pushpull.network.CommonResponse;
 import xyz.jienan.pushpull.network.MemoEntity;
@@ -65,54 +73,216 @@ public class FragmentPushPull extends Fragment {
     private final static String TAG = FragmentPushPull.class.getSimpleName();
     private final static String BASE_URL = "https://api.jienan.xyz/";
     private MemoService memoService;
+    private CoordinatorLayout coordiLayout;
     private RecyclerView recyclerView;
     private BottomSheetBehavior bottomSheetBehavior;
-    private FrameLayout bottomLayout;
+    private LinearLayout bottomLayout;
     private PushPullAdapter mAdapter;
     private FloatingActionButton fabSwipe;
     private FABProgressCircle fabWrapper;
-    private TextView tvPush;
-    private TextView tvPull;
     private RelativeLayout bottomHeader;
-    private LinearLayout headerBtns;
     private RelativeLayout bottomWrapper;
-    private NestedScrollView edtPanel;
     private EditText edtMemo;
-    private EditText edtMemo2;
     private TextView tvSwipeHint;
     private FrameLayout foreground;
-    private final static int STATE_PUSH  = 1;
-    private final static int STATE_PULL  = 2;
-    private int state = 0;
     private InputMethodManager imm;
     private SharedPreferences sharedPreferences;
+    private ClipboardManager clipboard;
 
+    // START views in bottom sheet
+    private View bsbShadow;
+    private TextView tvBsbMemoId;
+    private ImageView ivBsbIdCopy;
+    private TextView tvBsbMemoCreate;
+    private TextView tvBsbMemoExpire;
+    private TextView tvBsbMemoAccess;
+    private TextView tvBsbMemoContent;
+    private TextView tvBsbIsAuthor;
+    // END views in bottom sheet
+
+    private int swipeTransDistanceX = 0;
+    private float originX = 0;
+    private GestureDetectorCompat mDetector;
+    private int fabPosition = 0;
+
+    BottomSheetBehavior.BottomSheetCallback bottomSheetCallback =
+            new BottomSheetBehavior.BottomSheetCallback() {
+                @Override
+                public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                    switch (newState) {
+                        case BottomSheetBehavior.STATE_COLLAPSED:
+                            bsbShadow.setVisibility(View.GONE);
+                            foreground.setVisibility(View.GONE);
+                            break;
+                        case BottomSheetBehavior.STATE_DRAGGING:
+                            foreground.setVisibility(View.VISIBLE);
+                            break;
+                        case BottomSheetBehavior.STATE_EXPANDED:
+                            foreground.setVisibility(View.VISIBLE);
+                            bsbShadow.setVisibility(View.VISIBLE);
+                            break;
+                    }
+                }
+
+                @Override
+                public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                    foreground.setAlpha(slideOffset);
+                    foreground.setVisibility(View.VISIBLE);
+                }
+            };
+    private ItemInteractionCallback itemInteractionCallback = new ItemInteractionCallback() {
+        @Override
+        public void onClick(final MemoEntity entity) {
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            tvBsbMemoId.setText(entity.getId());
+            ivBsbIdCopy.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ClipData clip = ClipData.newPlainText("id", entity.getId());
+                    clipboard.setPrimaryClip(clip);
+                    Toast.makeText(getActivity(), "id copied to clipboard", Toast.LENGTH_SHORT).show();
+                }
+            });
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+
+            tvBsbMemoCreate.setText(String.format(getString(R.string.memo_create), DateUtils.parseMongoUTC(entity.getCreatedDate(), sdf)));
+            if (TextUtils.isEmpty(entity.getExpiredOn())) {
+                tvBsbMemoExpire.setVisibility(View.GONE);
+            } else {
+                tvBsbMemoExpire.setVisibility(View.VISIBLE);
+                tvBsbMemoExpire.setText(String.format(getString(R.string.memo_expire), DateUtils.parseMongoUTC(entity.getExpiredOn(), sdf)));
+            }
+            if (entity.getMaxAccessCount() == 0) {
+                tvBsbMemoAccess.setVisibility(View.GONE);
+            } else {
+                tvBsbMemoAccess.setVisibility(View.VISIBLE);
+                int resId = entity.createdFromPush ? R.string.memo_allowance_author : R.string.memo_allowance_user;
+                tvBsbMemoAccess.setText(String.format(getString(resId), (entity.getMaxAccessCount() - entity.getAccessCount())));
+            }
+            if (!entity.createdFromPush) {
+                tvBsbIsAuthor.setVisibility(View.GONE);
+            } else {
+                tvBsbIsAuthor.setVisibility(View.VISIBLE);
+            }
+            final String msg = entity.getMsg();
+            tvBsbMemoContent.setText(msg);
+            if (msg.length() < 10) {
+                tvBsbMemoContent.setTextSize(30);
+            } else if (msg.length() < 20) {
+                tvBsbMemoContent.setTextSize(25);
+            } else {
+                tvBsbMemoContent.setTextSize(20);
+            }
+            tvBsbMemoContent.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ClipData clip = ClipData.newPlainText("msg", msg);
+                    clipboard.setPrimaryClip(clip);
+                    Toast.makeText(getActivity(), "Memo content copied to clipboard", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+        @Override
+        public void onDismiss(final int position) {
+            Snackbar snackbar = Snackbar.make(coordiLayout,
+                    R.string.snackbar_delete, Snackbar.LENGTH_SHORT);
+            snackbar.setAction(R.string.snackbar_undo, new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mAdapter.undoItemDismiss(position);
+                }
+            });
+            snackbar.show();
+        }
+    };
+
+    private MainActivity.OnBackPressedListener mBackPressListener = new MainActivity.OnBackPressedListener() {
+        @Override
+        public boolean onBackPressed() {
+            if (fabPosition != 0) {
+                fabPosition = 0;
+                swipeTo(0);
+                return true;
+            } else if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                return true;
+            } else {
+                return false;
+            }
+        }
+    };
+
+    private GestureDetector.OnGestureListener mFabGestureListener = new GestureDetector.SimpleOnGestureListener() {
+
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            if (Math.abs(velocityX) > 500) {
+                if (velocityX > 0) {
+                    fabPosition = Math.min(++fabPosition, 1);
+                } else if (velocityX < 0) {
+                    fabPosition = Math.max(--fabPosition, -1);
+                }
+                swipeTo(fabPosition);
+            }
+            return true;
+        }
+    };
+
+    private View.OnClickListener mClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.fab_action:
+                    if (fabWrapper.getTranslationX() == swipeTransDistanceX) {
+                        if (fabPosition == -1) {
+                            pushMemo();
+                        } else if (fabPosition == 1) {
+                            pullMemo();
+                        }
+                    }
+                    break;
+            }
+
+        }
+    };
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         this.setHasOptionsMenu(true);
         sharedPreferences = getActivity().getSharedPreferences("MEMO_CONFIG", Context.MODE_PRIVATE);
         View view = inflater.inflate(R.layout.fragment_pushpull, null, false);
-        recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+        coordiLayout = view.findViewById(R.id.coordi_layout);
+        recyclerView = view.findViewById(R.id.recycler_view);
         bottomLayout = view.findViewById(R.id.bottom_sheet);
         fabSwipe = view.findViewById(R.id.fab_action);
         fabWrapper = view.findViewById(R.id.fab_wrapper);
         tvSwipeHint = view.findViewById(R.id.tv_swipe_hint);
-        edtMemo2 = view.findViewById(R.id.edt_memo2);
+        edtMemo = view.findViewById(R.id.edt_memo2);
         foreground = view.findViewById(R.id.foreground);
         bottomWrapper = view.findViewById(R.id.bottom_wrapper);
         bottomHeader = view.findViewById(R.id.bottom_header);
+        bsbShadow = view.findViewById(R.id.bottom_sheet_shadow);
         mDetector = new GestureDetectorCompat(getActivity(), mFabGestureListener);
+        clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
         setupView();
         setupService();
         return view;
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        if (mAdapter != null)
+            mAdapter.expireItems();
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        ((MainActivity) getActivity()).setBackPressListener(mBackPressListener);
     }
 
     @Override
@@ -151,7 +321,7 @@ public class FragmentPushPull extends Fragment {
 
     private void setupView() {
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
-        mAdapter = new PushPullAdapter(getActivity());
+        mAdapter = new PushPullAdapter(getActivity(), itemInteractionCallback);
         recyclerView.setAdapter(mAdapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -159,18 +329,25 @@ public class FragmentPushPull extends Fragment {
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(recyclerView);
 
+        foreground.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (v.getAlpha() == 0) {
+                    return false;
+                }
+                return true;
+            }
+        });
+
         bottomSheetBehavior = BottomSheetBehavior.from(bottomLayout);
-//        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         bottomSheetBehavior.setBottomSheetCallback(bottomSheetCallback);
-        tvPush = bottomLayout.findViewById(R.id.btn_bottom_left);
-        tvPull = bottomLayout.findViewById(R.id.btn_bottom_right);
-        tvPush.setOnClickListener(mClickListener);
-        tvPull.setOnClickListener(mClickListener);
-        headerBtns = bottomLayout.findViewById(R.id.header_btns);
-        edtPanel = bottomLayout.findViewById(R.id.edt_panel);
-        edtMemo = bottomLayout.findViewById(R.id.edt_memo);
-
-
+        tvBsbMemoId = bottomLayout.findViewById(R.id.bsb_memo_id);
+        ivBsbIdCopy = bottomLayout.findViewById(R.id.bsb_memo_id_copy);
+        tvBsbMemoCreate = bottomLayout.findViewById(R.id.bsb_memo_create);
+        tvBsbMemoExpire = bottomLayout.findViewById(R.id.bsb_memo_expire);
+        tvBsbMemoAccess = bottomLayout.findViewById(R.id.bsb_memo_allowance);
+        tvBsbMemoContent = bottomLayout.findViewById(R.id.tv_memo);
+        tvBsbIsAuthor = bottomLayout.findViewById(R.id.bsb_memo_create_by_push);
         fabSwipe.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -184,49 +361,11 @@ public class FragmentPushPull extends Fragment {
         fabSwipe.setOnClickListener(mClickListener);
     }
 
-    private float originX = 0;
-
-    private GestureDetectorCompat mDetector;
-    private GestureDetector.OnGestureListener mFabGestureListener = new GestureDetector.SimpleOnGestureListener() {
-
-        @Override
-        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            Log.d(TAG, "onFling: " + e1.toString() + e2.toString());
-            Log.d(TAG, "onFling: " + velocityX +" "+ velocityY);
-            if (Math.abs(velocityX) > 500) {
-                int width = getActivity().getWindowManager().getDefaultDisplay().getWidth();
-
-                if (velocityX > 0) {
-                    fabPosition = Math.min(++fabPosition, 1);
-                } else if (velocityX < 0) {
-                    fabPosition = Math.max(--fabPosition, -1);
-                }
-                swipeTo(fabPosition);
-                int distance = width / 3 * fabPosition;
-                ObjectAnimator animation = ObjectAnimator.ofFloat(fabWrapper, "translationX", distance);
-                animation.setDuration(500);
-                Log.d(TAG, "onFling: " + distance);
-                animation.setInterpolator(new DecelerateInterpolator());
-                animation.start();
-                int from = fabPosition == 0 ? 1 : 0;
-                int to = fabPosition == 0 ? 0 : 1;
-                ObjectAnimator animatorBottom = ObjectAnimator.ofFloat(bottomWrapper, "alpha", from, to);
-                animatorBottom.setInterpolator(new AccelerateInterpolator());
-                animatorBottom.setDuration(500);
-                animatorBottom.start();
-            }
-            return true;
-        }
-    };
-
-    private int fabPosition = 0;
-
     private void swipeTo(int i) {
         if (i == 0) {
-//            tvSwipeHint.setVisibility(View.GONE);
-            edtMemo2.setVisibility(View.GONE);
-            edtMemo2.setText("");
-            edtMemo2.clearComposingText();
+            edtMemo.setVisibility(View.GONE);
+            edtMemo.setText("");
+            edtMemo.clearComposingText();
             final View view = getActivity().getCurrentFocus();
             new Handler().postDelayed(new Runnable() {
                 @Override
@@ -246,72 +385,78 @@ public class FragmentPushPull extends Fragment {
                 lp.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
                 lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
                 tvSwipeHint.setText("Create a pull");
-                edtMemo2.setHint("Input the memo id");
-                edtMemo2.setMaxEms(10);
-                edtMemo2.setSingleLine(true);
+                edtMemo.setHint("Input the memo id");
+                edtMemo.setMaxEms(10);
+                edtMemo.setSingleLine(true);
                 fabAnim(R.drawable.anim_swipe_to_add);
             } else if (i == -1) {
                 lp.removeRule(RelativeLayout.ALIGN_PARENT_LEFT);
                 lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
                 tvSwipeHint.setText("Create a push");
-                edtMemo2.setHint("Input your memo");
-                edtMemo2.setSingleLine(false);
-                edtMemo2.setMaxEms(Integer.MAX_VALUE);
+                edtMemo.setHint("Input your memo");
+                edtMemo.setSingleLine(false);
+                edtMemo.setMaxEms(Integer.MAX_VALUE);
                 fabAnim(R.drawable.anim_swipe_to_add);
             }
             tvSwipeHint.setLayoutParams(lp);
-            edtMemo2.setVisibility(View.VISIBLE);
+            edtMemo.setVisibility(View.VISIBLE);
+            foreground.setVisibility(View.VISIBLE);
+            foreground.setAlpha(0);
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    edtMemo2.requestFocus();
-                    imm.showSoftInput(edtMemo2, InputMethodManager.SHOW_IMPLICIT);
-                    foreground.setVisibility(View.VISIBLE);
+                    edtMemo.requestFocus();
+                    imm.showSoftInput(edtMemo, InputMethodManager.SHOW_IMPLICIT);
                 }
             }, 500);
             ColorDrawable drawable = new ColorDrawable();
             drawable.setColor(0x33000000);
         }
-    }
-    
-    private View.OnClickListener mClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            switch (v.getId()) {
-                case R.id.fab_action:
-                    if (fabPosition == -1) {
-                        pushMemo();
-                    } else if (fabPosition == 1) {
-                        pullMemo();
-                    }
-                    break;
-            }
+        int width = getActivity().getWindowManager().getDefaultDisplay().getWidth();
+        swipeTransDistanceX = width / 3 * fabPosition;
 
-        }
-    };
+        ArrayList<ObjectAnimator> objectAnimatorsArray = new ArrayList<ObjectAnimator>();
+
+        ObjectAnimator animatorFabTransX = ObjectAnimator.ofFloat(fabWrapper, "translationX", swipeTransDistanceX);
+        animatorFabTransX.setInterpolator(new DecelerateInterpolator());
+        objectAnimatorsArray.add(animatorFabTransX);
+        int from = fabPosition == 0 ? 1 : 0;
+        int to = fabPosition == 0 ? 0 : 1;
+        ObjectAnimator animatorBottom = ObjectAnimator.ofFloat(bottomWrapper, "alpha", from, to);
+        animatorBottom.setInterpolator(new AccelerateInterpolator());
+        objectAnimatorsArray.add(animatorBottom);
+        ObjectAnimator animatorCover = ObjectAnimator.ofFloat(foreground, "alpha", from, to);
+        animatorCover.setInterpolator(new AccelerateInterpolator());
+        objectAnimatorsArray.add(animatorCover);
+        ObjectAnimator[] objectAnimators = objectAnimatorsArray.toArray(new ObjectAnimator[objectAnimatorsArray.size()]);
+        AnimatorSet animSet = new AnimatorSet();
+        animSet.playTogether(objectAnimators);
+        animSet.setDuration(500);
+        animSet.start();
+    }
 
     private void pushMemo() {
-        String memoContent = edtMemo2.getText().toString();
+        String memoContent = edtMemo.getText().toString();
         if (TextUtils.isEmpty(memoContent)) {
             Toast.makeText(getActivity(), "Please input some contents", Toast.LENGTH_SHORT).show();
         } else {
             fabSwipe.setClickable(false);
-            int time = sharedPreferences.getInt("EXPIRED_TIME", 0);
-            int type = sharedPreferences.getInt("EXPIRED_TYPE", 2);
+            int time = sharedPreferences.getInt("EXPIRED_TIME", 1);
+            int type = sharedPreferences.getInt("EXPIRED_TYPE", 3);
             int count = sharedPreferences.getInt("ACCESS_COUNT", 0);
             String expiredArg = "";
             if (time > 0)
-            switch (type) {
-                case 0:
-                    expiredArg = time + "min";
-                    break;
-                case 1:
-                    expiredArg = time + "hr";
-                    break;
-                case 2:
-                    expiredArg = time + "day";
-                    break;
-            }
+                switch (type) {
+                    case 0:
+                        expiredArg = time + "min";
+                        break;
+                    case 1:
+                        expiredArg = time + "hr";
+                        break;
+                    case 2:
+                        expiredArg = time + "day";
+                        break;
+                }
             if (type == 3) {
                 expiredArg = "";
             }
@@ -325,7 +470,9 @@ public class FragmentPushPull extends Fragment {
 
                 @Override
                 public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
-                    mAdapter.addMemo(response.body().getMemo());
+                    MemoEntity entity = response.body().getMemo();
+                    entity.createdFromPush = true;
+                    mAdapter.addMemo(entity);
                     swipeBackFromCheck();
                     fabWrapper.hide();
                 }
@@ -341,10 +488,14 @@ public class FragmentPushPull extends Fragment {
     }
 
     private void pullMemo() {
-        String memoId = edtMemo2.getText().toString();
+        String memoId = edtMemo.getText().toString();
         if (TextUtils.isEmpty(memoId)) {
             Toast.makeText(getActivity(), "Please input correct memo id", Toast.LENGTH_SHORT).show();
         } else {
+            if (mAdapter.checkExistMeme(memoId)) {
+                swipeBackFromCheck();
+                return;
+            }
             fabSwipe.setClickable(false);
             fabWrapper.show();
             Call<CommonResponse> call = memoService.readMemo(memoId);
@@ -380,15 +531,21 @@ public class FragmentPushPull extends Fragment {
             @Override
             public void run() {
                 if (view != null) {
+                    ArrayList<ObjectAnimator> objectAnimatorsArray = new ArrayList<ObjectAnimator>();
+                    ObjectAnimator animatorCover = ObjectAnimator.ofFloat(foreground, "alpha", 1, 0);
+                    animatorCover.setInterpolator(new AccelerateInterpolator());
+                    objectAnimatorsArray.add(animatorCover);
                     ObjectAnimator animatorBottom = ObjectAnimator.ofFloat(bottomWrapper, "alpha", 1, 0);
                     animatorBottom.setInterpolator(new AccelerateInterpolator());
-                    animatorBottom.setDuration(500);
-                    animatorBottom.start();
-//                    tvSwipeHint.setVisibility(View.GONE);
-                    edtMemo2.setVisibility(View.GONE);
-                    edtMemo2.setText("");
-                    edtMemo2.clearComposingText();
-                    foreground.setVisibility(View.GONE);
+                    objectAnimatorsArray.add(animatorBottom);
+                    ObjectAnimator[] objectAnimators = objectAnimatorsArray.toArray(new ObjectAnimator[objectAnimatorsArray.size()]);
+                    AnimatorSet animSet = new AnimatorSet();
+                    animSet.playTogether(objectAnimators);
+                    animSet.setDuration(500);
+                    animSet.start();
+                    edtMemo.setVisibility(View.GONE);
+                    edtMemo.setText("");
+                    edtMemo.clearComposingText();
                     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
 
                 }
@@ -415,36 +572,4 @@ public class FragmentPushPull extends Fragment {
             ((Animatable) drawable).start();
         }
     }
-
-    BottomSheetBehavior.BottomSheetCallback bottomSheetCallback =
-            new BottomSheetBehavior.BottomSheetCallback() {
-                @Override
-                public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                    switch (newState) {
-                        case BottomSheetBehavior.STATE_COLLAPSED:
-                        case BottomSheetBehavior.STATE_DRAGGING:
-                            edtPanel.setVisibility(View.GONE);
-                            tvPull.setVisibility(View.VISIBLE);
-                            tvPush.setVisibility(View.VISIBLE);
-                            break;
-                        case BottomSheetBehavior.STATE_EXPANDED:
-
-                            int[] position = new int[2];
-                            headerBtns.getLocationOnScreen(position);
-
-                            Log.d(TAG, "onStateChanged: " + position[1]);
-                            edtPanel.setVisibility(View.VISIBLE);
-                            tvPull.setVisibility(View.INVISIBLE);
-                            tvPush.setVisibility(View.INVISIBLE);
-                            break;
-                    }
-                }
-
-                @Override
-                public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                    headerBtns.setAlpha(1-slideOffset);
-                }
-            };
-
-
 }

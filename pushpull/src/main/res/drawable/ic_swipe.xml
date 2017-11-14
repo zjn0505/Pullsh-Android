@@ -11,12 +11,4 @@
         android:strokeLineCap="square"
         android:strokeWidth="2" />
 
-    <!--<path-->
-        <!--android:pathData="M4.8,13.4 l2.1, 2.1 l2.1,2.1 M10.4,16.2 l4.3, -4.6,l 4.3, -4.6"-->
-        <!--android:strokeColor="#FFF"-->
-        <!--android:strokeLineCap="square"-->
-        <!--android:strokeWidth="2" />-->
-
-
-
 </vector>
