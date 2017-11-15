@@ -416,7 +416,7 @@ public class FragmentPushPull extends Fragment {
         if (fabPosition == 0) {
             animatorHintTransX.setInterpolator(new AccelerateInterpolator());
         } else {
-            animatorHintTransX.setInterpolator(new OvershootInterpolator());
+            animatorHintTransX.setInterpolator(new AccelerateInterpolator());
         }
         objectAnimatorsArray.add(animatorHintTransX);
         ObjectAnimator animatorFabTransX = ObjectAnimator.ofFloat(fabWrapper, "translationX", swipeTransDistanceX);
@@ -531,6 +531,7 @@ public class FragmentPushPull extends Fragment {
     }
 
     private void swipeBackFromCheck() {
+        fabPosition = 0;
         fabAnim(R.drawable.anim_add_to_check);
         fabSwipe.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.green)));
         final View view = getActivity().getCurrentFocus();
