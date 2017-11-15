@@ -35,7 +35,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AnticipateInterpolator;
 import android.view.animation.DecelerateInterpolator;
+import android.view.animation.OvershootInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -380,25 +382,19 @@ public class FragmentPushPull extends Fragment {
             fabAnim(R.drawable.anim_add_to_swipe);
         } else {
             bottomHeader.setVisibility(View.VISIBLE);
-            RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) tvSwipeHint.getLayoutParams();
             if (i == 1) {
-                lp.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
                 tvSwipeHint.setText("Create a pull");
                 edtMemo.setHint("Input the memo id");
                 edtMemo.setMaxEms(10);
                 edtMemo.setSingleLine(true);
                 fabAnim(R.drawable.anim_swipe_to_add);
             } else if (i == -1) {
-                lp.removeRule(RelativeLayout.ALIGN_PARENT_LEFT);
-                lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
                 tvSwipeHint.setText("Create a push");
                 edtMemo.setHint("Input your memo");
                 edtMemo.setSingleLine(false);
                 edtMemo.setMaxEms(Integer.MAX_VALUE);
                 fabAnim(R.drawable.anim_swipe_to_add);
             }
-            tvSwipeHint.setLayoutParams(lp);
             edtMemo.setVisibility(View.VISIBLE);
             foreground.setVisibility(View.VISIBLE);
             foreground.setAlpha(0);
@@ -416,15 +412,26 @@ public class FragmentPushPull extends Fragment {
         swipeTransDistanceX = width / 3 * fabPosition;
 
         ArrayList<ObjectAnimator> objectAnimatorsArray = new ArrayList<ObjectAnimator>();
-
+        ObjectAnimator animatorHintTransX = ObjectAnimator.ofFloat(tvSwipeHint, "translationX", -swipeTransDistanceX/1.5f);
+        if (fabPosition == 0) {
+            animatorHintTransX.setInterpolator(new AccelerateInterpolator());
+        } else {
+            animatorHintTransX.setInterpolator(new OvershootInterpolator());
+        }
+        objectAnimatorsArray.add(animatorHintTransX);
         ObjectAnimator animatorFabTransX = ObjectAnimator.ofFloat(fabWrapper, "translationX", swipeTransDistanceX);
         animatorFabTransX.setInterpolator(new DecelerateInterpolator());
         objectAnimatorsArray.add(animatorFabTransX);
         int from = fabPosition == 0 ? 1 : 0;
         int to = fabPosition == 0 ? 0 : 1;
         ObjectAnimator animatorBottom = ObjectAnimator.ofFloat(bottomWrapper, "alpha", from, to);
-        animatorBottom.setInterpolator(new AccelerateInterpolator());
+        animatorBottom.setInterpolator(new AnticipateInterpolator());
         objectAnimatorsArray.add(animatorBottom);
+        ObjectAnimator animatorHint = ObjectAnimator.ofFloat(tvSwipeHint, "alpha", from, to);
+        if (fabPosition == 0) {
+            animatorHint.setInterpolator(new DecelerateInterpolator());
+        }
+        objectAnimatorsArray.add(animatorHint);
         ObjectAnimator animatorCover = ObjectAnimator.ofFloat(foreground, "alpha", from, to);
         animatorCover.setInterpolator(new AccelerateInterpolator());
         objectAnimatorsArray.add(animatorCover);
@@ -554,10 +561,18 @@ public class FragmentPushPull extends Fragment {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                ObjectAnimator animation = ObjectAnimator.ofFloat(fabWrapper, "translationX", 0);
-                animation.setDuration(500);
-                animation.setInterpolator(new DecelerateInterpolator());
-                animation.start();
+                ArrayList<ObjectAnimator> objectAnimatorsArray = new ArrayList<ObjectAnimator>();
+                ObjectAnimator animatorHintTransX = ObjectAnimator.ofFloat(tvSwipeHint, "translationX", 0);
+                animatorHintTransX.setInterpolator(new AccelerateInterpolator());
+                objectAnimatorsArray.add(animatorHintTransX);
+                ObjectAnimator animatorFab = ObjectAnimator.ofFloat(fabWrapper, "translationX", 0);
+                animatorFab.setInterpolator(new DecelerateInterpolator());
+                objectAnimatorsArray.add(animatorFab);
+                ObjectAnimator[] objectAnimators = objectAnimatorsArray.toArray(new ObjectAnimator[objectAnimatorsArray.size()]);
+                AnimatorSet animSet = new AnimatorSet();
+                animSet.playTogether(objectAnimators);
+                animSet.setDuration(500);
+                animSet.start();
                 fabAnim(R.drawable.anim_check_to_swipe);
                 fabSwipe.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorAccent)));
                 fabSwipe.setClickable(true);
