@@ -3,6 +3,7 @@ package com.neuandroid.departify;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.webkit.WebView;
@@ -49,5 +50,16 @@ public class AboutActivity extends AppCompatActivity {
         WebView webView = new WebView(this);
         webView.loadDataWithBaseURL("file:///android_asset/", html , "text/html", "utf-8",null);
         setContentView(webView);
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
     }
 }

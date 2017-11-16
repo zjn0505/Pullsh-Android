@@ -1,6 +1,8 @@
 package com.neuandroid.departify;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -67,7 +69,14 @@ public class ArtStyleAdapter extends RecyclerView.Adapter<ArtStyleAdapter.ViewHo
         Style style = mStyles.get(position);
         String imageUrl = style.getUrl();
         Glide.with(mContext).load(imageUrl).placeholder(R.mipmap.ic_launcher).centerCrop().crossFade().into(holder.ivStyle);
-        holder.tvTitle.setText(style.getTitle());
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+        boolean shouldShowTitle = sharedPreferences.getBoolean("pref_title", false);
+        if (shouldShowTitle) {
+            holder.tvTitle.setVisibility(View.VISIBLE);
+            holder.tvTitle.setText(style.getTitle());
+        } else {
+            holder.tvTitle.setVisibility(View.GONE);
+        }
     }
 
 

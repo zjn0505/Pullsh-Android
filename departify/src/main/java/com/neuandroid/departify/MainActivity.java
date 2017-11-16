@@ -2,6 +2,7 @@ package com.neuandroid.departify;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -11,6 +12,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
@@ -99,6 +101,8 @@ public class MainActivity extends AppCompatActivity {
     private boolean isProcessing = false;
     private String currentUrl = null;
     private Palette palette;
+    private boolean shouldShowTitle;
+    private SharedPreferences sharedPreferences;
 
     ButterKnife.Action<SquareView> setColor = new ButterKnife.Action<SquareView>() {
 
@@ -183,8 +187,22 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
         deepArtEffectsClient = factory.build(DeepArtEffectsClient.class);
-
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+        shouldShowTitle = sharedPreferences.getBoolean("pref_title", false);
         loadingStyles();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        boolean newShouldShowTitle = sharedPreferences.getBoolean("pref_title", false);
+        if (shouldShowTitle != newShouldShowTitle) {
+            shouldShowTitle = newShouldShowTitle;
+            if (styleAdapter != null) {
+                styleAdapter.notifyDataSetChanged();
+            }
+        }
+
     }
 
     @OnClick(R.id.btn_load_style)
@@ -288,6 +306,12 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_share:
+                Intent shareIntent = new Intent();
+                shareIntent.setAction(Intent.ACTION_SEND);
+//                shareIntent.putExtra(Intent.EXTRA_STREAM, ivDepartifiedPic.);
+                shareIntent.setType("image/jpeg");
+                startActivity(Intent.createChooser(shareIntent, getString(R.string.share_to)));
+
                 break;
             case R.id.action_camera:
                 openCamera();
@@ -298,6 +322,8 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_about:
                 startActivity(new Intent(this, AboutActivity.class));
                 break;
+            case R.id.action_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
             default:
                 break;
         }
@@ -370,7 +396,27 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    String mCurrentPhotoPath;
+    private boolean doubleBackToExit = false;
+
+    @Override
+    public void onBackPressed() {
+
+        if (doubleBackToExit) {
+            finish();
+        }
+        doubleBackToExit = true;
+        Toast.makeText(mContext, getString(R.string.click_back_again), Toast.LENGTH_SHORT).show();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                doubleBackToExit = false;
+            }
+        }, 2000);
+
+
+    }
+
+    private String mCurrentPhotoPath;
 
     private File createImageFile() throws IOException {
         // Create an image file name

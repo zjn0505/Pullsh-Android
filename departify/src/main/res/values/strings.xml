@@ -1,15 +1,27 @@
 <resources>
     <string name="app_name" translatable="false">Departify</string>
 
+    <!-- Menu Start -->
     <string name="action_share">Share</string>
     <string name="action_camera">Camera</string>
     <string name="action_gallery">Gallery</string>
     <string name="action_about">About</string>
+    <string name="action_settings">Setings</string>
+    <!-- Menu End -->
+
+    <!--Setting Start-->
+    <string name="pref_title">Show art style title</string>
+    <!--Setting End-->
     <string name="about_content_short">Thank you for using Departify</string>
 
     <string name="btn_take_photo">Take a photo</string>
     <string name="btn_open_album">Select from album</string>
     <string name="btn_load_style">Load art styles</string>
     <string name="or">or</string>
+
+    <string name="click_back_again">Click back again to exit</string>
+
+    <string name="share_to">Share image to...</string>
+
 
 </resources>
