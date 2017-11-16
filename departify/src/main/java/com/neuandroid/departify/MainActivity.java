@@ -5,17 +5,20 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Color;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -24,7 +27,9 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,7 +50,10 @@ import com.deeparteffects.sdk.android.model.UploadRequest;
 import com.deeparteffects.sdk.android.model.UploadResponse;
 
 import java.io.ByteArrayOutputStream;
-import java.net.SocketTimeoutException;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -53,20 +61,16 @@ import java.util.TimerTask;
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.OnLongClick;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-
-    private String apiKey = "", accessKey = "", secretKey = "";
-
     private static final int REQUEST_CAMERA = 100;
     private static final int REQUEST_GALLERY = 101;
-
     private static final int CHECK_RESULT_INTERVAL_IN_MS = 2500;
     private static final int IMAGE_MAX_SIDE_LENGTH = 768;
-
     private static final int MSG_REQUEST_TIMEOUT = 100;
     private static final int MSG_REQUEST_SUCCEED = 101;
 
@@ -76,16 +80,64 @@ public class MainActivity extends AppCompatActivity {
     ImageView ivDepartifiedPic;
     @BindView(R.id.pb_loading)
     ProgressBar pbLoading;
+    @BindView(R.id.control_panel)
+    LinearLayout controlPanel;
+    @BindView(R.id.btn_take_photo)
+    Button btnCamera;
+    @BindView(R.id.btn_open_album)
+    Button btnAlbum;
+    @BindView(R.id.btn_load_style)
+    Button btnLoadStyle;
 
-    private GridLayoutManager mLayoutManager;
+    private String apiKey = "", accessKey = "", secretKey = "";
     private DeepArtEffectsClient deepArtEffectsClient;
     private Bitmap mImageBitmap;
     private Context mContext;
     private ArtStyleAdapter styleAdapter;
+    private GridLayoutManager mLayoutManager;
 
     private boolean isProcessing = false;
     private String currentUrl = null;
+    private Palette palette;
 
+    ButterKnife.Action<SquareView> setColor = new ButterKnife.Action<SquareView>() {
+
+        @Override
+        public void apply(@NonNull SquareView view, int index) {
+            if (palette != null) {
+                Palette.Swatch swatch = null;
+                switch (index) {
+                    case 0:
+                        swatch = palette.getLightMutedSwatch();
+                        break;
+                    case 1:
+                        swatch = palette.getVibrantSwatch();
+                        break;
+                    case 2:
+                        swatch = palette.getDarkVibrantSwatch();
+                        break;
+                    case 3:
+                        swatch = palette.getLightMutedSwatch();
+                        break;
+                    case 4:
+                        swatch = palette.getMutedSwatch();
+                        break;
+                    case 5:
+                        swatch = palette.getDarkMutedSwatch();
+                        break;
+
+                }
+                if (swatch != null) {
+                    int i = swatch.getRgb();
+                    String strColor = String.format("#%06X", 0xFFFFFF & i);
+                    view.setText(strColor);
+                    view.setTextColor(swatch.getTitleTextColor());
+                    view.setBackgroundColor(swatch.getRgb());
+                }
+            }
+
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,15 +145,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         mContext = this;
-
         rvArtStyles.setHasFixedSize(true);
         mLayoutManager = new GridLayoutManager(this, 2, GridLayoutManager.HORIZONTAL, false);
-//        mLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-//            @Override
-//            public int getSpanSize(int position) {
-//                return styleAdapter.getItemViewType(position);
-//            }
-//        });
+        mLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                return styleAdapter.getItemViewType(position);
+            }
+        });
         rvArtStyles.setLayoutManager(mLayoutManager);
         rvArtStyles.setItemAnimator(new DefaultItemAnimator());
 
@@ -136,7 +187,8 @@ public class MainActivity extends AppCompatActivity {
         loadingStyles();
     }
 
-    private void loadingStyles() {
+    @OnClick(R.id.btn_load_style)
+    void loadingStyles() {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -167,10 +219,10 @@ public class MainActivity extends AppCompatActivity {
                                         }
                                     }
                             );
+                            btnLoadStyle.setVisibility(View.GONE);
                             rvArtStyles.setAdapter(styleAdapter);
-//                        styleAdapter.updateStyles(styles);
                             pbLoading.setVisibility(View.GONE);
-//                        mStatusText.setText("");
+                            controlPanel.setVisibility(View.VISIBLE);
                         }
                     });
                 } catch (ApiClientException e) {
@@ -179,6 +231,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             Toast.makeText(MainActivity.this, "Failed to connect to Deep Art Effects service", Toast.LENGTH_SHORT).show();
+                            pbLoading.setVisibility(View.GONE);
                         }
                     });
                 }
@@ -200,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
                 uploadRequest.setImageBase64Encoded(convertBitmapToBase64(mImageBitmap));
                 UploadResponse response = null;
                 try {
-                     response = deepArtEffectsClient.uploadPost(uploadRequest);
+                    response = deepArtEffectsClient.uploadPost(uploadRequest);
                 } catch (RuntimeException ex) {
                     ex.printStackTrace();
                     myHandler.sendEmptyMessage(MSG_REQUEST_TIMEOUT);
@@ -237,13 +290,13 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_share:
                 break;
             case R.id.action_camera:
+                openCamera();
                 break;
             case R.id.action_gallery:
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("image/*");
-                if (intent.resolveActivity(getPackageManager()) != null) {
-                    startActivityForResult(intent, REQUEST_GALLERY);
-                }
+                openAlbum();
+                break;
+            case R.id.action_about:
+                startActivity(new Intent(this, AboutActivity.class));
                 break;
             default:
                 break;
@@ -255,6 +308,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case REQUEST_CAMERA:
+                if (resultCode == RESULT_OK) {
+                    setPic();
+                }
                 break;
             case REQUEST_GALLERY:
                 if (resultCode == RESULT_OK) {
@@ -262,7 +318,6 @@ public class MainActivity extends AppCompatActivity {
                             this.getContentResolver(), IMAGE_MAX_SIDE_LENGTH);
                     ivDepartifiedPic.setImageBitmap(mImageBitmap);
                     currentUrl = null;
-
                 }
                 break;
             default:
@@ -270,6 +325,117 @@ public class MainActivity extends AppCompatActivity {
         }
 
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @OnClick(R.id.btn_take_photo)
+    void openCamera() {
+        Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePhotoIntent.resolveActivity(getPackageManager()) != null) {
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(mContext, "Failed to take a photo", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID+".fileprovider", photoFile);
+                takePhotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePhotoIntent, REQUEST_CAMERA);
+            }
+
+        }
+    }
+
+
+    @OnClick(R.id.btn_open_album)
+    void openAlbum() {
+        Intent openAlbumIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        openAlbumIntent.setType("image/*");
+        if (openAlbumIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(openAlbumIntent, REQUEST_GALLERY);
+        }
+    }
+
+    @OnLongClick(R.id.iv_departified_pic)
+    boolean onImgLongClick(ImageView imgView) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                createPaletteAsync(mImageBitmap);
+            }
+        }).start();
+        return true;
+    }
+
+    String mCurrentPhotoPath;
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    private void setPic() {
+        // Get the dimensions of the View
+        int targetW = ivDepartifiedPic.getWidth();
+        int targetH = ivDepartifiedPic.getHeight();
+
+        // Get the dimensions of the bitmap
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        bmOptions.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+        int photoW = bmOptions.outWidth;
+
+        // Determine how much to scale down the image
+        int scaleFactor = photoW/targetW;
+
+        // Decode the image file into a Bitmap sized to fill the View
+        bmOptions.inJustDecodeBounds = false;
+        bmOptions.inSampleSize = scaleFactor;
+        bmOptions.inPurgeable = true;
+
+        mImageBitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+        ivDepartifiedPic.setImageBitmap(mImageBitmap);
+    }
+
+    private void createPaletteAsync(Bitmap bitmap) {
+        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+            public void onGenerated(Palette p) {
+                // Use generated instance
+                View view = LayoutInflater.from(mContext).inflate(R.layout.dialog_palette, null);
+                palette = p;
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext).setView(view);
+                DialogViews dialogViews = new DialogViews();
+                ButterKnife.bind(dialogViews, view);
+                ButterKnife.apply(dialogViews.paletteImages, setColor);
+                if (TextUtils.isEmpty(currentUrl)) {
+                    dialogViews.ivDialogPic.setImageBitmap(mImageBitmap);
+                } else {
+                    Glide.with(mContext).load(currentUrl).centerCrop().into(dialogViews.ivDialogPic);
+                }
+                Palette.Swatch dominantSwatch = palette.getDominantSwatch();
+                if (dominantSwatch != null) {
+                    int color = dominantSwatch.getRgb();
+                    dialogViews.tvDominant.setText(String.format("#%06X", 0xFFFFFF & color));
+                    dialogViews.tvDominant.setTextColor(color);
+                }
+
+                builder.show();
+            }
+        });
     }
 
     private class ImageReadyCheckTimer extends TimerTask {
@@ -331,94 +497,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-    @OnLongClick(R.id.iv_departified_pic)
-    boolean onImgLongClick(ImageView imgView) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                createPaletteAsync(mImageBitmap);
-            }
-        }).start();
-        return true;
-    }
-
-    public void createPaletteAsync(Bitmap bitmap) {
-        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
-            public void onGenerated(Palette p) {
-                // Use generated instance
-                Log.d("Zjn", "!!!!!!");
-                View view = LayoutInflater.from(mContext).inflate(R.layout.dialog_palette, null);
-                palette = p;
-                AlertDialog.Builder builder = new AlertDialog.Builder(mContext).setView(view);
-                DialogViews dialogViews = new DialogViews();
-                ButterKnife.bind(dialogViews, view);
-                ButterKnife.apply(dialogViews.paletteImages, setColor);
-                if (TextUtils.isEmpty(currentUrl)) {
-                    dialogViews.ivDialogPic.setImageBitmap(mImageBitmap);
-                } else {
-                    Glide.with(mContext).load(currentUrl).centerCrop().into(dialogViews.ivDialogPic);
-                }
-                Palette.Swatch dominantSwatch = palette.getDominantSwatch();
-                if (dominantSwatch != null) {
-                    int color = dominantSwatch.getRgb();
-                    dialogViews.tvDominant.setText(String.format("#%06X", 0xFFFFFF & color));
-                    dialogViews.tvDominant.setTextColor(color);
-                }
-
-                builder.show();
-            }
-        });
-    }
-
-    private Palette palette;
-
     class DialogViews {
-        @BindViews ({R.id.iv_palette_1, R.id.iv_palette_2, R.id.iv_palette_3, R.id.iv_palette_4, R.id.iv_palette_5, R.id.iv_palette_6})
+        @BindViews({R.id.iv_palette_1, R.id.iv_palette_2, R.id.iv_palette_3, R.id.iv_palette_4, R.id.iv_palette_5, R.id.iv_palette_6})
         List<SquareView> paletteImages;
         @BindView(R.id.iv_dialog_pic)
         ImageView ivDialogPic;
         @BindView(R.id.tv_dominant_color)
         TextView tvDominant;
     }
-
-
-    ButterKnife.Action<SquareView> setColor = new ButterKnife.Action<SquareView>() {
-
-        @Override
-        public void apply(@NonNull SquareView view, int index) {
-            if (palette != null) {
-                Palette.Swatch swatch = null;
-                switch (index) {
-                    case 0:
-                        swatch = palette.getLightMutedSwatch();
-                        break;
-                    case 1:
-                        swatch = palette.getVibrantSwatch();
-                        break;
-                    case 2:
-                        swatch = palette.getDarkVibrantSwatch();
-                        break;
-                    case 3:
-                        swatch = palette.getLightMutedSwatch();
-                        break;
-                    case 4:
-                        swatch = palette.getMutedSwatch();
-                        break;
-                    case 5:
-                        swatch = palette.getDarkMutedSwatch();
-                        break;
-
-                }
-                if (swatch != null) {
-                    int i = swatch.getRgb();
-                    String strColor = String.format("#%06X", 0xFFFFFF & i);
-                    view.setText(strColor);
-                    view.setTextColor(swatch.getTitleTextColor());
-                    view.setBackgroundColor(swatch.getRgb());
-                }
-            }
-
-        }
-    };
 }

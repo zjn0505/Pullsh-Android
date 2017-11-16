@@ -2,12 +2,15 @@ package com.neuandroid.departify;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.deeparteffects.sdk.android.model.Style;
 import com.deeparteffects.sdk.android.model.Styles;
 
 /**
@@ -27,13 +30,15 @@ public class ArtStyleAdapter extends RecyclerView.Adapter<ArtStyleAdapter.ViewHo
     }
 
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
 
-        public ImageView ivStyle;
+        private ImageView ivStyle;
+        private TextView tvTitle;
 
         public ViewHolder(View itemView) {
             super(itemView);
             ivStyle = (ImageView) itemView.findViewById(R.id.iv_style);
+            tvTitle = (TextView) itemView.findViewById(R.id.tv_title);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -59,19 +64,20 @@ public class ArtStyleAdapter extends RecyclerView.Adapter<ArtStyleAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        String imageUrl = mStyles.get(position).getUrl();
-        Glide.with(mContext).load(imageUrl).centerCrop().crossFade().into(holder.ivStyle);
-
+        Style style = mStyles.get(position);
+        String imageUrl = style.getUrl();
+        Glide.with(mContext).load(imageUrl).placeholder(R.mipmap.ic_launcher).centerCrop().crossFade().into(holder.ivStyle);
+        holder.tvTitle.setText(style.getTitle());
     }
 
 
     @Override
     public int getItemViewType(int position) {
         int size = getItemCount();
-        if (size % 2 == 1 && position == 1){
-            return 1;
+        if (size % 2 == 1 && position == (size - 1)){
+            return 2;
         }
-        return super.getItemViewType(position);
+        return 1;
     }
 
 

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Departify</string>
+    <string name="action_share">分享</string>
+    <string name="action_camera">拍照</string>
+    <string name="action_gallery">相册</string>
+    <string name="action_about">关于</string>
+    <string name="about_content_short">感谢您使用 Departify</string>
+    <string name="btn_take_photo">拍摄一张照片</string>
+    <string name="or">或</string>
+    <string name="btn_open_album">从相册中选择</string>
+    <string name="btn_load_style">加载艺术样式</string>
+</resources>

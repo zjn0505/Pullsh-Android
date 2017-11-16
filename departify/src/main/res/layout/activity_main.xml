@@ -5,50 +5,95 @@
     android:layout_height="match_parent"
     tools:context="com.neuandroid.departify.MainActivity">
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
+            <LinearLayout
+                android:id="@+id/control_panel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="invisible">
 
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:orientation="vertical">
+                <Button
+                    android:id="@+id/btn_take_photo"
+                    android:drawableEnd="@drawable/ic_action_camera"
+                    android:text="@string/btn_take_photo"
+                    style="@style/material_button"/>
 
-                <ImageView
-                    android:id="@+id/iv_departified_pic"
-                    android:layout_width="match_parent"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:adjustViewBounds="true"
-                    android:layout_gravity="center"
-                    android:scaleType="fitCenter"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"/>
+                    android:layout_margin="15dp"
+                    android:text="@string/or"
+                    android:textSize="24sp" />
 
-            </FrameLayout>
+                <Button
+                    android:id="@+id/btn_open_album"
+                    android:drawableEnd="@drawable/ic_action_album"
+                    android:text="@string/btn_open_album"
+                    style="@style/material_button" />
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/iv_departified_pic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter" />
+
+            <View
+                android:id="@+id/bottom_sheet_shadow"
+                android:layout_gravity="end|bottom"
+                android:layout_width="match_parent"
+                android:layout_height="6dp"
+                android:background="@drawable/shape_gradient_top_shadow"/>
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/btn_load_style"
+                android:drawableEnd="@drawable/ic_art_style"
+                android:text="@string/btn_load_style"
+                style="@style/material_button"
+                android:layout_gravity="center"/>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/rv_art_styles"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:scrollbars="none">
+                android:scrollbars="none"
+                android:background="#FFFFFF"
+                style="@style/recyclerview_style" />
 
-            </android.support.v7.widget.RecyclerView>
+        </FrameLayout>
 
     </LinearLayout>
-
 
 
     <ProgressBar
         android:id="@+id/pb_loading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:visibility="gone"/>
+        android:layout_gravity="center"/>
 
 
 </FrameLayout>
