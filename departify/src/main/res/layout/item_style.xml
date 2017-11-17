@@ -17,7 +17,7 @@
         android:id="@+id/tv_title"
         android:layout_width="match_parent"
         android:layout_height="20dp"
-        android:background="@drawable/shape_gradient_top_shadow"
+        android:background="@drawable/shape_gradient_item_shadow"
         android:ellipsize="none"
         android:singleLine="true"
         android:gravity="bottom"
