@@ -1,12 +1,20 @@
 package com.neuandroid.departify;
 
+import android.annotation.TargetApi;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,6 +57,7 @@ public class AboutActivity extends AppCompatActivity {
 
         WebView webView = new WebView(this);
         webView.loadDataWithBaseURL("file:///android_asset/", html , "text/html", "utf-8",null);
+        webView.setWebViewClient(new AboutWebViewClient());
         setContentView(webView);
 
         ActionBar actionBar = getSupportActionBar();
@@ -61,5 +70,49 @@ public class AboutActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         finish();
         return true;
+    }
+
+    private class AboutWebViewClient extends WebViewClient {
+
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            return handleUrl(view, url);
+        }
+
+        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+            return handleUrl(view, request.getUrl().toString());
+        }
+
+
+        private boolean handleUrl(WebView view, final String url) {
+            if (!TextUtils.isEmpty(url)) {
+                 if (url.startsWith("http")) {
+                     String urlAlert = String.format(getString(R.string.url_redirect), url);
+                     new AlertDialog.Builder(AboutActivity.this)
+                             .setMessage(urlAlert)
+                             .setPositiveButton(R.string.proceed, new DialogInterface.OnClickListener() {
+                                 @Override
+                                 public void onClick(DialogInterface dialog, int which) {
+                                     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                                     startActivity(browserIntent);
+                                 }
+                             })
+                             .setNegativeButton(R.string.dismiss, new DialogInterface.OnClickListener() {
+                                 @Override
+                                 public void onClick(DialogInterface dialog, int which) {
+                                     if (dialog != null) {
+                                         dialog.dismiss();
+                                     }
+                                 }
+                             }).show();
+                 } else if (url.startsWith("departify")) {
+                     startActivity(new Intent(AboutActivity.this, CredActivity.class));
+                 }
+            }
+
+            return true;
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.neuandroid.departify;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -50,6 +51,7 @@ import com.deeparteffects.sdk.android.model.Result;
 import com.deeparteffects.sdk.android.model.Styles;
 import com.deeparteffects.sdk.android.model.UploadRequest;
 import com.deeparteffects.sdk.android.model.UploadResponse;
+import com.google.gson.Gson;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -75,6 +77,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int IMAGE_MAX_SIDE_LENGTH = 768;
     private static final int MSG_REQUEST_TIMEOUT = 100;
     private static final int MSG_REQUEST_SUCCEED = 101;
+    private static final long TIME_FOR_NEXT_STYLE_REQUEST = 1000 * 60 * 60 * 24;
+
 
     @BindView(R.id.rv_art_styles)
     RecyclerView rvArtStyles;
@@ -103,6 +107,8 @@ public class MainActivity extends AppCompatActivity {
     private Palette palette;
     private boolean shouldShowTitle;
     private SharedPreferences sharedPreferences;
+
+    private Gson gson = new Gson();
 
     ButterKnife.Action<SquareView> setColor = new ButterKnife.Action<SquareView>() {
 
@@ -212,7 +218,25 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
 
                 try {
-                    final Styles styles = deepArtEffectsClient.stylesGet();
+                    String json = sharedPreferences.getString("preserved_styles", "");
+                    long retrieveTime = sharedPreferences.getLong("last_refresh", 0);
+
+                    Styles cacheStyles = null;
+                    if (!TextUtils.isEmpty(json) && retrieveTime != 0) {
+                        long diff = new Date().getTime() - retrieveTime;
+                        if (diff < TIME_FOR_NEXT_STYLE_REQUEST && diff > 0) {
+                            cacheStyles = gson.fromJson(json, Styles.class);
+                        }
+                    }
+
+                    if (cacheStyles == null) {
+                        cacheStyles = deepArtEffectsClient.stylesGet();
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString("preserved_styles", gson.toJson(cacheStyles));
+                        editor.putLong("last_refresh", new Date().getTime());
+                        editor.commit();
+                    }
+                    final Styles styles = cacheStyles;
 
                     runOnUiThread(new Runnable() {
                         @Override

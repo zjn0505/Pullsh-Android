@@ -7,10 +7,13 @@
     <string name="action_gallery">Gallery</string>
     <string name="action_about">About</string>
     <string name="action_settings">Setings</string>
+    <string name="action_help">Help</string>
     <!-- Menu End -->
 
     <!--Setting Start-->
     <string name="pref_title">Show art style title</string>
+    <string name="pref_cred">Input credentials</string>
+    <string name="pref_cred_summary">Use your private credentials from DeepArtEffects</string>
     <!--Setting End-->
     <string name="about_content_short">Thank you for using Departify</string>
 
@@ -23,5 +26,12 @@
 
     <string name="share_to">Share image to...</string>
 
+    <string name="url_redirect">You are heading to:\n%s</string>
+    <string name="proceed">Proceed</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="register">Register</string>
 
+    <string name="cred_title">Enter your credentials</string>
+    <string name="cred_declare">On this page you can add your own DeepArtEffect credentials.\n\nThere\'re pre-installed credentials, but they\'re shared, limited and can be unreliable or unusable at any time.\n\nRegister as a DeepArtEffect developer for credentials that only belong to you.\n\nThey will be stored locally on your device, and used for nothing but DeepArtEffect\'s service.
+    </string>
 </resources>

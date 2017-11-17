@@ -5,7 +5,7 @@
         android:title="@string/pref_cred"
         android:summary="@string/pref_cred_summary">
         <intent
-            android:targetPackage="com.neuandroid.departify"
+            android:targetPackage="com.neuandroid.departify.debug"
             android:targetClass="com.neuandroid.departify.CredActivity" />
     </Preference>
     <SwitchPreference
