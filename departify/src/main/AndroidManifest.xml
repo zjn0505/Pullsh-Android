@@ -26,15 +26,15 @@
 
         <activity
             android:name=".AboutActivity"
-            android:label="About"
+            android:label="@string/action_about"
             android:screenOrientation="portrait" />
 
         <activity android:name=".SettingsActivity"
-            android:label="Settings"
+            android:label="@string/action_settings"
             android:screenOrientation="portrait" />
 
         <activity android:name=".CredActivity"
-            android:label="Enter your credentials"
+            android:label="@string/cred_title"
             android:screenOrientation="portrait" />
 
         <provider

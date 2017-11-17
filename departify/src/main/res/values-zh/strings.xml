@@ -10,4 +10,18 @@
     <string name="or">或</string>
     <string name="btn_open_album">从相册中选择</string>
     <string name="btn_load_style">加载艺术样式</string>
+    <string name="action_settings">设置</string>
+    <string name="action_help">帮助</string>
+    <string name="pref_title">显示艺术样式标题</string>
+    <string name="pref_cred">输入 API 密匙</string>
+    <string name="pref_cred_summary">使用私有的 DeepArtEffects 密匙</string>
+    <string name="click_back_again">再次点击以退出</string>
+    <string name="share_to">分享图片至...</string>
+    <string name="url_redirect">将要跳转至:\\n%s</string>
+    <string name="proceed">继续</string>
+    <string name="dismiss">取消</string>
+    <string name="register">注册</string>
+    <string name="cred_title">输入密匙</string>
+    <string name="cred_declare">在本页输入你私有的 DeepArtEffects 密匙。\n\n应用提供默认密匙，但不存在使用限制并不保证其可用性。\n\n点击“继续”注册成为 DeepArtEffects 开发者获取密匙。\n\n输入的密匙将保存于本机，只会被用于使用 DeepArtEffects 的服务。</string>
+    <string name="pref_lang">语言</string>
 </resources>

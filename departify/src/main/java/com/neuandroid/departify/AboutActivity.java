@@ -24,7 +24,7 @@ import java.io.InputStream;
  * Created by Jienan on 2017/11/16.
  */
 
-public class AboutActivity extends AppCompatActivity {
+public class AboutActivity extends BaseActivity {
 
     private final static String DEPARTIFY_CONFIG = "departify_config";
     private final static String DEPARTIFY_SUB_TYPE = "departify_sub_type";

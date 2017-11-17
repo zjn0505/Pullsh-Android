@@ -12,5 +12,10 @@
         android:key="pref_title"
         android:title="@string/pref_title"
         android:defaultValue="false"/>
+    <ListPreference
+        android:key="pref_lang"
+        android:title="@string/pref_lang"
+        android:entries="@array/language"
+        android:entryValues="@array/lang_data" />
 
 </PreferenceScreen>

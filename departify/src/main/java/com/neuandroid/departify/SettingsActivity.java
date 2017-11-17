@@ -9,7 +9,7 @@ import android.support.v7.app.AppCompatActivity;
  * Created by jienanzhang on 16/11/2017.
  */
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends BaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
