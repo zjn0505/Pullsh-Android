@@ -397,23 +397,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean doubleBackToExit = false;
-
+    private Toast exitToast;
+    
+    @SuppressLint("ShowToast")
     @Override
     public void onBackPressed() {
-
         if (doubleBackToExit) {
-            finish();
-        }
-        doubleBackToExit = true;
-        Toast.makeText(mContext, getString(R.string.click_back_again), Toast.LENGTH_SHORT).show();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                doubleBackToExit = false;
+            if (exitToast != null) {
+                exitToast.cancel();
             }
-        }, 2000);
-
-
+            finish();
+        } else {
+            doubleBackToExit = true;
+            if (exitToast == null) {
+                exitToast = Toast.makeText(mContext, getString(R.string.click_back_again), Toast.LENGTH_SHORT);
+            }
+            exitToast.show();
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    doubleBackToExit = false;
+                }
+            }, 2000);
+        }
     }
 
     private String mCurrentPhotoPath;
