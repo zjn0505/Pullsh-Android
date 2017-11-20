@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="click_to_enter_dev_mode">
+        <item quantity="one">再点击%d次，启动开发者模式</item>
+        <item quantity="other">再点击%d次，启动开发者模式</item>
+    </plurals>
+</resources>

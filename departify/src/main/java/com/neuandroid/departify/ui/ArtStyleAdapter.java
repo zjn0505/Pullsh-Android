@@ -1,10 +1,9 @@
-package com.neuandroid.departify;
+package com.neuandroid.departify.ui;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +13,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.deeparteffects.sdk.android.model.Style;
 import com.deeparteffects.sdk.android.model.Styles;
+import com.neuandroid.departify.R;
 
 /**
  * Created by jienanzhang on 12/07/2017.

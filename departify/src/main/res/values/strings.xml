@@ -35,4 +35,7 @@
     <string name="cred_title">Enter your credentials</string>
     <string name="cred_declare">On this page you can add your own DeepArtEffect credentials.\n\nThere\'re pre-installed credentials, but they\'re shared, limited and can be unreliable or unusable at any time.\n\nRegister as a DeepArtEffect developer for credentials that only belong to you.\n\nThey will be stored locally on your device, and used for nothing but DeepArtEffect\'s service.
     </string>
+
+    <string name="already_in_dev_mode">You are already in developer mode</string>
+    <string name="in_dev_mode">You are now in developer mode</string>
 </resources>

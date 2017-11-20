@@ -1,9 +1,10 @@
-package com.neuandroid.departify;
+package com.neuandroid.departify.ui;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+
+import com.neuandroid.departify.R;
 
 /**
  * Created by jienanzhang on 16/11/2017.

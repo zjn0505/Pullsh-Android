@@ -1,4 +1,4 @@
-package com.neuandroid.departify;
+package com.neuandroid.departify.ui;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -18,7 +18,6 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -52,6 +51,10 @@ import com.deeparteffects.sdk.android.model.Styles;
 import com.deeparteffects.sdk.android.model.UploadRequest;
 import com.deeparteffects.sdk.android.model.UploadResponse;
 import com.google.gson.Gson;
+import com.neuandroid.departify.BuildConfig;
+import com.neuandroid.departify.ImageHelper;
+import com.neuandroid.departify.R;
+import com.neuandroid.departify.SubmissionStatus;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -73,12 +76,12 @@ public class MainActivity extends BaseActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_CAMERA = 100;
     private static final int REQUEST_GALLERY = 101;
+    private static final int REQUEST_SETTINGS = 102;
     private static final int CHECK_RESULT_INTERVAL_IN_MS = 2500;
     private static final int IMAGE_MAX_SIDE_LENGTH = 768;
     private static final int MSG_REQUEST_TIMEOUT = 100;
     private static final int MSG_REQUEST_SUCCEED = 101;
     private static final long TIME_FOR_NEXT_STYLE_REQUEST = 1000 * 60 * 60 * 24;
-
 
     @BindView(R.id.rv_art_styles)
     RecyclerView rvArtStyles;
@@ -347,7 +350,7 @@ public class MainActivity extends BaseActivity {
                 startActivity(new Intent(this, AboutActivity.class));
                 break;
             case R.id.action_settings:
-                startActivity(new Intent(this, SettingsActivity.class));
+                startActivityForResult(new Intent(this, SettingsActivity.class), REQUEST_SETTINGS);
             default:
                 break;
         }
@@ -370,6 +373,10 @@ public class MainActivity extends BaseActivity {
                     currentUrl = null;
                 }
                 break;
+            case REQUEST_SETTINGS:
+                if (resultCode == RESULT_OK) {
+                    recreate();
+                }
             default:
                 break;
         }

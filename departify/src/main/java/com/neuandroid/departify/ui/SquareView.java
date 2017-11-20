@@ -1,4 +1,4 @@
-package com.neuandroid.departify;
+package com.neuandroid.departify.ui;
 
 import android.content.Context;
 import android.util.AttributeSet;

@@ -6,7 +6,7 @@
         android:summary="@string/pref_cred_summary">
         <intent
             android:targetPackage="com.neuandroid.departify.debug"
-            android:targetClass="com.neuandroid.departify.CredActivity" />
+            android:targetClass="com.neuandroid.departify.ui.CredActivity" />
     </Preference>
     <SwitchPreference
         android:key="pref_title"

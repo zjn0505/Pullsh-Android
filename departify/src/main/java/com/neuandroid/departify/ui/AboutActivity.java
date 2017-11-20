@@ -1,5 +1,6 @@
-package com.neuandroid.departify;
+package com.neuandroid.departify.ui;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -7,17 +8,26 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
+
+import com.neuandroid.departify.LocaleManager;
+import com.neuandroid.departify.R;
 
 import java.io.IOException;
 import java.io.InputStream;
+
+import static com.neuandroid.departify.Const.DEPARTIFY_QUOTA;
+import static com.neuandroid.departify.Const.DEPARTIFY_SUB_TYPE;
+import static com.neuandroid.departify.Const.DEV_MODE;
 
 
 /**
@@ -26,21 +36,21 @@ import java.io.InputStream;
 
 public class AboutActivity extends BaseActivity {
 
-    private final static String DEPARTIFY_CONFIG = "departify_config";
-    private final static String DEPARTIFY_SUB_TYPE = "departify_sub_type";
-    private final static String DEPARTIFY_QUOTA = "departify_quota";
-
+    private SharedPreferences sharedPreferences;
+    private int clickCountMax = 5;
+    private Toast clickToast;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences sharedPreferences = getSharedPreferences(DEPARTIFY_CONFIG, MODE_PRIVATE);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String subType = sharedPreferences.getString(DEPARTIFY_SUB_TYPE, "test");
         String dailyQuota = sharedPreferences.getString(DEPARTIFY_QUOTA, "10");
 
         String html = "";
+        String lang = LocaleManager.getLanguage(this);
         try {
-            InputStream is = getAssets().open("about.html");
+            InputStream is = getAssets().open(String.format("about-%s.html", lang));
             int size = is.available();
             byte[] buffer = new byte[size];
             is.read(buffer);
@@ -108,11 +118,49 @@ public class AboutActivity extends BaseActivity {
                                  }
                              }).show();
                  } else if (url.startsWith("departify")) {
-                     startActivity(new Intent(AboutActivity.this, CredActivity.class));
+                     if (url.endsWith("enter-user-credentials"))
+                        startActivity(new Intent(AboutActivity.this, CredActivity.class));
+                     else if (url.endsWith("activate-developer-mode"))
+                         activateDevMode();
                  }
             }
 
             return true;
+        }
+    }
+    private Handler mHandler = new Handler();
+    private Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            clickCountMax = 5;
+        }
+    };
+
+    private boolean devMode = false;
+
+    private void activateDevMode() {
+//        boolean devMode = sharedPreferences.getBoolean(DEV_MODE, false);
+        if (clickToast == null) {
+            clickToast = Toast.makeText(this, R.string.already_in_dev_mode, Toast.LENGTH_SHORT);
+        }
+        if (devMode) {
+            clickToast.setText(R.string.already_in_dev_mode);
+            clickToast.show();
+        } else {
+            mHandler.removeCallbacks(mRunnable);
+            mHandler.postDelayed(mRunnable, 2500);
+
+            if (clickCountMax != 0) {
+                clickToast.setText(getResources().getQuantityString(R.plurals.click_to_enter_dev_mode, clickCountMax, clickCountMax));
+                clickCountMax--;
+            } else {
+                clickToast.setText(getString(R.string.in_dev_mode));
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putBoolean(DEV_MODE, true);
+                devMode = true;
+                editor.apply();
+            }
+            clickToast.show();
         }
     }
 }

@@ -29,27 +29,27 @@
         android:layout_marginTop="5dp"
         android:orientation="horizontal">
 
-        <com.neuandroid.departify.SquareView
+        <com.neuandroid.departify.ui.SquareView
             android:id="@+id/iv_palette_1"
             style="@style/style_SquareView" />
 
-        <com.neuandroid.departify.SquareView
+        <com.neuandroid.departify.ui.SquareView
             android:id="@+id/iv_palette_2"
             style="@style/style_SquareView" />
 
-        <com.neuandroid.departify.SquareView
+        <com.neuandroid.departify.ui.SquareView
             android:id="@+id/iv_palette_3"
             style="@style/style_SquareView" />
 
-        <com.neuandroid.departify.SquareView
+        <com.neuandroid.departify.ui.SquareView
             android:id="@+id/iv_palette_4"
             style="@style/style_SquareView" />
 
-        <com.neuandroid.departify.SquareView
+        <com.neuandroid.departify.ui.SquareView
             android:id="@+id/iv_palette_5"
             style="@style/style_SquareView" />
 
-        <com.neuandroid.departify.SquareView
+        <com.neuandroid.departify.ui.SquareView
             android:id="@+id/iv_palette_6"
             style="@style/style_SquareView"/>
 

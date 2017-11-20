@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="click_to_enter_dev_mode">
+        <item quantity="one">Click %d more time for developer mode</item>
+        <item quantity="other">Click %d more times for developer mode</item>
+    </plurals>
+</resources>
