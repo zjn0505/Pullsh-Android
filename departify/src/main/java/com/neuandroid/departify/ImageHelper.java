@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.net.Uri;
 
+import java.io.File;
 import java.io.InputStream;
 
 /**
@@ -14,6 +15,39 @@ import java.io.InputStream;
  */
 
 public class ImageHelper {
+
+    public static Bitmap loadSizeLimitedBitmapFromUri(
+            File file,
+            int imageMaxSideLength) {
+        try {
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+
+            int maxSideLength = options.outWidth > options.outHeight ? options.outWidth : options.outHeight;
+            options.inSampleSize = 1;
+            options.inSampleSize = calculateSampleSize(maxSideLength, imageMaxSideLength);
+            options.inJustDecodeBounds = false;
+
+            Bitmap bitmap =  BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+            maxSideLength = bitmap.getWidth() > bitmap.getHeight()
+                    ? bitmap.getWidth() : bitmap.getHeight();
+            double ratio = imageMaxSideLength / (double) maxSideLength;
+            if (ratio < 1) {
+                bitmap = Bitmap.createScaledBitmap(
+                        bitmap,
+                        (int) (bitmap.getWidth() * ratio),
+                        (int) (bitmap.getHeight() * ratio),
+                        false);
+            }
+
+            return bitmap;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public static Bitmap loadSizeLimitedBitmapFromUri(
             Uri imageUri,
             ContentResolver contentResolver,
