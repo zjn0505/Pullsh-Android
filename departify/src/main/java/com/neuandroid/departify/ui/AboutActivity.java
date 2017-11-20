@@ -136,10 +136,9 @@ public class AboutActivity extends BaseActivity {
         }
     };
 
-    private boolean devMode = false;
 
     private void activateDevMode() {
-//        boolean devMode = sharedPreferences.getBoolean(DEV_MODE, false);
+        boolean devMode = sharedPreferences.getBoolean(DEV_MODE, false);
         if (clickToast == null) {
             clickToast = Toast.makeText(this, R.string.already_in_dev_mode, Toast.LENGTH_SHORT);
         }

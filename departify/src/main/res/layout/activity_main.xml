@@ -89,6 +89,32 @@
     </LinearLayout>
 
 
+    <RelativeLayout
+        android:id="@+id/rl_loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center_vertical"
+        android:background="#AA000000"
+        android:padding="40dp"
+        android:clickable="true"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/img_loading_left"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:scaleType="centerCrop"
+            android:layout_alignParentLeft="true"/>
+
+        <ImageView
+            android:id="@+id/img_loading_right"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_alignParentEnd="true"/>
+
+    </RelativeLayout>
+    
     <ProgressBar
         android:id="@+id/pb_loading"
         android:layout_width="wrap_content"

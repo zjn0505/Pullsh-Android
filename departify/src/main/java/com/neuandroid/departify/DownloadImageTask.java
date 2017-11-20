@@ -1,9 +1,6 @@
 package com.neuandroid.departify;
 
-import android.content.Context;
 import android.os.AsyncTask;
-import android.os.Environment;
-import android.util.Log;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -65,7 +62,6 @@ public class DownloadImageTask extends AsyncTask<String, String, String> {
     }
 
     protected void onProgressUpdate(String... progress) {
-        Log.d("zjn", progress[0]);
         mListener.progressUpdate(Integer.valueOf(progress[0]));
     }
 
@@ -75,10 +71,7 @@ public class DownloadImageTask extends AsyncTask<String, String, String> {
      * **/
     @Override
     protected void onPostExecute(String file_url) {
-
         String imagePath = f.getPath();
-        Log.d("zjn", "onPostExecute: " + imagePath);
-
         mListener.downloadResult(imagePath);
     }
 }

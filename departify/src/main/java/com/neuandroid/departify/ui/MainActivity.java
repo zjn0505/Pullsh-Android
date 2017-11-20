@@ -1,5 +1,8 @@
 package com.neuandroid.departify.ui;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -8,10 +11,8 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
@@ -30,10 +31,12 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,6 +51,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.deeparteffects.sdk.android.DeepArtEffectsClient;
 import com.deeparteffects.sdk.android.model.Result;
+import com.deeparteffects.sdk.android.model.Style;
 import com.deeparteffects.sdk.android.model.Styles;
 import com.deeparteffects.sdk.android.model.UploadRequest;
 import com.deeparteffects.sdk.android.model.UploadResponse;
@@ -61,9 +65,7 @@ import com.neuandroid.departify.SubmissionStatus;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Timer;
@@ -93,6 +95,12 @@ public class MainActivity extends BaseActivity {
     ImageView ivDepartifiedPic;
     @BindView(R.id.pb_loading)
     ProgressBar pbLoading;
+    @BindView(R.id.rl_loading)
+    RelativeLayout rlLoading;
+    @BindView(R.id.img_loading_left)
+    ImageView ivLoadingLeft;
+    @BindView(R.id.img_loading_right)
+    ImageView ivLoadingRight;
     @BindView(R.id.control_panel)
     LinearLayout controlPanel;
     @BindView(R.id.btn_take_photo)
@@ -104,7 +112,8 @@ public class MainActivity extends BaseActivity {
 
     private String apiKey = "", accessKey = "", secretKey = "";
     private DeepArtEffectsClient deepArtEffectsClient;
-    private Bitmap mImageBitmap;
+    private Bitmap mImageBitmap; // raw bitmap
+    private Bitmap mTransBitmap; // trans bitmap
     private Context mContext;
     private ArtStyleAdapter styleAdapter;
     private GridLayoutManager mLayoutManager;
@@ -116,6 +125,10 @@ public class MainActivity extends BaseActivity {
     private SharedPreferences sharedPreferences;
 
     private Gson gson = new Gson();
+    private AnimatorSet animatorSet;
+    private String mCurrentPhotoPath; // raw image path
+    private File fileToBeStored; // image after transformed
+
 
     ButterKnife.Action<SquareView> setColor = new ButterKnife.Action<SquareView>() {
 
@@ -203,6 +216,30 @@ public class MainActivity extends BaseActivity {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         shouldShowTitle = sharedPreferences.getBoolean("pref_title", false);
         loadingStyles();
+
+        ObjectAnimator animatorLX = ObjectAnimator.ofFloat(ivLoadingLeft, "translationX", 0, 310, 0);
+        ObjectAnimator animatorRX = ObjectAnimator.ofFloat(ivLoadingRight, "translationX", 0, -310, 0);
+        ObjectAnimator animatorLA = ObjectAnimator.ofFloat(ivLoadingLeft, "alpha", 1, 0.5f, 1);
+        ObjectAnimator animatorRA = ObjectAnimator.ofFloat(ivLoadingRight, "alpha", 1, 0.5f, 1);
+
+        animatorLX.setRepeatCount(ValueAnimator.INFINITE);
+        animatorRX.setRepeatCount(ValueAnimator.INFINITE);
+        animatorLA.setRepeatCount(ValueAnimator.INFINITE);
+        animatorRA.setRepeatCount(ValueAnimator.INFINITE);
+
+        animatorLX.setInterpolator(new AccelerateDecelerateInterpolator());
+        animatorRX.setInterpolator(new AccelerateDecelerateInterpolator());
+        animatorLA.setInterpolator(new AccelerateDecelerateInterpolator());
+        animatorRA.setInterpolator(new AccelerateDecelerateInterpolator());
+
+        ObjectAnimator[] objectAnimators = new ObjectAnimator[4];
+        objectAnimators[0] = animatorLX;
+        objectAnimators[1] = animatorRX;
+        objectAnimators[2] = animatorLA;
+        objectAnimators[3] = animatorRA;
+        animatorSet = new AnimatorSet();
+        animatorSet.playTogether(objectAnimators);
+        animatorSet.setDuration(2000);
     }
 
     @Override
@@ -217,6 +254,9 @@ public class MainActivity extends BaseActivity {
         }
 
     }
+
+    private Styles styles;
+    private String mStyleId;
 
     @OnClick(R.id.btn_load_style)
     void loadingStyles() {
@@ -243,7 +283,7 @@ public class MainActivity extends BaseActivity {
                         editor.putLong("last_refresh", new Date().getTime());
                         editor.commit();
                     }
-                    final Styles styles = cacheStyles;
+                    styles = cacheStyles;
 
                     runOnUiThread(new Runnable() {
                         @Override
@@ -256,8 +296,9 @@ public class MainActivity extends BaseActivity {
                                         public void onClick(String styleId) {
                                             if (!isProcessing) {
                                                 if (mImageBitmap != null) {
+                                                    mStyleId = styleId;
                                                     Log.d(TAG, String.format("Style with ID %s clicked.", styleId));
-                                                    pbLoading.setVisibility(View.VISIBLE);
+                                                    showLoading();
                                                     isProcessing = true;
                                                     uploadImage(styleId);
                                                 } else {
@@ -289,8 +330,29 @@ public class MainActivity extends BaseActivity {
         }).start();
     }
 
+    private void showLoading() {
+        ivLoadingLeft.setImageBitmap(mImageBitmap);
+        Glide.with(this).load(getStyleUrl(mStyleId)).listener(new RequestListener<String, GlideDrawable>() {
+            @Override
+            public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                return false;
+            }
+
+            @Override
+            public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                rlLoading.setVisibility(View.VISIBLE);
+                animatorSet.start();
+                return false;
+            }
+        }).centerCrop().into(ivLoadingRight);
+    }
+
+    private void hideLoading() {
+        rlLoading.setVisibility(View.GONE);
+        animatorSet.pause();
+    }
+
     private void uploadImage(final String styleId) {
-//        mStatusText.setText("Uploading picture...");
         Log.d(TAG, String.format("Upload image with style id %s", styleId));
         final MyHandler myHandler = new MyHandler();
         new Thread(new Runnable() {
@@ -337,28 +399,18 @@ public class MainActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_share:
-                BitmapDrawable drawable = (BitmapDrawable)ivDepartifiedPic.getDrawable();
-                if (drawable == null) {
+                String path;
+                if (currentUrl == null) {
+                    Toast.makeText(this, "Please transform a picture first",
+                            Toast.LENGTH_SHORT).show();
                     return true;
+                } else {
+                    path = fileToBeStored.getAbsolutePath();
                 }
-                Bitmap bitmap = drawable.getBitmap();
-                if (bitmap == null) {
-                    return true;
-                }
-                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-                File f = null;
-                try {
-                    f = FileUtils.createImageFile(MainActivity.this);
-                    mCurrentPhotoPath = f.getAbsolutePath();
-                    FileOutputStream fo = new FileOutputStream(f);
-                    fo.write(bytes.toByteArray());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+
                 Intent shareIntent = new Intent();
                 shareIntent.setAction(Intent.ACTION_SEND);
-                shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(mCurrentPhotoPath));
+                shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(path));
                 shareIntent.setType("image/jpeg");
                 startActivity(Intent.createChooser(shareIntent, getString(R.string.share_to)));
 
@@ -431,7 +483,6 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-
     @OnClick(R.id.btn_open_album)
     void openAlbum() {
         Intent openAlbumIntent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -446,11 +497,11 @@ public class MainActivity extends BaseActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                if (TextUtils.isEmpty(currentUrl)) {
+                if (TextUtils.isEmpty(currentUrl)) { // Analyze raw img
                     createPaletteAsync(mImageBitmap);
-                } else {
-                    Bitmap bitmap = ImageHelper.loadSizeLimitedBitmapFromUri(fileToBeStored, IMAGE_MAX_SIDE_LENGTH);
-                    createPaletteAsync(bitmap);
+                } else {                             // Analyze trans img
+                    mTransBitmap = ImageHelper.loadSizeLimitedBitmapFromUri(fileToBeStored, IMAGE_MAX_SIDE_LENGTH);
+                    createPaletteAsync(mTransBitmap);
                 }
 
             }
@@ -483,8 +534,6 @@ public class MainActivity extends BaseActivity {
             }, 2000);
         }
     }
-
-    private String mCurrentPhotoPath;
 
     private void setPic() {
         // Get the dimensions of the View
@@ -549,7 +598,8 @@ public class MainActivity extends BaseActivity {
                 Log.d(TAG, String.format("Submission status is %s", submissionStatus));
                 if (submissionStatus.equals(SubmissionStatus.FINISHED)) {
                     fileToBeStored = FileUtils.createImageFile(MainActivity.this);
-                    new DownloadImageTask(fileToBeStored, mDownloadListener).execute(currentUrl);
+                    mDownloadImageTask = new DownloadImageTask(fileToBeStored, mDownloadListener);
+                    mDownloadImageTask.execute(currentUrl);
                     cancel();
                 }
             } catch (Exception e) {
@@ -558,22 +608,44 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    private File fileToBeStored;
+    @Override
+    protected void onDestroy() {
+        if (mDownloadImageTask != null) {
+            mDownloadImageTask.cancel(true);
+        }
+        super.onDestroy();
+    }
+
+    private DownloadImageTask mDownloadImageTask;
 
     private DownloadImageTask.DownloadImageTaskListener mDownloadListener = new DownloadImageTask.DownloadImageTaskListener() {
         @Override
         public void progressUpdate(int progress) {
-            pbLoading.setProgress(progress);
+//            pbLoading.setProgress(progress);
         }
 
         @Override
         public void downloadResult(String path) {
-            pbLoading.setVisibility(View.GONE);
+            if (MainActivity.this.isDestroyed()) {
+                return;
+            }
+            hideLoading();
             isProcessing = false;
             ivDepartifiedPic.setVisibility(View.VISIBLE); // TODO
             Glide.with(MainActivity.this).load(Uri.fromFile(fileToBeStored)).crossFade().into(ivDepartifiedPic);
         }
     };
+
+    private String getStyleUrl(String id) {
+        if (styles != null && styles.size() > 0) {
+            for (Style style : styles) {
+                if (style.getId().equals(id)) {
+                    return style.getUrl();
+                }
+            }
+        }
+        return "";
+    }
 
     private class MyHandler extends Handler {
         @Override
@@ -582,7 +654,7 @@ public class MainActivity extends BaseActivity {
                 case MSG_REQUEST_SUCCEED:
                     break;
                 case MSG_REQUEST_TIMEOUT:
-                    pbLoading.setVisibility(View.GONE);
+                    hideLoading();
                     isProcessing = false;
                     Toast.makeText(mContext, "Request failed, time out", Toast.LENGTH_SHORT).show();
                     break;
