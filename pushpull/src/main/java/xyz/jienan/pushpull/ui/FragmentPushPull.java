@@ -37,7 +37,6 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AnticipateInterpolator;
 import android.view.animation.DecelerateInterpolator;
-import android.view.animation.OvershootInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -586,6 +585,15 @@ public class FragmentPushPull extends Fragment {
         Drawable drawable = fabSwipe.getDrawable();
         if (drawable instanceof Animatable) {
             ((Animatable) drawable).start();
+        }
+    }
+
+    public void handleSendText(String sharedText) {
+        Log.d(TAG, "handleSendText: " + sharedText);
+        fabPosition = -1;
+        swipeTo(fabPosition);
+        if (edtMemo != null) {
+            edtMemo.setText(sharedText);
         }
     }
 }
