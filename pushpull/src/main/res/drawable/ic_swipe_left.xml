@@ -1,0 +1,25 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="12dp"
+    android:height="12dp"
+    android:viewportWidth="24.0"
+    android:viewportHeight="24.0">
+
+    <path
+        android:name="swipe"
+        android:pathData="@string/path_swipe_left"
+        android:strokeColor="#44000000"
+        android:strokeLineCap="square"
+        android:strokeWidth="3" />
+
+    <path
+        android:name="swipe"
+        android:pathData="@string/path_swipe_left"
+        android:strokeColor="#33FFFFFF"
+        android:strokeLineCap="square"
+        android:strokeWidth="2" />
+
+
+
+
+
+</vector>

@@ -95,6 +95,28 @@
                 tools:ignore="VectorDrawableCompat" />
         </com.github.jorgecastilloprz.FABProgressCircle>
 
+        <ImageView
+            android:id="@+id/iv_swipe_left"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_toLeftOf="@id/fab_wrapper"
+            android:layout_alignTop="@id/fab_wrapper"
+            android:layout_marginTop="20dp"
+            app:srcCompat="@drawable/ic_swipe_left"
+            android:visibility="gone"
+            android:alpha="0"/>
+
+        <ImageView
+            android:id="@+id/iv_swipe_right"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_toRightOf="@id/fab_wrapper"
+            android:layout_alignTop="@id/fab_wrapper"
+            android:layout_marginTop="20dp"
+            app:srcCompat="@drawable/ic_swipe_right"
+            android:visibility="gone"
+            android:alpha="0"/>
+
     </RelativeLayout>
 
     <View

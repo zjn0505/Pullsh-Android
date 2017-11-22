@@ -2,6 +2,7 @@ package xyz.jienan.pushpull.ui;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -34,7 +35,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AnticipateInterpolator;
 import android.view.animation.DecelerateInterpolator;
@@ -85,6 +88,8 @@ public class FragmentPushPull extends Fragment {
     private FABProgressCircle fabWrapper;
     private RelativeLayout bottomHeader;
     private RelativeLayout bottomWrapper;
+    private ImageView ivSwipeLeft;
+    private ImageView ivSwipeRight;
     private EditText edtMemo;
     private TextView tvSwipeHint;
     private FrameLayout foreground;
@@ -107,6 +112,8 @@ public class FragmentPushPull extends Fragment {
     private float originX = 0;
     private GestureDetectorCompat mDetector;
     private int fabPosition = 0;
+    private boolean fabPressTriggered = false;
+    private float oldX, oldY, posX, posY;
 
     BottomSheetBehavior.BottomSheetCallback bottomSheetCallback =
             new BottomSheetBehavior.BottomSheetCallback() {
@@ -235,6 +242,14 @@ public class FragmentPushPull extends Fragment {
             }
             return true;
         }
+
+
+        @Override
+        public void onShowPress(MotionEvent e) {
+            if (fabPosition == 0)
+                fabPressTriggered = true;
+            super.onShowPress(e);
+        }
     };
 
     private View.OnClickListener mClickListener = new View.OnClickListener() {
@@ -267,6 +282,8 @@ public class FragmentPushPull extends Fragment {
         bottomLayout = view.findViewById(R.id.bottom_sheet);
         fabSwipe = view.findViewById(R.id.fab_action);
         fabWrapper = view.findViewById(R.id.fab_wrapper);
+        ivSwipeLeft = view.findViewById(R.id.iv_swipe_left);
+        ivSwipeRight = view.findViewById(R.id.iv_swipe_right);
         tvSwipeHint = view.findViewById(R.id.tv_swipe_hint);
         edtMemo = view.findViewById(R.id.edt_memo2);
         foreground = view.findViewById(R.id.foreground);
@@ -359,13 +376,46 @@ public class FragmentPushPull extends Fragment {
         fabSwipe.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+
+                swipeDirectShown(event.getAction() == MotionEvent.ACTION_MOVE && fabPosition == 0);
                 mDetector.onTouchEvent(event);
+
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        oldX = event.getX();
+                        oldY = event.getY();
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        posX = event.getX();
+                        posY = event.getY();
+                        if (Math.abs(posX - oldX) > Math.abs(posY - oldY)) {
+                            if (Math.abs(posX - oldX) > 90) {
+                                if (fabPressTriggered) {
+                                    if (posX > oldX) {
+                                        if (fabPosition < 1) {
+                                            fabPosition++;
+                                            swipeTo(fabPosition);
+                                        }
+                                    } else if (posX < oldX) {
+                                        if (fabPosition > -1) {
+                                            fabPosition--;
+                                            swipeTo(fabPosition);
+                                        }
+                                    }
+                                    fabPressTriggered = false;
+                                }
+                            }
+                        }
+                }
+
+
                 if (originX == 0) {
                     originX = v.getX();
                 }
                 return false;
             }
         });
+        swipeDirectShown(true);
         fabSwipe.setOnClickListener(mClickListener);
     }
 
@@ -592,6 +642,49 @@ public class FragmentPushPull extends Fragment {
         Drawable drawable = fabSwipe.getDrawable();
         if (drawable instanceof Animatable) {
             ((Animatable) drawable).start();
+        }
+    }
+
+    private AnimatorSet animatorSet;
+
+    private void swipeDirectShown(boolean isShown) {
+        if (isShown) {
+            if (animatorSet!= null && animatorSet.isStarted()) {
+                return;
+            }
+            ivSwipeLeft.setVisibility(View.VISIBLE);
+            ivSwipeRight.setVisibility(View.VISIBLE);
+
+            if (animatorSet == null) {
+                ObjectAnimator animatorLeftX = ObjectAnimator.ofFloat(ivSwipeLeft, "translationX", -80);
+                ObjectAnimator animatorRightX = ObjectAnimator.ofFloat(ivSwipeRight, "translationX", 80);
+                ObjectAnimator animatorLeftA = ObjectAnimator.ofFloat(ivSwipeLeft, "alpha", 0, 1, 0);
+                ObjectAnimator animatorRightA = ObjectAnimator.ofFloat(ivSwipeRight, "alpha", 0, 1, 0);
+
+                animatorLeftX.setRepeatCount(ValueAnimator.INFINITE);
+                animatorRightX.setRepeatCount(ValueAnimator.INFINITE);
+                animatorLeftA.setRepeatCount(ValueAnimator.INFINITE);
+                animatorRightA.setRepeatCount(ValueAnimator.INFINITE);
+
+                animatorLeftX.setInterpolator(new AccelerateDecelerateInterpolator());
+                animatorRightX.setInterpolator(new AccelerateDecelerateInterpolator());
+                animatorLeftA.setInterpolator(new AccelerateDecelerateInterpolator());
+                animatorRightA.setInterpolator(new AccelerateDecelerateInterpolator());
+
+                ObjectAnimator[] objectAnimators = new ObjectAnimator[4];
+                objectAnimators[0] = animatorLeftX;
+                objectAnimators[1] = animatorRightX;
+                objectAnimators[2] = animatorLeftA;
+                objectAnimators[3] = animatorRightA;
+                animatorSet = new AnimatorSet();
+                animatorSet.playTogether(objectAnimators);
+                animatorSet.setDuration(2000);
+            }
+            animatorSet.start();
+        } else {
+            ivSwipeLeft.setVisibility(View.GONE);
+            ivSwipeRight.setVisibility(View.GONE);
+            animatorSet.cancel();
         }
     }
 
