@@ -222,11 +222,16 @@ public class FragmentPushPull extends Fragment {
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             if (Math.abs(velocityX) > 500) {
                 if (velocityX > 0) {
-                    fabPosition = Math.min(++fabPosition, 1);
+                    if (fabPosition < 1) {
+                        fabPosition++;
+                        swipeTo(fabPosition);
+                    }
                 } else if (velocityX < 0) {
-                    fabPosition = Math.max(--fabPosition, -1);
+                    if (fabPosition > -1) {
+                        fabPosition--;
+                        swipeTo(fabPosition);
+                    }
                 }
-                swipeTo(fabPosition);
             }
             return true;
         }
