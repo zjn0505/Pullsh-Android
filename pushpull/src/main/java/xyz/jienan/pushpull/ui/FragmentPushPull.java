@@ -27,6 +27,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -61,6 +62,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import xyz.jienan.pushpull.BuildConfig;
 import xyz.jienan.pushpull.DateUtils;
 import xyz.jienan.pushpull.R;
+import xyz.jienan.pushpull.ToastUtils;
 import xyz.jienan.pushpull.network.CommonResponse;
 import xyz.jienan.pushpull.network.MemoEntity;
 import xyz.jienan.pushpull.network.MemoService;
@@ -141,7 +143,7 @@ public class FragmentPushPull extends Fragment {
                 public void onClick(View v) {
                     ClipData clip = ClipData.newPlainText("id", entity.getId());
                     clipboard.setPrimaryClip(clip);
-                    Toast.makeText(getActivity(), "id copied to clipboard", Toast.LENGTH_SHORT).show();
+                    ToastUtils.showToast(getActivity(), "id copied to clipboard");
                 }
             });
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
@@ -179,7 +181,7 @@ public class FragmentPushPull extends Fragment {
                 public void onClick(View v) {
                     ClipData clip = ClipData.newPlainText("msg", msg);
                     clipboard.setPrimaryClip(clip);
-                    Toast.makeText(getActivity(), "Memo content copied to clipboard", Toast.LENGTH_SHORT).show();
+                    ToastUtils.showToast(getActivity(), "Memo content copied to clipboard");
                 }
             });
         }
@@ -444,7 +446,7 @@ public class FragmentPushPull extends Fragment {
     private void pushMemo() {
         String memoContent = edtMemo.getText().toString();
         if (TextUtils.isEmpty(memoContent)) {
-            Toast.makeText(getActivity(), "Please input some contents", Toast.LENGTH_SHORT).show();
+            ToastUtils.showToast(getActivity(), "Please input some contents");
         } else {
             fabSwipe.setClickable(false);
             int time = sharedPreferences.getInt("EXPIRED_TIME", 1);
@@ -496,7 +498,7 @@ public class FragmentPushPull extends Fragment {
     private void pullMemo() {
         String memoId = edtMemo.getText().toString();
         if (TextUtils.isEmpty(memoId)) {
-            Toast.makeText(getActivity(), "Please input correct memo id", Toast.LENGTH_SHORT).show();
+            ToastUtils.showToast(getActivity(), "Please input correct memo id");
         } else {
             if (mAdapter.checkExistMeme(memoId)) {
                 swipeBackFromCheck();
@@ -510,7 +512,7 @@ public class FragmentPushPull extends Fragment {
                 @Override
                 public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
                     if (response.body().getMemo() == null) {
-                        Toast.makeText(getActivity(), response.body().getMsg(), Toast.LENGTH_SHORT).show();
+                        ToastUtils.showToast(getActivity(), response.body().getMsg());
                         fabSwipe.setClickable(true);
                     } else {
                         mAdapter.addMemo(response.body().getMemo());

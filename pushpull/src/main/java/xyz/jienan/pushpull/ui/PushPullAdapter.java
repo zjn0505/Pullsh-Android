@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,7 @@ import java.util.Random;
 
 import xyz.jienan.pushpull.DateUtils;
 import xyz.jienan.pushpull.R;
+import xyz.jienan.pushpull.ToastUtils;
 import xyz.jienan.pushpull.network.MemoEntity;
 
 /**
@@ -106,10 +108,11 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
             }
         }
         if (i == 1) {
-            Toast.makeText(mContext, "One item has been removed from list", Toast.LENGTH_SHORT).show();
+            ToastUtils.showToast(mContext, "One item has been removed from list");
         } else if (i > 1) {
-            Toast.makeText(mContext, i + " items have been removed from list", Toast.LENGTH_SHORT).show();
+            ToastUtils.showToast(mContext, i + " items have been removed from list");
         }
+
         notifyDataSetChanged();
         saveToPreference();
     }
@@ -163,7 +166,7 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
             public void onClick(View v) {
                 ClipData clip = ClipData.newPlainText("id",memo.getId());
                 clipboard.setPrimaryClip(clip);
-                Toast.makeText(mContext, "id copied to clipboard", Toast.LENGTH_SHORT).show();
+                ToastUtils.showToast(mContext, "id copied to clipboard");
             }
         });
 
@@ -188,7 +191,7 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
                     }
                 }
                 if (!memo.createdFromPush && memo.hasExpired) {
-                    Toast.makeText(mContext, "This memo has been expired", Toast.LENGTH_SHORT).show();
+                    ToastUtils.showToast(mContext, "This memo has been expired");
                     setItemExpiredView(holder);
                 } else {
                     mCallback.onClick(memo);
@@ -207,7 +210,7 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
             int index = mList.indexOf(memo);
             Collections.swap(mList, index, 0);
             this.notifyItemMoved(index, 0);
-            Toast.makeText(mContext, "item already in list", Toast.LENGTH_SHORT).show();
+            ToastUtils.showToast(mContext, "item already in list");
         } else {
             mList.add(0, memo);
             notifyItemInserted(0);
@@ -219,7 +222,7 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
     public boolean checkExistMeme(String id) {
         for (int i = 0; i < mList.size(); i++) {
             if (mList.get(i).getId().equals(id)) {
-                Toast.makeText(mContext, "item already in list", Toast.LENGTH_SHORT).show();
+                ToastUtils.showToast(mContext, "item already in list");
                 recyclerView.scrollToPosition(i);
                 return true;
             }
