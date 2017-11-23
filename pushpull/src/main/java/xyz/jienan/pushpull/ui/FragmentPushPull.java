@@ -3,9 +3,12 @@ package xyz.jienan.pushpull.ui;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.app.ActionBar;
+import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Animatable;
@@ -13,6 +16,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
@@ -69,6 +73,7 @@ import xyz.jienan.pushpull.ToastUtils;
 import xyz.jienan.pushpull.network.CommonResponse;
 import xyz.jienan.pushpull.network.MemoEntity;
 import xyz.jienan.pushpull.network.MemoService;
+import xyz.jienan.pushpull.ui.settings.SettingsActivity;
 
 /**
  * Created by Jienan on 2017/10/30.
@@ -78,6 +83,8 @@ public class FragmentPushPull extends Fragment {
 
     private final static String TAG = FragmentPushPull.class.getSimpleName();
     private final static String BASE_URL = "https://api.jienan.xyz/";
+    private static final int REQUEST_SETTINGS = 100;
+
     private MemoService memoService;
     private CoordinatorLayout coordiLayout;
     private RecyclerView recyclerView;
@@ -114,6 +121,8 @@ public class FragmentPushPull extends Fragment {
     private int fabPosition = 0;
     private boolean fabPressTriggered = false;
     private float oldX, oldY, posX, posY;
+
+    private SharedPreferences sharedPref;
 
     BottomSheetBehavior.BottomSheetCallback bottomSheetCallback =
             new BottomSheetBehavior.BottomSheetCallback() {
@@ -264,6 +273,14 @@ public class FragmentPushPull extends Fragment {
                             pullMemo();
                         }
                     }
+                    if (fabPosition == 0 && fabWrapper.getTranslationX() == 0) {
+                        String action = sharedPref.getString("pref_click", "click_push");
+                        if (action.equals("click_push")) {
+                            swipeTo(--fabPosition);
+                        } else if (action.equals("click_pull")) {
+                            swipeTo(++fabPosition);
+                        }
+                    }
                     break;
             }
 
@@ -294,6 +311,7 @@ public class FragmentPushPull extends Fragment {
         clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
         setupView();
         setupService();
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         return view;
     }
 
@@ -302,6 +320,12 @@ public class FragmentPushPull extends Fragment {
         super.onStart();
         if (mAdapter != null)
             mAdapter.expireItems();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
     }
 
     @Override
@@ -325,9 +349,23 @@ public class FragmentPushPull extends Fragment {
             dialog.setContext(getActivity());
             dialog.show(getFragmentManager(), null);
             return true;
+        } else if (id == R.id.action_settings) {
+            startActivityForResult(new Intent(getActivity(), SettingsActivity.class), REQUEST_SETTINGS);
+            return true;
         }
 
+
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_SETTINGS) {
+            if (resultCode == Activity.RESULT_OK) {
+                getActivity().recreate();
+            }
+        }
     }
 
     private void setupService() {
@@ -438,19 +476,20 @@ public class FragmentPushPull extends Fragment {
             fabAnim(R.drawable.anim_add_to_swipe);
         } else {
             bottomHeader.setVisibility(View.VISIBLE);
-            if (i == 1) {
+            boolean reversed = sharedPref.getBoolean("pref_reverse", false);
+            if ((i == 1) != reversed) {
                 tvSwipeHint.setText("Create a pull");
                 edtMemo.setHint("Input the memo id");
                 edtMemo.setMaxEms(10);
                 edtMemo.setSingleLine(true);
-                fabAnim(R.drawable.anim_swipe_to_add);
-            } else if (i == -1) {
+            } else {
                 tvSwipeHint.setText("Create a push");
                 edtMemo.setHint("Input your memo");
                 edtMemo.setSingleLine(false);
                 edtMemo.setMaxEms(Integer.MAX_VALUE);
-                fabAnim(R.drawable.anim_swipe_to_add);
+
             }
+            fabAnim(R.drawable.anim_swipe_to_add);
             edtMemo.setVisibility(View.VISIBLE);
             foreground.setVisibility(View.VISIBLE);
             foreground.setAlpha(0);
@@ -695,5 +734,6 @@ public class FragmentPushPull extends Fragment {
         if (edtMemo != null) {
             edtMemo.setText(sharedText);
         }
+        swipeDirectShown(false);
     }
 }

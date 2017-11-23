@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="array_click">
+        <item>@string/click_push</item>
+        <item>@string/click_pull</item>
+        <item>@string/click_nothing</item>
+    </string-array>
+    <string-array name="array_click_value">
+        <item>click_push</item>
+        <item>click_pull</item>
+        <item>click_nothing</item>
+    </string-array>
+
+</resources>

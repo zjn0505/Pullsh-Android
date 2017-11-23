@@ -30,6 +30,7 @@
                 <data android:mimeType="text/*" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.settings.SettingsActivity" />
     </application>
 
 </manifest>

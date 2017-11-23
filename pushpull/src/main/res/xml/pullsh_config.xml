@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference
+        android:key="pref_click"
+        android:title="@string/pref_click"
+        android:entries="@array/array_click"
+        android:entryValues="@array/array_click_value"
+        android:defaultValue="click_push"
+        android:summary="@string/click_push"/>
+    <SwitchPreference
+        android:key="pref_reverse"
+        android:title="@string/pref_reverse"
+        android:defaultValue="false"
+        android:summaryOff="@string/pref_swipe_default"
+        android:summaryOn="@string/pref_swipe_reverse"/>
+    <SwitchPreference
+        android:key="pref_copy"
+        android:title="@string/pref_copy"
+        android:defaultValue="true" />
+
+</PreferenceScreen>
