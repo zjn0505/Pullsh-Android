@@ -40,32 +40,30 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.mobileconnectors.apigateway.ApiClientException;
-import com.amazonaws.mobileconnectors.apigateway.ApiClientFactory;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
-import com.deeparteffects.sdk.android.DeepArtEffectsClient;
-import com.deeparteffects.sdk.android.model.Result;
-import com.deeparteffects.sdk.android.model.Style;
-import com.deeparteffects.sdk.android.model.Styles;
-import com.deeparteffects.sdk.android.model.UploadRequest;
-import com.deeparteffects.sdk.android.model.UploadResponse;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.neuandroid.departify.BuildConfig;
 import com.neuandroid.departify.DownloadImageTask;
 import com.neuandroid.departify.FileUtils;
 import com.neuandroid.departify.ImageHelper;
 import com.neuandroid.departify.R;
 import com.neuandroid.departify.SubmissionStatus;
+import com.neuandroid.departify.model.Result;
+import com.neuandroid.departify.model.Style;
+import com.neuandroid.departify.model.Styles;
+import com.neuandroid.departify.model.UploadRequest;
+import com.neuandroid.departify.model.UploadResponse;
+import com.neuandroid.departify.network.DepartifyService;
+import com.neuandroid.departify.network.RetrofitClient;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Timer;
@@ -76,6 +74,12 @@ import butterknife.BindViews;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnLongClick;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends BaseActivity {
 
@@ -111,7 +115,6 @@ public class MainActivity extends BaseActivity {
     Button btnLoadStyle;
 
     private String apiKey = "", accessKey = "", secretKey = "";
-    private DeepArtEffectsClient deepArtEffectsClient;
     private Bitmap mImageBitmap; // raw bitmap
     private Bitmap mTransBitmap; // trans bitmap
     private Context mContext;
@@ -187,32 +190,8 @@ public class MainActivity extends BaseActivity {
         rvArtStyles.setItemAnimator(new DefaultItemAnimator());
 
 
-        String packageName = mContext.getApplicationContext().getPackageName();
-        try {
-            ApplicationInfo appInfo = mContext.getPackageManager().getApplicationInfo(packageName, PackageManager.GET_META_DATA);
-            if (appInfo.metaData != null) {
-                apiKey = appInfo.metaData.getString("DEEP_ART_EFFECT_API_KEY");
-                accessKey = appInfo.metaData.getString("DEEP_ART_EFFECT_ACCESS_KEY");
-                secretKey = appInfo.metaData.getString("DEEP_ART_EFFECT_SECRET_KEY");
-            }
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
 
-        ApiClientFactory factory = new ApiClientFactory()
-                .apiKey(apiKey)
-                .region("eu-west-1")
-                .credentialsProvider(new AWSCredentialsProvider() {
-                    @Override
-                    public AWSCredentials getCredentials() {
-                        return new BasicAWSCredentials(accessKey, secretKey); // TODO
-                    }
 
-                    @Override
-                    public void refresh() {
-                    }
-                });
-        deepArtEffectsClient = factory.build(DeepArtEffectsClient.class);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         shouldShowTitle = sharedPreferences.getBoolean("pref_title", false);
         loadingStyles();
@@ -260,74 +239,90 @@ public class MainActivity extends BaseActivity {
 
     @OnClick(R.id.btn_load_style)
     void loadingStyles() {
-        new Thread(new Runnable() {
+        String json = sharedPreferences.getString("preserved_styles", "");
+        long retrieveTime = sharedPreferences.getLong("last_refresh", 0);
+
+        final Styles[] cacheStyles = new Styles[1];
+        if (!TextUtils.isEmpty(json) && retrieveTime != 0) {
+            long diff = new Date().getTime() - retrieveTime;
+            if (diff < TIME_FOR_NEXT_STYLE_REQUEST && diff > 0) {
+                cacheStyles[0] = gson.fromJson(json, Styles.class);
+            }
+        }
+
+        Observer styleObserver = new Observer<Styles>() {
             @Override
-            public void run() {
-
-                try {
-                    String json = sharedPreferences.getString("preserved_styles", "");
-                    long retrieveTime = sharedPreferences.getLong("last_refresh", 0);
-
-                    Styles cacheStyles = null;
-                    if (!TextUtils.isEmpty(json) && retrieveTime != 0) {
-                        long diff = new Date().getTime() - retrieveTime;
-                        if (diff < TIME_FOR_NEXT_STYLE_REQUEST && diff > 0) {
-                            cacheStyles = gson.fromJson(json, Styles.class);
-                        }
-                    }
-
-                    if (cacheStyles == null) {
-                        cacheStyles = deepArtEffectsClient.stylesGet();
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putString("preserved_styles", gson.toJson(cacheStyles));
-                        editor.putLong("last_refresh", new Date().getTime());
-                        editor.commit();
-                    }
-                    styles = cacheStyles;
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            styleAdapter = new ArtStyleAdapter(
-                                    getApplicationContext(),
-                                    styles,
-                                    new ArtStyleAdapter.IClickListener() {
-                                        @Override
-                                        public void onClick(String styleId) {
-                                            if (!isProcessing) {
-                                                if (mImageBitmap != null) {
-                                                    mStyleId = styleId;
-                                                    Log.d(TAG, String.format("Style with ID %s clicked.", styleId));
-                                                    showLoading();
-                                                    isProcessing = true;
-                                                    uploadImage(styleId);
-                                                } else {
-                                                    Toast.makeText(mContext, "Please choose a picture first",
-                                                            Toast.LENGTH_SHORT).show();
-                                                }
-                                            }
-                                        }
-                                    }
-                            );
-                            btnLoadStyle.setVisibility(View.GONE);
-                            rvArtStyles.setAdapter(styleAdapter);
-                            pbLoading.setVisibility(View.GONE);
-                            controlPanel.setVisibility(View.VISIBLE);
-                        }
-                    });
-                } catch (ApiClientException e) {
-                    e.printStackTrace();
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(MainActivity.this, "Failed to connect to Deep Art Effects service", Toast.LENGTH_SHORT).show();
-                            pbLoading.setVisibility(View.GONE);
-                        }
-                    });
-                }
+            public void onSubscribe(Disposable disposable) {
 
             }
-        }).start();
+
+            @Override
+            public void onNext(Styles styles) {
+                MainActivity.this.styles = styles;
+                if (cacheStyles[0] == null) {
+                    cacheStyles[0] = styles;
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("preserved_styles", gson.toJson(cacheStyles[0]));
+                    editor.putLong("last_refresh", new Date().getTime());
+                    editor.commit();
+                }
+                styleAdapter = new ArtStyleAdapter(
+                        getApplicationContext(),
+                        styles,
+                        new ArtStyleAdapter.IClickListener() {
+                            @Override
+                            public void onClick(String styleId) {
+                                if (!isProcessing) {
+                                    if (mImageBitmap != null) {
+                                        mStyleId = styleId;
+                                        Log.d(TAG, String.format("Style with ID %s clicked.", styleId));
+                                        showLoading();
+                                        isProcessing = true;
+                                        uploadImage(styleId);
+                                    } else {
+                                        Toast.makeText(mContext, "Please choose a picture first",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            }
+                        }
+                );
+                btnLoadStyle.setVisibility(View.GONE);
+                rvArtStyles.setAdapter(styleAdapter);
+                pbLoading.setVisibility(View.GONE);
+                controlPanel.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                Toast.makeText(MainActivity.this, "Failed to connect to Deep Art Effects service", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, throwable.getMessage());
+                pbLoading.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        };
+
+        if (cacheStyles[0] == null) {
+            DepartifyService service = RetrofitClient.getInstance().getDepartifyService();
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+            boolean shouldUseProxy = sharedPreferences.getBoolean("pref_style_proxy", false);
+            if (shouldUseProxy) {
+                service.stylesGetFromProxy("https://webapp.jienan.xyz/departify").subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(styleObserver);
+            } else {
+                service.stylesGet().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(styleObserver);
+            }
+
+        } else {
+            Observable.fromArray(cacheStyles[0]).observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(styleObserver);
+        }
+
     }
 
     private void showLoading() {
@@ -355,31 +350,37 @@ public class MainActivity extends BaseActivity {
     private void uploadImage(final String styleId) {
         Log.d(TAG, String.format("Upload image with style id %s", styleId));
         final MyHandler myHandler = new MyHandler();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
+        UploadRequest uploadRequest = new UploadRequest();
+        uploadRequest.setStyleId(styleId);
+        uploadRequest.setImageBase64Encoded(convertBitmapToBase64(mImageBitmap));
+        DepartifyService service = RetrofitClient.getInstance().getDepartifyService();
+        service.uploadPost(uploadRequest).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<UploadResponse>() {
+                    @Override
+                    public void onSubscribe(Disposable disposable) {
 
-                UploadRequest uploadRequest = new UploadRequest();
-                uploadRequest.setStyleId(styleId);
-                uploadRequest.setImageBase64Encoded(convertBitmapToBase64(mImageBitmap));
-                UploadResponse response = null;
-                try {
-                    response = deepArtEffectsClient.uploadPost(uploadRequest);
-                } catch (RuntimeException ex) {
-                    ex.printStackTrace();
-                    myHandler.sendEmptyMessage(MSG_REQUEST_TIMEOUT);
-                }
-                if (response == null) {
-                    return;
-                }
-                String submissionId = response.getSubmissionId();
-                Log.d(TAG, String.format("Upload complete. Got submissionId %s", response.getSubmissionId()));
-                Timer timer = new Timer();
-                timer.scheduleAtFixedRate(new ImageReadyCheckTimer(submissionId),
-                        CHECK_RESULT_INTERVAL_IN_MS, CHECK_RESULT_INTERVAL_IN_MS);
-                myHandler.sendEmptyMessage(MSG_REQUEST_SUCCEED);
-            }
-        }).start();
+                    }
+
+                    @Override
+                    public void onNext(UploadResponse uploadResponse) {
+                        String submissionId = uploadResponse.getSubmissionId();
+                        Log.d(TAG, String.format("Upload complete. Got submissionId %s", submissionId));
+                        Timer timer = new Timer();
+                        timer.scheduleAtFixedRate(new ImageReadyCheckTimer(submissionId),
+                                CHECK_RESULT_INTERVAL_IN_MS, CHECK_RESULT_INTERVAL_IN_MS);
+                        myHandler.sendEmptyMessage(MSG_REQUEST_SUCCEED);
+                    }
+
+                    @Override
+                    public void onError(Throwable throwable) {
+                        myHandler.sendEmptyMessage(MSG_REQUEST_TIMEOUT);
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
     }
 
     private String convertBitmapToBase64(Bitmap bitmap) {
@@ -591,20 +592,41 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public void run() {
-            try {
-                final Result result = deepArtEffectsClient.resultGet(mSubmissionId);
-                currentUrl = result.getUrl();
-                String submissionStatus = result.getStatus();
-                Log.d(TAG, String.format("Submission status is %s", submissionStatus));
-                if (submissionStatus.equals(SubmissionStatus.FINISHED)) {
-                    fileToBeStored = FileUtils.createImageFile(MainActivity.this);
-                    mDownloadImageTask = new DownloadImageTask(fileToBeStored, mDownloadListener);
-                    mDownloadImageTask.execute(currentUrl);
-                    cancel();
-                }
-            } catch (Exception e) {
-                cancel();
-            }
+            DepartifyService service = RetrofitClient.getInstance().getDepartifyService();
+            service.resultGet(mSubmissionId).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<Result>() {
+                        @Override
+                        public void onSubscribe(Disposable disposable) {
+
+                        }
+
+                        @Override
+                        public void onNext(Result result) {
+                            currentUrl = result.getUrl();
+                            String submissionStatus = result.getStatus();
+                            Log.d(TAG, String.format("Submission status is %s", submissionStatus));
+                            if (submissionStatus.equals(SubmissionStatus.FINISHED)) {
+                                try {
+                                    fileToBeStored = FileUtils.createImageFile(MainActivity.this);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                mDownloadImageTask = new DownloadImageTask(fileToBeStored, mDownloadListener);
+                                mDownloadImageTask.execute(currentUrl);
+                                cancel();
+                            }
+                        }
+
+                        @Override
+                        public void onError(Throwable throwable) {
+                            cancel();
+                        }
+
+                        @Override
+                        public void onComplete() {
+
+                        }
+                    });
         }
     }
 
@@ -637,8 +659,8 @@ public class MainActivity extends BaseActivity {
     };
 
     private String getStyleUrl(String id) {
-        if (styles != null && styles.size() > 0) {
-            for (Style style : styles) {
+        if (styles != null && styles.getStyles().size() > 0) {
+            for (Style style : styles.getStyles()) {
                 if (style.getId().equals(id)) {
                     return style.getUrl();
                 }

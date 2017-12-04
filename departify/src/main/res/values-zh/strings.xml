@@ -22,6 +22,6 @@
     <string name="dismiss">取消</string>
     <string name="register">注册</string>
     <string name="cred_title">输入密钥</string>
-    <string name="cred_declare">在本页输入你私有的 DeepArtEffects 密钥。\n\n应用提供默认密钥，但不存在使用限制并不保证其可用性。\n\n点击“继续”注册成为 DeepArtEffects 开发者获取密钥。\n\n输入的密钥将保存于本机，只会被用于使用 DeepArtEffects 的服务。</string>
+    <string name="cred_declare">在本页输入你私有的 DeepArtEffects 密钥。\n\n应用提供默认密钥，但存在使用限制，并且不保证其可用性。\n\n点击“继续”注册成为 DeepArtEffects 开发者获取密钥。\n\n输入的密钥将保存于本机，只会被用于使用 DeepArtEffects 的服务。</string>
     <string name="pref_lang">语言</string>
 </resources>

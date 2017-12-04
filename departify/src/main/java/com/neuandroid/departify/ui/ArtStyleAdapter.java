@@ -11,9 +11,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.deeparteffects.sdk.android.model.Style;
-import com.deeparteffects.sdk.android.model.Styles;
 import com.neuandroid.departify.R;
+import com.neuandroid.departify.model.Style;
+import com.neuandroid.departify.model.Styles;
 
 /**
  * Created by jienanzhang on 12/07/2017.
@@ -47,7 +47,7 @@ public class ArtStyleAdapter extends RecyclerView.Adapter<ArtStyleAdapter.ViewHo
                     if (ivStyle == null) {
                         return;
                     }
-                    mClickListener.onClick(mStyles.get(getAdapterPosition()).getId());
+                    mClickListener.onClick(mStyles.getStyles().get(getAdapterPosition()).getId());
                 }
             });
         }
@@ -66,7 +66,7 @@ public class ArtStyleAdapter extends RecyclerView.Adapter<ArtStyleAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Style style = mStyles.get(position);
+        Style style = mStyles.getStyles().get(position);
         String imageUrl = style.getUrl();
         Glide.with(mContext).load(imageUrl).placeholder(R.mipmap.ic_launcher).centerCrop().crossFade().into(holder.ivStyle);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
@@ -92,7 +92,7 @@ public class ArtStyleAdapter extends RecyclerView.Adapter<ArtStyleAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        return mStyles == null ? 0 : mStyles.size();
+        return mStyles == null ? 0 : mStyles.getStyles().size();
     }
 
     public interface IClickListener {
