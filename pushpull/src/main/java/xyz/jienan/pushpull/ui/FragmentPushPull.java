@@ -3,7 +3,6 @@ package xyz.jienan.pushpull.ui;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -11,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
+import android.graphics.Typeface;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -32,14 +32,12 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.GestureDetector;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
@@ -52,7 +50,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.github.jorgecastilloprz.FABProgressCircle;
@@ -123,6 +120,7 @@ public class FragmentPushPull extends Fragment {
     private float oldX, oldY, posX, posY;
 
     private SharedPreferences sharedPref;
+    private Typeface fontMonaco;
 
     BottomSheetBehavior.BottomSheetCallback bottomSheetCallback =
             new BottomSheetBehavior.BottomSheetCallback() {
@@ -153,6 +151,7 @@ public class FragmentPushPull extends Fragment {
         @Override
         public void onClick(final MemoEntity entity) {
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            tvBsbMemoId.setTypeface(fontMonaco,Typeface.BOLD);
             tvBsbMemoId.setText(entity.getId());
             ivBsbIdCopy.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -312,6 +311,9 @@ public class FragmentPushPull extends Fragment {
         setupView();
         setupService();
         sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        if (fontMonaco == null) {
+            fontMonaco = Typeface.createFromAsset(getContext().getAssets(), "Monaco.ttf");
+        }
         return view;
     }
 

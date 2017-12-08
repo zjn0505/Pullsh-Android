@@ -5,16 +5,14 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -25,7 +23,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
 import xyz.jienan.pushpull.DateUtils;
 import xyz.jienan.pushpull.R;
@@ -46,12 +43,16 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
     private Gson gson;
     private RecyclerView recyclerView;
     private ItemInteractionCallback mCallback;
+    private Typeface fontMonaco;
 
     PushPullAdapter(Context context, ItemInteractionCallback itemInteractionCallback) {
         mList = new LinkedList<MemoEntity>();
         mContext = context;
         if (clipboard == null) {
             clipboard = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
+        }
+        if (fontMonaco == null) {
+            fontMonaco = Typeface.createFromAsset(mContext.getAssets(), "Monaco.ttf");
         }
         gson = new Gson();
         SharedPreferences sharedPreferences = mContext.getSharedPreferences("Memo", Context.MODE_PRIVATE);
@@ -152,6 +153,7 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
     public void onBindViewHolder(final ViewHolder holder, int position) {
         final MemoEntity memo = mList.get(position);
         holder.tvId.setText(memo.getId());
+        holder.tvId.setTypeface(fontMonaco, Typeface.BOLD);
         holder.tvMsg.setText(memo.getMsg());
         long lifeSpan = 0;
         if (!TextUtils.isEmpty(memo.getExpiredOn())) {
