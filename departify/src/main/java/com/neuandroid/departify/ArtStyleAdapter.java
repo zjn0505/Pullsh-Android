@@ -33,7 +33,7 @@ public class ArtStyleAdapter extends RecyclerView.Adapter<ArtStyleAdapter.ViewHo
 
         public ViewHolder(View itemView) {
             super(itemView);
-            ivStyle = (ImageView) itemView.findViewById(R.id.iv_style);
+            ivStyle = itemView.findViewById(R.id.iv_style);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

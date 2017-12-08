@@ -1,13 +1,13 @@
 package com.neuandroid.face.util;
 
+import android.graphics.Bitmap;
+import android.os.Environment;
+import android.util.Log;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
-import android.graphics.Bitmap;
-import android.os.Environment;
-import android.util.Log;
 
 public class FileUtil {
 	private static final  String TAG = "FileUtil";

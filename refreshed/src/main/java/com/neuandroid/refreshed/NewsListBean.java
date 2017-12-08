@@ -17,7 +17,6 @@
 package com.neuandroid.refreshed;
 
 
-import java.io.Serializable;
 import java.util.List;
 
 public class NewsListBean extends BaseBean {

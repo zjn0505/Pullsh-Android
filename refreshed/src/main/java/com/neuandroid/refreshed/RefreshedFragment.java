@@ -24,12 +24,9 @@ import com.google.gson.Gson;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import javax.xml.transform.Source;
 
 import static android.view.View.GONE;
 import static com.neuandroid.refreshed.NetworkUtils.NEWS_API_SOURCES_URL;
@@ -51,13 +48,13 @@ public class RefreshedFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_refreshed, container, false);
-        viewPager = (ViewPager) view.findViewById(R.id.viewpager);
-        pbLoading = (ProgressBar) view.findViewById(R.id.pb_loading);
+        viewPager = view.findViewById(R.id.viewpager);
+        pbLoading = view.findViewById(R.id.pb_loading);
         viewPager.setOffscreenPageLimit(1);
         if (viewPager != null) {
             setupViewPager(viewPager);
         }
-        tabLayout = (TabLayout) getActivity().findViewById(R.id.tabs);
+        tabLayout = getActivity().findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
         setHasOptionsMenu(true);
         querySources();

@@ -22,11 +22,11 @@ public class ChuckFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chuck, container, false);
-        TabLayout tabLayout = (TabLayout) getActivity().findViewById(R.id.tabs);
+        TabLayout tabLayout = getActivity().findViewById(R.id.tabs);
         tabLayout.setVisibility(View.GONE);
-        AppBarLayout appbar = (AppBarLayout) getActivity().findViewById(R.id.appbar);
+        AppBarLayout appbar = getActivity().findViewById(R.id.appbar);
         appbar.setExpanded(true, true);
-        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
 
         return view;
     }

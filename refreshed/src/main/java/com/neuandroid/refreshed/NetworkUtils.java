@@ -1,7 +1,5 @@
 package com.neuandroid.refreshed;
 
-import android.net.Uri;
-import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.IOException;

@@ -13,10 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -114,9 +111,9 @@ public class SourcesSelectActivity extends AppCompatActivity {
             public ViewHolder(View view) {
                 super(view);
                 mView = view;
-                mTvName = (TextView) view.findViewById(R.id.tv_source_name);
-                mTvDescription = (TextView) view.findViewById(R.id.tv_source_description);
-                mCkbSelect = (CheckBox) view.findViewById(R.id.cbx_selected);
+                mTvName = view.findViewById(R.id.tv_source_name);
+                mTvDescription = view.findViewById(R.id.tv_source_description);
+                mCkbSelect = view.findViewById(R.id.cbx_selected);
             }
 
         }

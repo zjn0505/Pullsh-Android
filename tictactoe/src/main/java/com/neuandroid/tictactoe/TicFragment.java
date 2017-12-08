@@ -16,13 +16,10 @@
 
 package com.neuandroid.tictactoe;
 
-import java.util.Random;
-
-import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.os.Handler.Callback;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -31,6 +28,8 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+
+import java.util.Random;
 
 
 public class TicFragment extends Fragment {
@@ -52,9 +51,9 @@ public class TicFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.lib_game, container, false);
-        mTicBoardView = (TicBoardView) view.findViewById(R.id.game_view);
-        mInfoView = (TextView) view.findViewById(R.id.info_turn);
-        mButtonNext = (Button) view.findViewById(R.id.next_turn);
+        mTicBoardView = view.findViewById(R.id.game_view);
+        mInfoView = view.findViewById(R.id.info_turn);
+        mButtonNext = view.findViewById(R.id.next_turn);
 
         mTicBoardView.setFocusable(true);
         mTicBoardView.setFocusableInTouchMode(true);

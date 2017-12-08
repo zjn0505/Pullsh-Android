@@ -1,15 +1,9 @@
 package com.neuandroid.face.camera;
 
-import java.io.IOException;
-import java.util.List;
-
-
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
-import android.hardware.Camera.CameraInfo;
-import android.hardware.Camera.FaceDetectionListener;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.ShutterCallback;
 import android.hardware.Camera.Size;
@@ -19,6 +13,9 @@ import android.view.SurfaceHolder;
 import com.neuandroid.face.util.CamParaUtil;
 import com.neuandroid.face.util.FileUtil;
 import com.neuandroid.face.util.ImageUtil;
+
+import java.io.IOException;
+import java.util.List;
 
 public class CameraInterface {
 	private static final String TAG = "YanZi";

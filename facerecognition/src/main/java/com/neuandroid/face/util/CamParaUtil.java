@@ -1,12 +1,12 @@
 package com.neuandroid.face.util;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import android.util.Log;
+
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 public class CamParaUtil {
 	private static final String TAG = "yanzi";

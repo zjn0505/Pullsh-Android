@@ -21,7 +21,7 @@ public class ImageDetailPageActivity extends Activity {
         setContentView(R.layout.activity_image_detail);
         String url = getIntent().getStringExtra("URL");
 
-        PhotoView photoView = (PhotoView) findViewById(R.id.photo_view);
+        PhotoView photoView = findViewById(R.id.photo_view);
         Glide.with(this).load(url).into(photoView);
         photoView.setOnClickListener(new View.OnClickListener() {
             @Override

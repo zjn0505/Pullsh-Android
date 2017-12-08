@@ -397,10 +397,7 @@ public class FragmentPushPull extends Fragment {
         foreground.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (v.getAlpha() == 0) {
-                    return false;
-                }
-                return true;
+                return !(v.getAlpha() == 0);
             }
         });
 

@@ -50,7 +50,7 @@ public class NumberPickerDialogFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View contentView = inflater.inflate(R.layout.dialog_picker, null);
-        final NumberPicker picker = (NumberPicker) contentView.findViewById(R.id.picker_xkcd_id);
+        final NumberPicker picker = contentView.findViewById(R.id.picker_xkcd_id);
         picker.setMinValue(min);
         picker.setMaxValue(max);
         builder.setView(contentView)

@@ -1,7 +1,6 @@
 package xyz.jienan.checked;
 
 import android.content.Context;
-import android.net.wifi.WifiManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -92,7 +91,7 @@ public class TaskAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         public TaskViewHolder(View itemView) {
             super(itemView);
             taskIndicator = itemView.findViewById(R.id.task_status_indicator);
-            tvTaskName = (TextView) itemView.findViewById(R.id.task_name);
+            tvTaskName = itemView.findViewById(R.id.task_name);
         }
     }
 

@@ -79,11 +79,11 @@ public class NewsListFragment extends Fragment implements NewsQueryTask.IAsyncTa
         if (savedInstanceState != null) {
             newsSource = savedInstanceState.getString("source");
         }
-        refreshLayout = (SwipeRefreshLayout) layout.findViewById(R.id.swipe_refresh_list);
+        refreshLayout = layout.findViewById(R.id.swipe_refresh_list);
         refreshLayout.setOnRefreshListener(this);
         refreshLayout.setEnabled(false);
-        pbLoading = (ProgressBar) layout.findViewById(R.id.pb_loading);
-        RecyclerView rv = (RecyclerView) layout.findViewById(R.id.recyclerview);
+        pbLoading = layout.findViewById(R.id.pb_loading);
+        RecyclerView rv = layout.findViewById(R.id.recyclerview);
         setupRecyclerView(rv);
         return layout;
     }
@@ -164,10 +164,10 @@ public class NewsListFragment extends Fragment implements NewsQueryTask.IAsyncTa
             public ViewHolder(View view) {
                 super(view);
                 mView = view;
-                mIvThumbnail = (ImageView) view.findViewById(R.id.iv_thumbnails);
-                mTvTitle = (TextView) view.findViewById(R.id.tv_title);
-                mTvDescription = (TextView) view.findViewById(R.id.tv_description);
-                mTvPublishTime = (TextView) view.findViewById(R.id.tv_publish_time);
+                mIvThumbnail = view.findViewById(R.id.iv_thumbnails);
+                mTvTitle = view.findViewById(R.id.tv_title);
+                mTvDescription = view.findViewById(R.id.tv_description);
+                mTvPublishTime = view.findViewById(R.id.tv_publish_time);
             }
 
         }

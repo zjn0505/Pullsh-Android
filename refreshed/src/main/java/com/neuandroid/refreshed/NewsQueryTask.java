@@ -1,7 +1,6 @@
 package com.neuandroid.refreshed;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.google.gson.Gson;
 
