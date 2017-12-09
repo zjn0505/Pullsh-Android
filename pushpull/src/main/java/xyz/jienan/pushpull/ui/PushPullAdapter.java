@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -29,13 +30,15 @@ import xyz.jienan.pushpull.R;
 import xyz.jienan.pushpull.ToastUtils;
 import xyz.jienan.pushpull.network.MemoEntity;
 
+import static xyz.jienan.pushpull.base.Const.*;
+
 /**
  * Created by Jienan on 2017/11/1.
  */
 
 public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHolder> implements TouchHelperAdapter {
 
-    private final static String MEMO_KEY = "memo_key";
+
     private ClipboardManager clipboard;
     private List<MemoEntity> mList;
     private Context mContext;
@@ -44,6 +47,7 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
     private RecyclerView recyclerView;
     private ItemInteractionCallback mCallback;
     private Typeface fontMonaco;
+    private SharedPreferences sharedPref;
 
     PushPullAdapter(Context context, ItemInteractionCallback itemInteractionCallback) {
         mList = new LinkedList<MemoEntity>();
@@ -55,8 +59,8 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
             fontMonaco = Typeface.createFromAsset(mContext.getAssets(), "Monaco.ttf");
         }
         gson = new Gson();
-        SharedPreferences sharedPreferences = mContext.getSharedPreferences("Memo", Context.MODE_PRIVATE);
-        String json = sharedPreferences.getString(MEMO_KEY, null);
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(mContext);
+        String json = sharedPref.getString(PREF_KEY_MEMO, null);
         if (!TextUtils.isEmpty(json)) {
             try {
                 JSONArray a = new JSONArray(json);
@@ -71,7 +75,7 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
             }
 
         }
-        editor = sharedPreferences.edit();
+        editor = sharedPref.edit();
         mCallback = itemInteractionCallback;
     }
 
@@ -166,9 +170,16 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
         holder.ivAction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ClipData clip = ClipData.newPlainText("id",memo.getId());
+                ClipData clip;
+                if (sharedPref.getBoolean(PREF_KEY_COPY, true)) {
+                    String host = sharedPref.getString(PREF_KEY_PULLSH_HOST, "https://jienan.xyz/m/");
+                    clip = ClipData.newPlainText("url", host + memo.getId());
+                    ToastUtils.showToast(mContext, "Share link copied to clipboard");
+                } else {
+                    clip = ClipData.newPlainText("id", memo.getId());
+                    ToastUtils.showToast(mContext, "id copied to clipboard");
+                }
                 clipboard.setPrimaryClip(clip);
-                ToastUtils.showToast(mContext, "id copied to clipboard");
             }
         });
 
@@ -238,7 +249,7 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
             a.put(gson.toJson(entity));
         }
 
-        editor.putString(MEMO_KEY, a.toString());
+        editor.putString(PREF_KEY_MEMO, a.toString());
         editor.commit();
     }
 

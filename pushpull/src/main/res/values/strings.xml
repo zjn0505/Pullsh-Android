@@ -26,4 +26,7 @@
 
     <string name="snackbar_delete">One memo removed</string>
     <string name="snackbar_undo">UNDO</string>
+    <string name="copy">copy</string>
+    <string name="swipe_left">swipe left</string>
+    <string name="swipe_right">swipe right</string>
 </resources>

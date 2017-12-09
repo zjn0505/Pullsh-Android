@@ -14,8 +14,10 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -72,6 +74,8 @@ import xyz.jienan.pushpull.network.MemoEntity;
 import xyz.jienan.pushpull.network.MemoService;
 import xyz.jienan.pushpull.ui.settings.SettingsActivity;
 
+import static xyz.jienan.pushpull.base.Const.*;
+
 /**
  * Created by Jienan on 2017/10/30.
  */
@@ -98,7 +102,6 @@ public class FragmentPushPull extends Fragment {
     private TextView tvSwipeHint;
     private FrameLayout foreground;
     private InputMethodManager imm;
-    private SharedPreferences sharedPreferences;
     private ClipboardManager clipboard;
 
     // START views in bottom sheet
@@ -121,6 +124,7 @@ public class FragmentPushPull extends Fragment {
 
     private SharedPreferences sharedPref;
     private Typeface fontMonaco;
+    private boolean reversed;
 
     BottomSheetBehavior.BottomSheetCallback bottomSheetCallback =
             new BottomSheetBehavior.BottomSheetCallback() {
@@ -156,9 +160,16 @@ public class FragmentPushPull extends Fragment {
             ivBsbIdCopy.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ClipData clip = ClipData.newPlainText("id", entity.getId());
+                    ClipData clip;
+                    if (sharedPref.getBoolean(PREF_KEY_COPY, true)) {
+                        String host = sharedPref.getString(PREF_KEY_PULLSH_HOST, "https://jienan.xyz/m/");
+                        clip = ClipData.newPlainText("url", host + entity.getId());
+                        ToastUtils.showToast(getActivity(), "Share link copied to clipboard");
+                    } else {
+                        clip = ClipData.newPlainText("id", entity.getId());
+                        ToastUtils.showToast(getActivity(), "id copied to clipboard");
+                    }
                     clipboard.setPrimaryClip(clip);
-                    ToastUtils.showToast(getActivity(), "id copied to clipboard");
                 }
             });
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
@@ -266,14 +277,22 @@ public class FragmentPushPull extends Fragment {
             switch (v.getId()) {
                 case R.id.fab_action:
                     if (fabWrapper.getTranslationX() == swipeTransDistanceX) {
+
+                        reversed = sharedPref.getBoolean("pref_reverse", false);
                         if (fabPosition == -1) {
-                            pushMemo();
+                            if (!reversed)
+                                pushMemo();
+                            else
+                                pullMemo();
                         } else if (fabPosition == 1) {
-                            pullMemo();
+                            if (!reversed)
+                                pullMemo();
+                            else
+                                pushMemo();
                         }
                     }
                     if (fabPosition == 0 && fabWrapper.getTranslationX() == 0) {
-                        String action = sharedPref.getString("pref_click", "click_push");
+                        String action = sharedPref.getString(PREF_KEY_CLICK, "click_push");
                         if (action.equals("click_push")) {
                             swipeTo(--fabPosition);
                         } else if (action.equals("click_pull")) {
@@ -291,7 +310,6 @@ public class FragmentPushPull extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         this.setHasOptionsMenu(true);
-        sharedPreferences = getActivity().getSharedPreferences("MEMO_CONFIG", Context.MODE_PRIVATE);
         View view = inflater.inflate(R.layout.fragment_pushpull, null, false);
         coordiLayout = view.findViewById(R.id.coordi_layout);
         recyclerView = view.findViewById(R.id.recycler_view);
@@ -322,12 +340,6 @@ public class FragmentPushPull extends Fragment {
         super.onStart();
         if (mAdapter != null)
             mAdapter.expireItems();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
     }
 
     @Override
@@ -364,6 +376,10 @@ public class FragmentPushPull extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_SETTINGS) {
+            if (sharedPref.getBoolean(PREF_KEY_REVERSE, false) != reversed) {
+                fabPosition = 0;
+                swipeTo(0);
+            }
             if (resultCode == Activity.RESULT_OK) {
                 getActivity().recreate();
             }
@@ -461,21 +477,22 @@ public class FragmentPushPull extends Fragment {
             edtMemo.setVisibility(View.GONE);
             edtMemo.setText("");
             edtMemo.clearComposingText();
-            final View view = getActivity().getCurrentFocus();
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    if (view != null) {
-
-                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-                        foreground.setVisibility(View.GONE);
+                    foreground.setVisibility(View.GONE);
+                    View view = getActivity().getCurrentFocus();
+                    if (view == null && getView() != null) {
+                        view = getView().getRootView();
                     }
+                    if (view != null)
+                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                 }
             }, 500);
-            fabAnim(R.drawable.anim_add_to_swipe);
+            fabAnim(R.drawable.anim_add_to_swipe, R.drawable.ic_swipe);
         } else {
             bottomHeader.setVisibility(View.VISIBLE);
-            boolean reversed = sharedPref.getBoolean("pref_reverse", false);
+            reversed = sharedPref.getBoolean(PREF_KEY_REVERSE, false);
             if ((i == 1) != reversed) {
                 tvSwipeHint.setText("Create a pull");
                 edtMemo.setHint("Input the memo id");
@@ -488,7 +505,7 @@ public class FragmentPushPull extends Fragment {
                 edtMemo.setMaxEms(Integer.MAX_VALUE);
 
             }
-            fabAnim(R.drawable.anim_swipe_to_add);
+            fabAnim(R.drawable.anim_swipe_to_add, R.drawable.ic_add);
             edtMemo.setVisibility(View.VISIBLE);
             foreground.setVisibility(View.VISIBLE);
             foreground.setAlpha(0);
@@ -542,9 +559,9 @@ public class FragmentPushPull extends Fragment {
             ToastUtils.showToast(getActivity(), "Please input some contents");
         } else {
             fabSwipe.setClickable(false);
-            int time = sharedPreferences.getInt("EXPIRED_TIME", 1);
-            int type = sharedPreferences.getInt("EXPIRED_TYPE", 3);
-            int count = sharedPreferences.getInt("ACCESS_COUNT", 0);
+            int time = sharedPref.getInt(PREF_KEY_PUSH_EXPIRED_TIME, 1);
+            int type = sharedPref.getInt(PREF_KEY_PUSH_EXPIRED_TYPE, 3);
+            int count = sharedPref.getInt(PREF_KEY_PUSH_ACCESS_COUNT, 0);
             String expiredArg = "";
             if (time > 0)
                 switch (type) {
@@ -583,6 +600,7 @@ public class FragmentPushPull extends Fragment {
                     fabSwipe.setClickable(true);
                     fabWrapper.hide();
                     Log.e("Request", t.getLocalizedMessage());
+                    ToastUtils.showToast(getActivity(), "Create push failed");
                 }
             });
         }
@@ -619,6 +637,7 @@ public class FragmentPushPull extends Fragment {
                     fabSwipe.setClickable(true);
                     fabWrapper.hide();
                     Log.e("Request", t.getLocalizedMessage());
+                    ToastUtils.showToast(getActivity(), "Create pull failed");
                 }
             });
         }
@@ -626,31 +645,33 @@ public class FragmentPushPull extends Fragment {
 
     private void swipeBackFromCheck() {
         fabPosition = 0;
-        fabAnim(R.drawable.anim_add_to_check);
+        fabAnim(R.drawable.anim_add_to_check, R.drawable.ic_check);
         fabSwipe.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.green)));
-        final View view = getActivity().getCurrentFocus();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (view != null) {
-                    ArrayList<ObjectAnimator> objectAnimatorsArray = new ArrayList<ObjectAnimator>();
-                    ObjectAnimator animatorCover = ObjectAnimator.ofFloat(foreground, "alpha", 1, 0);
-                    animatorCover.setInterpolator(new AccelerateInterpolator());
-                    objectAnimatorsArray.add(animatorCover);
-                    ObjectAnimator animatorBottom = ObjectAnimator.ofFloat(bottomWrapper, "alpha", 1, 0);
-                    animatorBottom.setInterpolator(new AccelerateInterpolator());
-                    objectAnimatorsArray.add(animatorBottom);
-                    ObjectAnimator[] objectAnimators = objectAnimatorsArray.toArray(new ObjectAnimator[objectAnimatorsArray.size()]);
-                    AnimatorSet animSet = new AnimatorSet();
-                    animSet.playTogether(objectAnimators);
-                    animSet.setDuration(500);
-                    animSet.start();
-                    edtMemo.setVisibility(View.GONE);
-                    edtMemo.setText("");
-                    edtMemo.clearComposingText();
+                ArrayList<ObjectAnimator> objectAnimatorsArray = new ArrayList<ObjectAnimator>();
+                ObjectAnimator animatorCover = ObjectAnimator.ofFloat(foreground, "alpha", 1, 0);
+                animatorCover.setInterpolator(new AccelerateInterpolator());
+                objectAnimatorsArray.add(animatorCover);
+                ObjectAnimator animatorBottom = ObjectAnimator.ofFloat(bottomWrapper, "alpha", 1, 0);
+                animatorBottom.setInterpolator(new AccelerateInterpolator());
+                objectAnimatorsArray.add(animatorBottom);
+                ObjectAnimator[] objectAnimators = objectAnimatorsArray.toArray(new ObjectAnimator[objectAnimatorsArray.size()]);
+                AnimatorSet animSet = new AnimatorSet();
+                animSet.playTogether(objectAnimators);
+                animSet.setDuration(500);
+                animSet.start();
+                edtMemo.setVisibility(View.GONE);
+                edtMemo.setText("");
+                edtMemo.clearComposingText();
+                View view = getActivity().getCurrentFocus();
+                if (view == null && getView() != null) {
+                    view = getView().getRootView();
+                }
+                if (view != null)
                     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
 
-                }
             }
         }, 500);
         new Handler().postDelayed(new Runnable() {
@@ -668,19 +689,24 @@ public class FragmentPushPull extends Fragment {
                 animSet.playTogether(objectAnimators);
                 animSet.setDuration(500);
                 animSet.start();
-                fabAnim(R.drawable.anim_check_to_swipe);
+                fabAnim(R.drawable.anim_check_to_swipe, R.drawable.ic_swipe);
                 fabSwipe.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorAccent)));
                 fabSwipe.setClickable(true);
             }
         }, 1000);
     }
 
-    private void fabAnim(int animId) {
-        fabSwipe.setImageResource(animId);
-        Drawable drawable = fabSwipe.getDrawable();
-        if (drawable instanceof Animatable) {
-            ((Animatable) drawable).start();
+    private void fabAnim(int animId, int fallbackResId) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            fabSwipe.setImageResource(animId);
+            Drawable drawable = fabSwipe.getDrawable();
+            if (drawable instanceof Animatable) {
+                ((Animatable) drawable).start();
+            }
+        } else {
+            fabSwipe.setImageResource(fallbackResId);
         }
+
     }
 
     private AnimatorSet animatorSet;

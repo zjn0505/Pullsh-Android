@@ -32,15 +32,17 @@
             android:gravity="center_vertical"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:typeface="monospace"
+            android:letterSpacing="0.1"
             android:layout_margin="10dp"
-            tools:text="pbbv" />
+            tools:text="pbbv"
+            tools:targetApi="lollipop" />
 
         <ImageView
             android:id="@+id/bsb_memo_id_copy"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_copy"
+            app:srcCompat="@drawable/ic_copy"
+            android:contentDescription="@string/copy"
             android:layout_alignParentRight="true"
             android:layout_gravity="center_vertical"
             android:layout_marginTop="10dp"

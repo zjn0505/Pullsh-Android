@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:drawable="@drawable/ic_swipe">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:drawable="@drawable/ic_swipe"
+    tools:targetApi="lollipop">
 
     <target
         android:animation="@animator/swipe_to_add"

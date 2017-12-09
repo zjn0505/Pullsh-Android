@@ -18,17 +18,20 @@ import java.util.Random;
 
 import xyz.jienan.pushpull.R;
 
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_CLICK;
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_COPY;
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_PULLSH_HOST;
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_REVERSE;
+
 /**
  * Created by jienanzhang on 23/11/2017.
  */
 
 public class SettingsFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener {
 
-    private final static String PULLSH_HOST = "pullsh_host";
-
-    private static boolean hasReveseChanged = false;
-
+    private ListPreference clickPref;
     private SwitchPreference copyPref;
+    private SwitchPreference reversePref;
     private SharedPreferences sharedPreferences;
     private AlertDialog restoreDialog;
 
@@ -37,28 +40,26 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         addPreferencesFromResource(R.xml.pullsh_config);
-        ListPreference clickPref = (ListPreference) findPreference("pref_click");
-        SwitchPreference reversePref = (SwitchPreference) findPreference("pref_reverse");
-        copyPref = (SwitchPreference) findPreference("pref_copy");
-
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        clickPref = (ListPreference) findPreference(PREF_KEY_CLICK);
+        reversePref = (SwitchPreference) findPreference(PREF_KEY_REVERSE);
+        copyPref = (SwitchPreference) findPreference(PREF_KEY_COPY);
 
         clickPref.setSummary(clickPref.getEntry());
         clickPref.setOnPreferenceChangeListener(this);
         reversePref.setOnPreferenceChangeListener(this);
         copyPref.setOnPreferenceChangeListener(this);
         setCopyPref(copyPref.isChecked());
-
     }
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         switch (preference.getKey()) {
-            case "pref_click":
+            case PREF_KEY_CLICK:
                 ((ListPreference) preference).setValue(newValue.toString());
                 preference.setSummary(((ListPreference) preference).getEntry());
                 break;
-            case "pref_copy":
+            case PREF_KEY_COPY:
                 setCopyPref((boolean) newValue);
                 break;
         }
@@ -83,7 +84,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 PreferenceManager.getDefaultSharedPreferences(getActivity()).edit().clear().commit();
                                 PreferenceManager.setDefaultValues(getActivity(), R.xml.pullsh_config, true);
-                                getActivity().recreate();
+                                reset();
                                 dialogInterface.dismiss();
                             }
                         })
@@ -100,9 +101,20 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         return true;
     }
 
+    private void reset() {
+        String click = sharedPreferences.getString(PREF_KEY_CLICK ,"click_push");
+        boolean copy = sharedPreferences.getBoolean(PREF_KEY_COPY,true);
+        boolean reverse = sharedPreferences.getBoolean(PREF_KEY_REVERSE ,false);
+
+        int res = getResources().getIdentifier(click, "string", getActivity().getPackageName());
+        clickPref.setSummary(getString(res));
+        copyPref.setChecked(copy);
+        reversePref.setChecked(reverse);
+    }
+
     private void setCopyPref(boolean isChecked) {
         if (isChecked) {
-            String url = sharedPreferences.getString(PULLSH_HOST, "https://jienan.xyz/m/");
+            String url = sharedPreferences.getString(PREF_KEY_PULLSH_HOST, "https://jienan.xyz/m/");
             copyPref.setSummary(String.format(getString(R.string.pref_copy_full), url + randId(4)));
         } else {
             copyPref.setSummary(String.format(getString(R.string.pref_copy_id), randId(4)));
@@ -110,10 +122,6 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     }
 
     private String randId(int length) {
-        System.out.println("zjn");
-        System.out.println('a' + 1);
-        System.out.println('A' + 1);
-        System.out.println('1' + 1);
         StringBuilder sb = new StringBuilder();
         Random rand = new Random();
         for (int i = 0; i < length; i++) {

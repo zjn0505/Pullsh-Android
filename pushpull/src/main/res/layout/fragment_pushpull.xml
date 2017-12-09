@@ -84,15 +84,11 @@
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fab_action"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
                 app:fabSize="normal"
                 app:borderWidth="0dp"
-                android:src="@drawable/ic_swipe"
-                android:padding="3dp"
+                app:srcCompat="@drawable/ic_swipe"
                 android:layout_margin="10dp"
-                android:elevation="2dp"
-                tools:ignore="VectorDrawableCompat" />
+                style="@style/fab_action" />
         </com.github.jorgecastilloprz.FABProgressCircle>
 
         <ImageView
@@ -102,6 +98,7 @@
             android:layout_toLeftOf="@id/fab_wrapper"
             android:layout_alignTop="@id/fab_wrapper"
             android:layout_marginTop="20dp"
+            android:contentDescription="@string/swipe_left"
             app:srcCompat="@drawable/ic_swipe_left"
             android:visibility="gone"
             android:alpha="0"/>
@@ -113,6 +110,7 @@
             android:layout_toRightOf="@id/fab_wrapper"
             android:layout_alignTop="@id/fab_wrapper"
             android:layout_marginTop="20dp"
+            android:contentDescription="@string/swipe_right"
             app:srcCompat="@drawable/ic_swipe_right"
             android:visibility="gone"
             android:alpha="0"/>
