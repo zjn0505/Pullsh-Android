@@ -16,3 +16,18 @@ android:
       - $HOME/.gradle/caches/
       - $HOME/.gradle/wrapper/
       - $HOME/.android/build-cache
+   before_install:
+    - openssl aes-256-cbc -K $encrypted_3df1f5b70746_key -iv $encrypted_3df1f5b70746_iv -in key.jks.enc -out key.jks -d
+
+script:
+  - "./gradlew assembleRelease"
+  
+deploy:
+    provider: release
+    api_key:
+        secure: "QIINSt1nCJvRYz6bCWCgBhdHEnvb2qD3IvGtneonEjub8cREIS/dFbZ9iu/n0HrjRWy39j088HkT2DeMIr2GI3Q7TD3uKSf8jzlcijVNhFi7p4gGaC4x1mXeI1mLqcR/0RaaEBLs6hf1UkPBclrwejUiaO9cQ7adlcvw+rhyMS7+gzkQx7yekOwT4rD6Tl0dRTABVLFCceUELdvDdMV++NK9fE7/kA9hAIRdo0oEhU2G/Jd2g9w2Cjb868l8W5K1AR4NiaUqmUdnYrUrO1yEs6RMKzvvngJCAh8BGvxMDNCsaOhZrKnAK8z4TKJtv9daTyXUXJnNXRY+N4EC/HGobnBa2mpWT3TGMv/xnCBCDjmyxeq72uE0WrDJcGUy666ukWqULXDYFLOTRlS0khuxVgj2t4x6s170dI+JJPOCqySJ6VuDv3ZsPGZ66QZP3Y5ZZ36+SV3lriTWv6AwhrPO+GmOCtfMsaSDFelXbe1s/vB1URTeNfJWxoyY5g4/0WdDiNHMjmmI4sAP8lHWPacYEGPKe/0qBReQHXrvZlojY81IHcSae3QTazWK6A5xW61SXSNRKcxEvmLINHtIy8xDZZ13IPK4topr4hrmsxVHKR5dF06h+td0eu8oSzjyAejsWbMf0qnkbVR1edtbJCCtdLEYSAtQOgBkJiWpxmcbPOo="
+    file: pushpull/build/outputs/apk/release/pushpull-release.apk
+    skip_cleanup: true
+    on:
+        tags: true
+        all_branches: true
