@@ -9,7 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -25,9 +25,9 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private final static String TAG = MainActivity.class.getSimpleName();
     private final static String BASE_URL = "https://api.jienan.xyz/";
 
-    @Bind(R.id.container_todo)
+    @BindView(R.id.container_todo)
     SwipeRefreshLayout container;
-    @Bind(R.id.lv_todo)
+    @BindView(R.id.lv_todo)
     RecyclerView rvTodo;
 
     private TodoService todoService;
