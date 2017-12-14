@@ -617,7 +617,7 @@ public class FragmentPushPull extends Fragment {
             }
             fabSwipe.setClickable(false);
             fabWrapper.show();
-            Call<CommonResponse> call = memoService.readMemo(memoId);
+            Call<CommonResponse> call = memoService.readMemo(memoId.trim());
             call.enqueue(new Callback<CommonResponse>() {
 
                 @Override
