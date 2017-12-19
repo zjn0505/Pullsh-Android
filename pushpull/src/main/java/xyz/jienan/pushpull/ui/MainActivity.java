@@ -3,8 +3,8 @@ package xyz.jienan.pushpull.ui;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AlertDialog;
@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
 
     private final static String TAG = MainActivity.class.getSimpleName();
     private OnBackPressedListener mListener;
-    private Fragment fragment;
+    private IPullshAction fragment;
 
 
     static {
@@ -41,7 +41,17 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragment = fragmentManager.findFragmentById(R.id.fragment_pushpull);
+        fragment = (IPullshAction) fragmentManager.findFragmentById(R.id.fragment_pushpull);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+            Intent intent = getIntent();
+            String shortcutType = intent.getStringExtra("shortcut_type");
+            if ("push".equals(shortcutType)) {
+                fragment.goPushState();
+            } else if ("pull".equals(shortcutType)) {
+                fragment.goPullState();
+            }
+        }
 
     }
 
@@ -115,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
                                 } catch (IOException e) {
                                     Log.d(TAG, "I/O Error", e);
                                 }
-                                ((FragmentPushPull)fragment).handleSendText(txt.toString());
+                                fragment.goPushState(txt.toString());
                             }
                         }
                     })
@@ -124,14 +134,14 @@ public class MainActivity extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
                             String str = txt.toString();
                             if (!TextUtils.isEmpty(str))
-                                ((FragmentPushPull)fragment).handleSendText(txt.toString());
+                                fragment.goPushState(txt.toString());
                         }
                     }).create();
             dialog.show();
         } else {
             String str = txt.toString();
             if (!TextUtils.isEmpty(str))
-                ((FragmentPushPull)fragment).handleSendText(txt.toString());
+                fragment.goPushState(txt.toString());
         }
     }
 }

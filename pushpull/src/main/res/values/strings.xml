@@ -29,4 +29,11 @@
     <string name="copy">copy</string>
     <string name="swipe_left">swipe left</string>
     <string name="swipe_right">swipe right</string>
+
+    <string name="shortcut_push_short">Push</string>
+    <string name="shortcut_push_long">Create a push</string>
+
+    <string name="shortcut_pull_short">Pull</string>
+    <string name="shortcut_pull_long">Create a pull</string>
+
 </resources>

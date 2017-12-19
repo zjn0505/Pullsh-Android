@@ -80,7 +80,7 @@ import static xyz.jienan.pushpull.base.Const.*;
  * Created by Jienan on 2017/10/30.
  */
 
-public class FragmentPushPull extends Fragment {
+public class FragmentPushPull extends Fragment implements IPullshAction{
 
     private final static String TAG = FragmentPushPull.class.getSimpleName();
     private final static String BASE_URL = "https://api.jienan.xyz/";
@@ -230,7 +230,6 @@ public class FragmentPushPull extends Fragment {
         @Override
         public boolean onBackPressed() {
             if (fabPosition != 0) {
-                fabPosition = 0;
                 swipeTo(0);
                 return true;
             } else if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
@@ -249,13 +248,11 @@ public class FragmentPushPull extends Fragment {
             if (Math.abs(velocityX) > 500) {
                 if (velocityX > 0) {
                     if (fabPosition < 1) {
-                        fabPosition++;
-                        swipeTo(fabPosition);
+                        swipeTo(++fabPosition);
                     }
                 } else if (velocityX < 0) {
                     if (fabPosition > -1) {
-                        fabPosition--;
-                        swipeTo(fabPosition);
+                        swipeTo(--fabPosition);
                     }
                 }
             }
@@ -377,7 +374,6 @@ public class FragmentPushPull extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_SETTINGS) {
             if (sharedPref.getBoolean(PREF_KEY_REVERSE, false) != reversed) {
-                fabPosition = 0;
                 swipeTo(0);
             }
             if (resultCode == Activity.RESULT_OK) {
@@ -446,13 +442,11 @@ public class FragmentPushPull extends Fragment {
                                 if (fabPressTriggered) {
                                     if (posX > oldX) {
                                         if (fabPosition < 1) {
-                                            fabPosition++;
-                                            swipeTo(fabPosition);
+                                            swipeTo(++fabPosition);
                                         }
                                     } else if (posX < oldX) {
                                         if (fabPosition > -1) {
-                                            fabPosition--;
-                                            swipeTo(fabPosition);
+                                            swipeTo(--fabPosition);
                                         }
                                     }
                                     fabPressTriggered = false;
@@ -473,6 +467,7 @@ public class FragmentPushPull extends Fragment {
     }
 
     private void swipeTo(int i) {
+        fabPosition = i;
         if (i == 0) {
             edtMemo.setVisibility(View.GONE);
             edtMemo.setText("");
@@ -491,6 +486,7 @@ public class FragmentPushPull extends Fragment {
             }, 500);
             fabAnim(R.drawable.anim_add_to_swipe, R.drawable.ic_swipe);
         } else {
+            swipeDirectShown(false);
             bottomHeader.setVisibility(View.VISIBLE);
             reversed = sharedPref.getBoolean(PREF_KEY_REVERSE, false);
             if ((i == 1) != reversed) {
@@ -752,13 +748,22 @@ public class FragmentPushPull extends Fragment {
         }
     }
 
-    public void handleSendText(String sharedText) {
-        Log.d(TAG, "handleSendText: " + sharedText);
-        fabPosition = -1;
-        swipeTo(fabPosition);
+    @Override
+    public void goPushState() {
+        swipeTo(-1);
+    }
+
+    @Override
+    public void goPushState(String s) {
+        Log.d(TAG, "goPushState: " + s);
+        swipeTo(-1);
         if (edtMemo != null) {
-            edtMemo.setText(sharedText);
+            edtMemo.setText(s);
         }
-        swipeDirectShown(false);
+    }
+
+    @Override
+    public void goPullState() {
+        swipeTo(1);
     }
 }
