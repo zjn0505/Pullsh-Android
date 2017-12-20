@@ -19,6 +19,7 @@ import java.util.Random;
 
 import xyz.jienan.pushpull.R;
 
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_ALIGN;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_CLICK;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_COPY;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_NIGHT;
@@ -35,6 +36,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     private SwitchPreference copyPref;
     private SwitchPreference reversePref;
     private SwitchPreference nightPref;
+    private ListPreference alignPref;
     private SharedPreferences sharedPreferences;
     private AlertDialog restoreDialog;
 
@@ -48,6 +50,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         reversePref = (SwitchPreference) findPreference(PREF_KEY_REVERSE);
         nightPref = (SwitchPreference) findPreference(PREF_KEY_NIGHT);
         copyPref = (SwitchPreference) findPreference(PREF_KEY_COPY);
+        alignPref = (ListPreference) findPreference(PREF_KEY_ALIGN);
 
         clickPref.setSummary(clickPref.getEntry());
         clickPref.setOnPreferenceChangeListener(this);
@@ -55,12 +58,15 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         copyPref.setOnPreferenceChangeListener(this);
         nightPref.setOnPreferenceChangeListener(this);
         setCopyPref(copyPref.isChecked());
+        alignPref.setSummary(alignPref.getEntry());
+        alignPref.setOnPreferenceChangeListener(this);
     }
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         switch (preference.getKey()) {
             case PREF_KEY_CLICK:
+            case PREF_KEY_ALIGN:
                 ((ListPreference) preference).setValue(newValue.toString());
                 preference.setSummary(((ListPreference) preference).getEntry());
                 break;
@@ -119,15 +125,25 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         boolean copy = sharedPreferences.getBoolean(PREF_KEY_COPY,true);
         boolean reverse = sharedPreferences.getBoolean(PREF_KEY_REVERSE ,false);
         boolean night = sharedPreferences.getBoolean(PREF_KEY_NIGHT, false);
+        String align = sharedPreferences.getString(PREF_KEY_ALIGN ,"align_center");
 
-        int res = getResources().getIdentifier(click, "string", getActivity().getPackageName());
-        clickPref.setSummary(getString(res));
+        int resClick = getResources().getIdentifier(click, "string", getActivity().getPackageName());
+        clickPref.setSummary(getString(resClick));
+        clickPref.setValue(click);
         copyPref.setChecked(copy);
         reversePref.setChecked(reverse);
         if (night != nightPref.isChecked()) {
             nightPref.setChecked(night);
+            if (night) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+            }
             getActivity().recreate();
         }
+        int resAlign = getResources().getIdentifier(align, "string", getActivity().getPackageName());
+        alignPref.setSummary(getString(resAlign));
+        alignPref.setValue(align);
     }
 
     private void setCopyPref(boolean isChecked) {

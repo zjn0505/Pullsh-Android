@@ -5,6 +5,8 @@
     <string name="action_restore">Restore</string>
     <string name="btn_confirm">Confirm</string>
 
+    <string name="pref_control">Control</string>
+    <string name="pref_appearance">Appearance</string>
     <string name="pref_click">Click on action button and trigger</string>
     <string name="click_push">Push</string>
     <string name="click_pull">Pull</string>
@@ -16,7 +18,9 @@
     <string name="pref_copy_full">Copy full path, e.g. %s</string>
     <string name="pref_copy_id">Copy id only, e.g. %s</string>
     <string name="pref_night">Enable night mode</string>
-
+    <string name="pref_memo_align">Align memo text</string>
+    <string name="align_center">Center</string>
+    <string name="align_left">Left</string>
 
     <string name="restore_alert_title">Restore settings</string>
     <string name="restore_alert_msg">Do you want to restore all the settings?</string>

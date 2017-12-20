@@ -66,7 +66,7 @@
                 android:inputType="textMultiLine|textNoSuggestions"
                 android:maxLines="5"
                 android:padding="20dp"
-                android:textAlignment="center"
+                android:gravity="center_horizontal"
                 android:visibility="gone"
                 tools:visibility="visible" />
         </RelativeLayout>

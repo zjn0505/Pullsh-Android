@@ -30,9 +30,11 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.InputFilter;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -73,6 +75,7 @@ import xyz.jienan.pushpull.network.MemoEntity;
 import xyz.jienan.pushpull.network.MemoService;
 import xyz.jienan.pushpull.ui.settings.SettingsActivity;
 
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_ALIGN;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_CLICK;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_COPY;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_PULLSH_HOST;
@@ -311,6 +314,10 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        if (fontMonaco == null) {
+            fontMonaco = Typeface.createFromAsset(getContext().getAssets(), "Monaco.ttf");
+        }
         this.setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_pushpull, null, false);
         coordiLayout = view.findViewById(R.id.coordi_layout);
@@ -330,10 +337,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
         setupView();
         setupService();
-        sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        if (fontMonaco == null) {
-            fontMonaco = Typeface.createFromAsset(getContext().getAssets(), "Monaco.ttf");
-        }
+
         return view;
     }
 
@@ -383,6 +387,18 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
             }
             if (resultCode == Activity.RESULT_OK) {
                 getActivity().recreate();
+            }
+            String align = sharedPref.getString(PREF_KEY_ALIGN, "align_center");
+
+            if ("align_center".equals(align)) {
+                if (fabPosition == -1)
+                    edtMemo.setGravity(Gravity.CENTER);
+                tvBsbMemoContent.setGravity(Gravity.CENTER);
+            } else if ("align_left".equals(align)) {
+                if (fabPosition == -1)
+                    edtMemo.setGravity(Gravity.START);
+                tvBsbMemoContent.setGravity(Gravity.START);
+
             }
         }
     }
@@ -469,6 +485,13 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         });
         swipeDirectShown(true);
         fabSwipe.setOnClickListener(mClickListener);
+
+        String align = sharedPref.getString(PREF_KEY_ALIGN, "align_center");
+        if ("align_center".equals(align)) {
+            tvBsbMemoContent.setGravity(Gravity.CENTER);
+        } else if ("align_left".equals(align)) {
+            tvBsbMemoContent.setGravity(Gravity.START);
+        }
     }
 
     private void swipeTo(int i) {
@@ -498,13 +521,23 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
                 tvSwipeHint.setText("Create a pull");
                 edtMemo.setHint("Input the memo id");
                 edtMemo.setMaxEms(10);
+                InputFilter[] filters = new InputFilter[1];
+                filters[0] = new InputFilter.LengthFilter(10);
+                edtMemo.setFilters(filters);
                 edtMemo.setSingleLine(true);
+                edtMemo.setGravity(Gravity.CENTER);
             } else {
                 tvSwipeHint.setText("Create a push");
                 edtMemo.setHint("Input your memo");
                 edtMemo.setSingleLine(false);
                 edtMemo.setMaxEms(Integer.MAX_VALUE);
-
+                String align = sharedPref.getString(PREF_KEY_ALIGN, "align_center");
+                edtMemo.setFilters(new InputFilter[0]);
+                if ("align_center".equals(align)) {
+                    edtMemo.setGravity(Gravity.CENTER);
+                } else if ("align_left".equals(align)) {
+                    edtMemo.setGravity(Gravity.START);
+                }
             }
             fabAnim(R.drawable.anim_swipe_to_add, R.drawable.ic_add);
             edtMemo.setVisibility(View.VISIBLE);

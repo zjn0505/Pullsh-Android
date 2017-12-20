@@ -11,4 +11,13 @@
         <item>click_nothing</item>
     </string-array>
 
+    <string-array name="array_align">
+        <item>@string/align_center</item>
+        <item>@string/align_left</item>
+    </string-array>
+    <string-array name="array_align_value">
+        <item>align_center</item>
+        <item>align_left</item>
+    </string-array>
+
 </resources>

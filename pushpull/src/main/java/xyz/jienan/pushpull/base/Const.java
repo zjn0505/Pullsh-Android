@@ -11,6 +11,7 @@ public class Const {
     public final static String PREF_KEY_CLICK = "pref_click";
     public final static String PREF_KEY_REVERSE = "pref_reverse";
     public final static String PREF_KEY_NIGHT = "pref_night";
+    public final static String PREF_KEY_ALIGN = "pref_align";
     public final static String PREF_KEY_PUSH_EXPIRED_TIME = "EXPIRED_TIME";
     public final static String PREF_KEY_PUSH_EXPIRED_TYPE = "EXPIRED_TYPE";
     public final static String PREF_KEY_PUSH_ACCESS_COUNT = "ACCESS_COUNT";
