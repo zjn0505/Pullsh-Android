@@ -17,5 +17,9 @@
         android:key="pref_copy"
         android:title="@string/pref_copy"
         android:defaultValue="true" />
+    <SwitchPreference
+        android:key="pref_night"
+        android:title="@string/pref_night"
+        android:defaultValue="false" />
 
 </PreferenceScreen>

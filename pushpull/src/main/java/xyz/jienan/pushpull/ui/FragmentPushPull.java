@@ -17,7 +17,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -74,7 +73,13 @@ import xyz.jienan.pushpull.network.MemoEntity;
 import xyz.jienan.pushpull.network.MemoService;
 import xyz.jienan.pushpull.ui.settings.SettingsActivity;
 
-import static xyz.jienan.pushpull.base.Const.*;
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_CLICK;
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_COPY;
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_PULLSH_HOST;
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_PUSH_ACCESS_COUNT;
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_PUSH_EXPIRED_TIME;
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_PUSH_EXPIRED_TYPE;
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_REVERSE;
 
 /**
  * Created by Jienan on 2017/10/30.

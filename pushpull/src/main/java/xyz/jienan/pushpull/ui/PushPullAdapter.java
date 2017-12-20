@@ -30,7 +30,9 @@ import xyz.jienan.pushpull.R;
 import xyz.jienan.pushpull.ToastUtils;
 import xyz.jienan.pushpull.network.MemoEntity;
 
-import static xyz.jienan.pushpull.base.Const.*;
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_COPY;
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_MEMO;
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_PULLSH_HOST;
 
 /**
  * Created by Jienan on 2017/11/1.

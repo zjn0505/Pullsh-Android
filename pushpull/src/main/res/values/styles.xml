@@ -1,11 +1,12 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorControlNormal">@color/white</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -17,9 +18,6 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="tab_text_style" parent="android:TextAppearance.Widget.TabWidget">
-        <item name="android:textStyle">bold</item>
-    </style>
 
     <style name="fab_action">
         <item name="android:layout_width">56dp</item>

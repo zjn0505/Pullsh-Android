@@ -27,14 +27,16 @@ public class MainActivity extends AppCompatActivity {
     private final static String TAG = MainActivity.class.getSimpleName();
     private OnBackPressedListener mListener;
     private IPullshAction fragment;
-
+    private int currentNightMode;
 
     static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        currentNightMode = AppCompatDelegate.getDefaultNightMode();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -52,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
                 fragment.goPullState();
             }
         }
-
     }
 
     @Override
@@ -67,6 +68,16 @@ public class MainActivity extends AppCompatActivity {
             } else if (type.startsWith("image/")) {
                 // not implemented yet
             }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        int nightMode = AppCompatDelegate.getDefaultNightMode();
+        if (nightMode != currentNightMode) {
+            AppCompatDelegate.setDefaultNightMode(nightMode);
+            recreate();
         }
     }
 

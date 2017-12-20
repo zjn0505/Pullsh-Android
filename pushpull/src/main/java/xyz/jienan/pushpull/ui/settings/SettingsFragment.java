@@ -10,6 +10,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.SwitchPreference;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatDelegate;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -20,6 +21,7 @@ import xyz.jienan.pushpull.R;
 
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_CLICK;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_COPY;
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_NIGHT;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_PULLSH_HOST;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_REVERSE;
 
@@ -32,6 +34,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     private ListPreference clickPref;
     private SwitchPreference copyPref;
     private SwitchPreference reversePref;
+    private SwitchPreference nightPref;
     private SharedPreferences sharedPreferences;
     private AlertDialog restoreDialog;
 
@@ -43,12 +46,14 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         clickPref = (ListPreference) findPreference(PREF_KEY_CLICK);
         reversePref = (SwitchPreference) findPreference(PREF_KEY_REVERSE);
+        nightPref = (SwitchPreference) findPreference(PREF_KEY_NIGHT);
         copyPref = (SwitchPreference) findPreference(PREF_KEY_COPY);
 
         clickPref.setSummary(clickPref.getEntry());
         clickPref.setOnPreferenceChangeListener(this);
         reversePref.setOnPreferenceChangeListener(this);
         copyPref.setOnPreferenceChangeListener(this);
+        nightPref.setOnPreferenceChangeListener(this);
         setCopyPref(copyPref.isChecked());
     }
 
@@ -61,6 +66,14 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
                 break;
             case PREF_KEY_COPY:
                 setCopyPref((boolean) newValue);
+                break;
+            case PREF_KEY_NIGHT:
+                if ((boolean) newValue) {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                } else {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                }
+                getActivity().recreate();
                 break;
         }
         return true;
@@ -105,11 +118,16 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         String click = sharedPreferences.getString(PREF_KEY_CLICK ,"click_push");
         boolean copy = sharedPreferences.getBoolean(PREF_KEY_COPY,true);
         boolean reverse = sharedPreferences.getBoolean(PREF_KEY_REVERSE ,false);
+        boolean night = sharedPreferences.getBoolean(PREF_KEY_NIGHT, false);
 
         int res = getResources().getIdentifier(click, "string", getActivity().getPackageName());
         clickPref.setSummary(getString(res));
         copyPref.setChecked(copy);
         reversePref.setChecked(reverse);
+        if (night != nightPref.isChecked()) {
+            nightPref.setChecked(night);
+            getActivity().recreate();
+        }
     }
 
     private void setCopyPref(boolean isChecked) {
