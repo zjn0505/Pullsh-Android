@@ -148,7 +148,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
 
     private void setCopyPref(boolean isChecked) {
         if (isChecked) {
-            String url = sharedPreferences.getString(PREF_KEY_PULLSH_HOST, "https://jienan.xyz/m/");
+            String url = sharedPreferences.getString(PREF_KEY_PULLSH_HOST, "https://pullsh.me/");
             copyPref.setSummary(String.format(getString(R.string.pref_copy_full), url + randId(4)));
         } else {
             copyPref.setSummary(String.format(getString(R.string.pref_copy_id), randId(4)));

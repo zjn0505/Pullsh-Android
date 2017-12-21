@@ -174,7 +174,7 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
             public void onClick(View v) {
                 ClipData clip;
                 if (sharedPref.getBoolean(PREF_KEY_COPY, true)) {
-                    String host = sharedPref.getString(PREF_KEY_PULLSH_HOST, "https://jienan.xyz/m/");
+                    String host = sharedPref.getString(PREF_KEY_PULLSH_HOST, "https://pullsh.me/");
                     clip = ClipData.newPlainText("url", host + memo.getId());
                     ToastUtils.showToast(mContext, "Share link copied to clipboard");
                 } else {

@@ -166,6 +166,12 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         @Override
         public void onClick(final MemoEntity entity) {
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            String align = sharedPref.getString(PREF_KEY_ALIGN, "align_center");
+            if ("align_center".equals(align)) {
+                tvBsbMemoContent.setGravity(Gravity.CENTER);
+            } else if ("align_left".equals(align)) {
+                tvBsbMemoContent.setGravity(Gravity.START);
+            }
             tvBsbMemoId.setTypeface(fontMonaco,Typeface.BOLD);
             tvBsbMemoId.setText(entity.getId());
             ivBsbIdCopy.setOnClickListener(new View.OnClickListener() {
@@ -173,7 +179,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
                 public void onClick(View v) {
                     ClipData clip;
                     if (sharedPref.getBoolean(PREF_KEY_COPY, true)) {
-                        String host = sharedPref.getString(PREF_KEY_PULLSH_HOST, "https://jienan.xyz/m/");
+                        String host = sharedPref.getString(PREF_KEY_PULLSH_HOST, "https://pullsh.me/");
                         clip = ClipData.newPlainText("url", host + entity.getId());
                         ToastUtils.showToast(getActivity(), "Share link copied to clipboard");
                     } else {
@@ -492,13 +498,6 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         });
         swipeDirectShown(true);
         fabSwipe.setOnClickListener(mClickListener);
-
-        String align = sharedPref.getString(PREF_KEY_ALIGN, "align_center");
-        if ("align_center".equals(align)) {
-            tvBsbMemoContent.setGravity(Gravity.CENTER);
-        } else if ("align_left".equals(align)) {
-            tvBsbMemoContent.setGravity(Gravity.START);
-        }
     }
 
     private void swipeTo(int i) {
