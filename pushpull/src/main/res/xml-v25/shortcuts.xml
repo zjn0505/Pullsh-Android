@@ -1,9 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <shortcut
+        android:shortcutId="pull"
+        android:enabled="true"
+        android:icon="@mipmap/ic_shortcut_pull"
+        android:shortcutShortLabel="@string/shortcut_pull_short"
+        android:shortcutLongLabel="@string/shortcut_pull_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="xyz.jienan.pushpull"
+            android:targetClass="xyz.jienan.pushpull.ui.MainActivity" >
+            <extra android:name="shortcut_type"
+                android:value="pull" />
+
+        </intent>
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
     <shortcut
         android:shortcutId="push"
         android:enabled="true"
-        android:icon="@drawable/ic_shortcut_p_round"
+        android:icon="@mipmap/ic_shortcut_push"
         android:shortcutShortLabel="@string/shortcut_push_short"
         android:shortcutLongLabel="@string/shortcut_push_long">
         <intent
@@ -18,21 +36,6 @@
         <categories android:name="android.shortcut.conversation" />
     </shortcut>
 
-    <shortcut
-        android:shortcutId="pull"
-        android:enabled="true"
-        android:icon="@drawable/ic_shortcut_p_round"
-        android:shortcutShortLabel="@string/shortcut_pull_short"
-        android:shortcutLongLabel="@string/shortcut_pull_long">
-        <intent
-            android:action="android.intent.action.VIEW"
-            android:targetPackage="xyz.jienan.pushpull"
-            android:targetClass="xyz.jienan.pushpull.ui.MainActivity" >
-            <extra android:name="shortcut_type"
-                android:value="pull" />
 
-        </intent>
-        <categories android:name="android.shortcut.conversation" />
-    </shortcut>
 
 </shortcuts>

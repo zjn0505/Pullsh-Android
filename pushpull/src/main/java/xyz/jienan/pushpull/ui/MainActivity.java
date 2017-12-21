@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AlertDialog;
@@ -22,12 +23,13 @@ import java.io.InputStreamReader;
 
 import xyz.jienan.pushpull.R;
 
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_NIGHT;
+
 public class MainActivity extends AppCompatActivity {
 
     private final static String TAG = MainActivity.class.getSimpleName();
     private OnBackPressedListener mListener;
     private IPullshAction fragment;
-    private int currentNightMode;
 
     static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
@@ -36,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        currentNightMode = AppCompatDelegate.getDefaultNightMode();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -54,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
                 fragment.goPullState();
             }
         }
+        setupNightMode();
     }
 
     @Override
@@ -69,15 +71,15 @@ public class MainActivity extends AppCompatActivity {
                 // not implemented yet
             }
         }
+        setupNightMode();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        int nightMode = AppCompatDelegate.getDefaultNightMode();
-        if (nightMode != currentNightMode) {
-            AppCompatDelegate.setDefaultNightMode(nightMode);
-            recreate();
+    private void setupNightMode() {
+        boolean isNightMode = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(PREF_KEY_NIGHT, false);
+        if (isNightMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
     }
 

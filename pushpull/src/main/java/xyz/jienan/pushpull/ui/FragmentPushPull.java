@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
+import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.ColorDrawable;
@@ -26,6 +27,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -78,6 +80,7 @@ import xyz.jienan.pushpull.ui.settings.SettingsActivity;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_ALIGN;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_CLICK;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_COPY;
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_NIGHT;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_PULLSH_HOST;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_PUSH_ACCESS_COUNT;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_PUSH_EXPIRED_TIME;
@@ -370,6 +373,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
             dialog.show(getFragmentManager(), null);
             return true;
         } else if (id == R.id.action_settings) {
+            oldNightMode = AppCompatDelegate.getDefaultNightMode();
             startActivityForResult(new Intent(getActivity(), SettingsActivity.class), REQUEST_SETTINGS);
             return true;
         }
@@ -378,6 +382,8 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         return super.onOptionsItemSelected(item);
     }
 
+    private int oldNightMode;
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -385,7 +391,8 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
             if (sharedPref.getBoolean(PREF_KEY_REVERSE, false) != reversed) {
                 swipeTo(0);
             }
-            if (resultCode == Activity.RESULT_OK) {
+            if (oldNightMode != AppCompatDelegate.getDefaultNightMode()) {
+                oldNightMode = AppCompatDelegate.getDefaultNightMode();
                 getActivity().recreate();
             }
             String align = sharedPref.getString(PREF_KEY_ALIGN, "align_center");
