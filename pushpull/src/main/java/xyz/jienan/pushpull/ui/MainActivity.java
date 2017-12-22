@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setupNightMode();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -55,11 +56,11 @@ public class MainActivity extends AppCompatActivity {
                 fragment.goPullState();
             }
         }
-        setupNightMode();
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
+        setupNightMode();
         super.onNewIntent(intent);
         setIntent(intent);
         String action = intent.getAction();
@@ -71,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
                 // not implemented yet
             }
         }
-        setupNightMode();
     }
 
     private void setupNightMode() {

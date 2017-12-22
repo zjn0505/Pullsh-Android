@@ -165,68 +165,8 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
     private ItemInteractionCallback itemInteractionCallback = new ItemInteractionCallback() {
         @Override
         public void onClick(final MemoEntity entity) {
+            inflateBsb(entity);
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-            String align = sharedPref.getString(PREF_KEY_ALIGN, "align_center");
-            if ("align_center".equals(align)) {
-                tvBsbMemoContent.setGravity(Gravity.CENTER);
-            } else if ("align_left".equals(align)) {
-                tvBsbMemoContent.setGravity(Gravity.START);
-            }
-            tvBsbMemoId.setTypeface(fontMonaco,Typeface.BOLD);
-            tvBsbMemoId.setText(entity.getId());
-            ivBsbIdCopy.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ClipData clip;
-                    if (sharedPref.getBoolean(PREF_KEY_COPY, true)) {
-                        String host = sharedPref.getString(PREF_KEY_PULLSH_HOST, "https://pullsh.me/");
-                        clip = ClipData.newPlainText("url", host + entity.getId());
-                        ToastUtils.showToast(getActivity(), "Share link copied to clipboard");
-                    } else {
-                        clip = ClipData.newPlainText("id", entity.getId());
-                        ToastUtils.showToast(getActivity(), "id copied to clipboard");
-                    }
-                    clipboard.setPrimaryClip(clip);
-                }
-            });
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
-
-            tvBsbMemoCreate.setText(String.format(getString(R.string.memo_create), DateUtils.parseMongoUTC(entity.getCreatedDate(), sdf)));
-            if (TextUtils.isEmpty(entity.getExpiredOn())) {
-                tvBsbMemoExpire.setVisibility(View.GONE);
-            } else {
-                tvBsbMemoExpire.setVisibility(View.VISIBLE);
-                tvBsbMemoExpire.setText(String.format(getString(R.string.memo_expire), DateUtils.parseMongoUTC(entity.getExpiredOn(), sdf)));
-            }
-            if (entity.getMaxAccessCount() == 0) {
-                tvBsbMemoAccess.setVisibility(View.GONE);
-            } else {
-                tvBsbMemoAccess.setVisibility(View.VISIBLE);
-                int resId = entity.createdFromPush ? R.string.memo_allowance_author : R.string.memo_allowance_user;
-                tvBsbMemoAccess.setText(String.format(getString(resId), (entity.getMaxAccessCount() - entity.getAccessCount())));
-            }
-            if (!entity.createdFromPush) {
-                tvBsbIsAuthor.setVisibility(View.GONE);
-            } else {
-                tvBsbIsAuthor.setVisibility(View.VISIBLE);
-            }
-            final String msg = entity.getMsg();
-            tvBsbMemoContent.setText(msg);
-            if (msg.length() < 10) {
-                tvBsbMemoContent.setTextSize(30);
-            } else if (msg.length() < 20) {
-                tvBsbMemoContent.setTextSize(25);
-            } else {
-                tvBsbMemoContent.setTextSize(20);
-            }
-            tvBsbMemoContent.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ClipData clip = ClipData.newPlainText("msg", msg);
-                    clipboard.setPrimaryClip(clip);
-                    ToastUtils.showToast(getActivity(), "Memo content copied to clipboard");
-                }
-            });
         }
 
         @Override
@@ -242,6 +182,72 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
             snackbar.show();
         }
     };
+
+    private void inflateBsb(final MemoEntity entity) {
+        String align = sharedPref.getString(PREF_KEY_ALIGN, "align_center");
+        if ("align_center".equals(align)) {
+            tvBsbMemoContent.setGravity(Gravity.CENTER);
+        } else if ("align_left".equals(align)) {
+            tvBsbMemoContent.setGravity(Gravity.START);
+        }
+        tvBsbMemoId.setTypeface(fontMonaco,Typeface.BOLD);
+        tvBsbMemoId.setText(entity.getId());
+        ivBsbIdCopy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ClipData clip;
+                if (sharedPref.getBoolean(PREF_KEY_COPY, true)) {
+                    String host = sharedPref.getString(PREF_KEY_PULLSH_HOST, "https://pullsh.me/");
+                    clip = ClipData.newPlainText("url", host + entity.getId());
+                    ToastUtils.showToast(getActivity(), "Share link copied to clipboard");
+                } else {
+                    clip = ClipData.newPlainText("id", entity.getId());
+                    ToastUtils.showToast(getActivity(), "id copied to clipboard");
+                }
+                clipboard.setPrimaryClip(clip);
+            }
+        });
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+
+        tvBsbMemoCreate.setText(String.format(getString(R.string.memo_create), DateUtils.parseMongoUTC(entity.getCreatedDate(), sdf)));
+        if (TextUtils.isEmpty(entity.getExpiredOn())) {
+            tvBsbMemoExpire.setVisibility(View.GONE);
+        } else {
+            tvBsbMemoExpire.setVisibility(View.VISIBLE);
+            tvBsbMemoExpire.setText(String.format(getString(R.string.memo_expire), DateUtils.parseMongoUTC(entity.getExpiredOn(), sdf)));
+        }
+        if (entity.getMaxAccessCount() == 0) {
+            tvBsbMemoAccess.setVisibility(View.GONE);
+        } else {
+            tvBsbMemoAccess.setVisibility(View.VISIBLE);
+            int resId = entity.createdFromPush ? R.string.memo_allowance_author : R.string.memo_allowance_user;
+            tvBsbMemoAccess.setText(String.format(getString(resId), (entity.getMaxAccessCount() - entity.getAccessCount())));
+        }
+        if (!entity.createdFromPush) {
+            tvBsbIsAuthor.setVisibility(View.GONE);
+        } else {
+            tvBsbIsAuthor.setVisibility(View.VISIBLE);
+        }
+        final String msg = entity.getMsg();
+        tvBsbMemoContent.setText(msg);
+        if (msg.length() < 10) {
+            tvBsbMemoContent.setTextSize(30);
+        } else if (msg.length() < 20) {
+            tvBsbMemoContent.setTextSize(25);
+        } else {
+            tvBsbMemoContent.setTextSize(20);
+        }
+        tvBsbMemoContent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ClipData clip = ClipData.newPlainText("msg", msg);
+                clipboard.setPrimaryClip(clip);
+                ToastUtils.showToast(getActivity(), "Memo content copied to clipboard");
+            }
+        });
+        tvBsbMemoContent.setTag(entity);
+    }
+
 
     private MainActivity.OnBackPressedListener mBackPressListener = new MainActivity.OnBackPressedListener() {
         @Override
@@ -358,6 +364,27 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+            MemoEntity entity = (MemoEntity)tvBsbMemoContent.getTag();
+            if (entity != null) {
+                outState.putSerializable("memo", entity);
+                tvBsbMemoContent.setTag(null);
+            }
+        }
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null && savedInstanceState.getSerializable("memo") != null) {
+            MemoEntity entity = (MemoEntity) savedInstanceState.getSerializable("memo");
+            inflateBsb(entity);
+        }
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         ((MainActivity) getActivity()).setBackPressListener(mBackPressListener);
@@ -397,10 +424,6 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
             if (sharedPref.getBoolean(PREF_KEY_REVERSE, false) != reversed) {
                 swipeTo(0);
             }
-            if (oldNightMode != AppCompatDelegate.getDefaultNightMode()) {
-                oldNightMode = AppCompatDelegate.getDefaultNightMode();
-                getActivity().recreate();
-            }
             String align = sharedPref.getString(PREF_KEY_ALIGN, "align_center");
 
             if ("align_center".equals(align)) {
@@ -412,6 +435,10 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
                     edtMemo.setGravity(Gravity.START);
                 tvBsbMemoContent.setGravity(Gravity.START);
 
+            }
+            if (oldNightMode != AppCompatDelegate.getDefaultNightMode()) {
+                oldNightMode = AppCompatDelegate.getDefaultNightMode();
+                getActivity().recreate();
             }
         }
     }
