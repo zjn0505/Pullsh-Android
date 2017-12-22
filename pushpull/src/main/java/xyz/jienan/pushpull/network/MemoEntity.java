@@ -46,6 +46,10 @@ public class MemoEntity implements Serializable {
         return created_date;
     }
 
+    public void setCreatedDate(String createdDate) {
+        created_date = createdDate;
+    }
+
     public int getMaxAccessCount() {
         return max_access_count;
     }

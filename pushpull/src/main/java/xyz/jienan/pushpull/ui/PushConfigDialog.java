@@ -15,7 +15,6 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -29,10 +28,6 @@ import xyz.jienan.pushpull.R;
 public class PushConfigDialog extends DialogFragment {
 
     private RadioGroup rgExpired;
-    private RadioButton rbMin;
-    private RadioButton rbHr;
-    private RadioButton rbDay;
-    private RadioButton rbInfi;
 
     private TextView tvExpire;
     private SeekBar sbPeriod;
@@ -52,10 +47,6 @@ public class PushConfigDialog extends DialogFragment {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_expire, null);
 
         rgExpired = view.findViewById(R.id.rg_expire);
-        rbMin = view.findViewById(R.id.rb_min);
-        rbHr = view.findViewById(R.id.rb_hr);
-        rbDay = view.findViewById(R.id.rb_day);
-        rbInfi = view.findViewById(R.id.rb_infi);
         sbPeriod = view.findViewById(R.id.sb_period);
         tvExpire = view.findViewById(R.id.tv_expire);
         edtAllowance = view.findViewById(R.id.edt_allowance);

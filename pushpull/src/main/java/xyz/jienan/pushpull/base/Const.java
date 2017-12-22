@@ -15,5 +15,6 @@ public class Const {
     public final static String PREF_KEY_PUSH_EXPIRED_TIME = "EXPIRED_TIME";
     public final static String PREF_KEY_PUSH_EXPIRED_TYPE = "EXPIRED_TYPE";
     public final static String PREF_KEY_PUSH_ACCESS_COUNT = "ACCESS_COUNT";
+    public final static String PREF_KEY_FRE = "is_first_running_experience";
 
 }

@@ -26,6 +26,12 @@ public class DateUtils {
         }
     }
 
+    public static String convertToMongoUTC(Date from) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+        return sdf.format(from);
+    }
+
     public static long getTimeDiffFromNow(String timeString) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));

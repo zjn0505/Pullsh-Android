@@ -3,14 +3,12 @@ package xyz.jienan.pushpull.ui;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
-import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
-import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.ColorDrawable;
@@ -58,9 +56,18 @@ import android.widget.TextView;
 
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.github.jorgecastilloprz.FABProgressCircle;
+import com.google.gson.Gson;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
@@ -80,7 +87,7 @@ import xyz.jienan.pushpull.ui.settings.SettingsActivity;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_ALIGN;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_CLICK;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_COPY;
-import static xyz.jienan.pushpull.base.Const.PREF_KEY_NIGHT;
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_FRE;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_PULLSH_HOST;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_PUSH_ACCESS_COUNT;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_PUSH_EXPIRED_TIME;
@@ -136,6 +143,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
     private SharedPreferences sharedPref;
     private Typeface fontMonaco;
     private boolean reversed;
+    private int oldNightMode;
 
     BottomSheetBehavior.BottomSheetCallback bottomSheetCallback =
             new BottomSheetBehavior.BottomSheetCallback() {
@@ -352,7 +360,6 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
         setupView();
         setupService();
-
         return view;
     }
 
@@ -361,6 +368,16 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         super.onStart();
         if (mAdapter != null)
             mAdapter.expireItems();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        try {
+            checkFRE();
+        } catch (IOException e) {
+
+        }
     }
 
     @Override
@@ -415,8 +432,6 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         return super.onOptionsItemSelected(item);
     }
 
-    private int oldNightMode;
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -442,6 +457,36 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
             }
         }
     }
+
+    private void checkFRE() throws IOException {
+        boolean isFRE = sharedPref.getBoolean(PREF_KEY_FRE, true);
+        if (isFRE) {
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putBoolean(PREF_KEY_FRE, false);
+            editor.apply();
+            InputStream inputStream = getActivity().getResources().openRawResource(R.raw.help);
+
+            Writer writer = new StringWriter();
+            char[] buffer = new char[1024];
+            try {
+                Reader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+                int n;
+                while ((n = reader.read(buffer)) != -1) {
+                    writer.write(buffer, 0, n);
+                }
+            } finally {
+                inputStream.close();
+            }
+
+            String jsonString = writer.toString();
+            MemoEntity helpEntity = new Gson().fromJson(jsonString, MemoEntity.class);
+            helpEntity.setCreatedDate(DateUtils.convertToMongoUTC(new Date()));
+            if (mAdapter != null) {
+                mAdapter.addMemo(helpEntity);
+            }
+        }
+    }
+
 
     private void setupService() {
         Retrofit.Builder builder = new Retrofit.Builder()
