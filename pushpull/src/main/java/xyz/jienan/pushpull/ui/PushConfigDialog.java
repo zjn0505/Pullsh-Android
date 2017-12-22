@@ -8,8 +8,8 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
@@ -36,15 +36,18 @@ public class PushConfigDialog extends DialogFragment {
     private TextView tvAllowancePre;
     private TextView tvAllowanceSuf;
 
-    private Context mContext;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
+    private boolean savedStateCbAllowance = false;
 
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_expire, null);
+
+        sharedPreferences = getActivity().getSharedPreferences("MEMO_CONFIG", Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
 
         rgExpired = view.findViewById(R.id.rg_expire);
         sbPeriod = view.findViewById(R.id.sb_period);
@@ -170,14 +173,26 @@ public class PushConfigDialog extends DialogFragment {
             sbPeriod.setProgress(time-1);
             if (count == 0) {
                 cbAllowance.setChecked(false);
+                if (savedStateCbAllowance) {
+                    cbAllowance.setChecked(true);
+                }
             }
             edtAllowance.setText(""+count);
         }
     }
 
-     public void setContext(FragmentActivity context) {
-        mContext = context;
-        sharedPreferences = mContext.getSharedPreferences("MEMO_CONFIG", Context.MODE_PRIVATE);
-        editor = sharedPreferences.edit();
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("check_allowance", cbAllowance.isChecked());
+    }
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            savedStateCbAllowance = savedInstanceState.getBoolean("check_allowance", false);
+        }
     }
 }

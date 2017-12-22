@@ -360,6 +360,11 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
         setupView();
         setupService();
+        try {
+            checkFRE();
+        } catch (IOException e) {
+
+        }
         return view;
     }
 
@@ -368,16 +373,6 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         super.onStart();
         if (mAdapter != null)
             mAdapter.expireItems();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        try {
-            checkFRE();
-        } catch (IOException e) {
-
-        }
     }
 
     @Override
@@ -390,14 +385,30 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
                 tvBsbMemoContent.setTag(null);
             }
         }
+        if (fabPosition != 0) {
+            outState.putInt("fab_position", fabPosition);
+            outState.putString("edit_content", edtMemo.getText().toString() + "");
+            outState.putInt("edit_content_selection_start", edtMemo.getSelectionStart());
+            outState.putInt("edit_content_selection_end", edtMemo.getSelectionEnd());
+        }
     }
 
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
-        if (savedInstanceState != null && savedInstanceState.getSerializable("memo") != null) {
-            MemoEntity entity = (MemoEntity) savedInstanceState.getSerializable("memo");
-            inflateBsb(entity);
+        if (savedInstanceState != null) {
+            if (savedInstanceState.getSerializable("memo") != null) {
+                MemoEntity entity = (MemoEntity) savedInstanceState.getSerializable("memo");
+                inflateBsb(entity);
+            }
+            int fabRestoredPosition = savedInstanceState.getInt("fab_position", 0);
+            if (fabRestoredPosition != 0) {
+                swipeTo(fabRestoredPosition);
+                edtMemo.setText(savedInstanceState.getString("edit_content", ""));
+                int startSelection = savedInstanceState.getInt("edit_content_selection_start", 0);
+                int endSelection = savedInstanceState.getInt("edit_content_selection_end", 0);
+                edtMemo.setSelection(startSelection, endSelection);
+            }
         }
     }
 
@@ -419,7 +430,6 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
 
         if (id == R.id.action_push_config) {
             PushConfigDialog dialog = new PushConfigDialog();
-            dialog.setContext(getActivity());
             dialog.show(getFragmentManager(), null);
             return true;
         } else if (id == R.id.action_settings) {
