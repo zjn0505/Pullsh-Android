@@ -30,3 +30,8 @@ deploy:
   on:
     tags: true
     all_branches: true
+after_success:
+  - dropbox-deployment
+  on:
+      tags: true
+      all_branches: true
