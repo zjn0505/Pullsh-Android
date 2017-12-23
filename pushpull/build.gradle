@@ -19,7 +19,9 @@ android {
             if (key.exists()) {
                 storeFile key
                 Properties properties = new Properties()
-                properties.load(project.rootProject.file('local.properties').newDataInputStream())
+                File localProperty = file('../local.properties')
+                if (localProperty.exists())
+                    properties.load(localProperty.newDataInputStream())
                 storePassword project.hasProperty("KEYSTORE_PASS") ? KEYSTORE_PASS : (System.getenv("KEYSTORE_PASS") ? System.getenv("KEYSTORE_PASS") : properties.getProperty("KEYSTORE_PASS"))
                 keyAlias project.hasProperty("ALIAS_NAME") ? ALIAS_NAME : (System.getenv("ALIAS_NAME") ? System.getenv("ALIAS_NAME") : properties.getProperty("ALIAS_NAME"))
                 keyPassword project.hasProperty("ALIAS_PASS") ? ALIAS_PASS : (System.getenv("ALIAS_PASS") ? System.getenv("ALIAS_PASS") : properties.getProperty("ALIAS_PASS"))
