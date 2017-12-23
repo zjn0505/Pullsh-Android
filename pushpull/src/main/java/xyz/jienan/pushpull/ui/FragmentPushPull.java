@@ -238,13 +238,6 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         }
         final String msg = entity.getMsg();
         tvBsbMemoContent.setText(msg);
-        if (msg.length() < 10) {
-            tvBsbMemoContent.setTextSize(30);
-        } else if (msg.length() < 20) {
-            tvBsbMemoContent.setTextSize(25);
-        } else {
-            tvBsbMemoContent.setTextSize(20);
-        }
         tvBsbMemoContent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
