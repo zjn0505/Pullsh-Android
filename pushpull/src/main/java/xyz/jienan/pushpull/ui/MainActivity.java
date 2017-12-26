@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
                 fragment.goPullState();
             }
         }
+        handleShareIntent();
     }
 
     @Override
@@ -63,15 +64,7 @@ public class MainActivity extends AppCompatActivity {
         setupNightMode();
         super.onNewIntent(intent);
         setIntent(intent);
-        String action = intent.getAction();
-        String type = intent.getType();
-        if (Intent.ACTION_SEND.equals(action) && type != null) {
-            if (type.startsWith("text/")) {
-                handleSendText();
-            } else if (type.startsWith("image/")) {
-                // not implemented yet
-            }
-        }
+        handleShareIntent();
     }
 
     private void setupNightMode() {
@@ -104,6 +97,18 @@ public class MainActivity extends AppCompatActivity {
 
     public interface OnBackPressedListener {
         boolean onBackPressed();
+    }
+
+    private void handleShareIntent() {
+        String action = getIntent().getAction();
+        String type = getIntent().getType();
+        if (Intent.ACTION_SEND.equals(action) && type != null) {
+            if (type.startsWith("text/")) {
+                handleSendText();
+            } else if (type.startsWith("image/")) {
+                // not implemented yet
+            }
+        }
     }
 
     private void handleSendText() {
