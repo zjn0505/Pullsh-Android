@@ -40,6 +40,7 @@
             app:srcCompat="@drawable/ic_notice_yellow"
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@id/iv_action"
+            android:layout_toStartOf="@id/iv_action"
             android:visibility="gone"/>
 
         <TextView
@@ -47,8 +48,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:layout_below="@id/tv_push_short_id"
             android:layout_toLeftOf="@id/iv_action"
+            android:layout_toStartOf="@id/iv_action"
             android:ellipsize="end"
             android:maxLines="1"
             android:textSize="18sp"

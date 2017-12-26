@@ -19,7 +19,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="Memo id:"
+            android:text="@string/bottom_sheet_memo_id"
             android:textSize="20sp"
             android:gravity="center"
             android:layout_margin="10dp"/>
@@ -43,11 +43,11 @@
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/ic_copy"
             android:contentDescription="@string/copy"
-            android:layout_alignParentRight="true"
             android:layout_gravity="center_vertical"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
-            android:layout_marginRight="20dp"/>
+            android:layout_marginRight="20dp"
+            android:layout_marginEnd="20dp" />
 
     </LinearLayout>
 
@@ -80,7 +80,7 @@
             android:id="@+id/bsb_memo_create_by_push"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="This memo is created by push"/>
+            android:text="@string/bottom_sheet_memo_created_by"/>
 
         <View
             android:layout_height="1dp"
@@ -112,7 +112,7 @@
             app:autoSizeMinTextSize="18sp"
             app:autoSizeMaxTextSize="30sp"
             app:autoSizeStepGranularity="1sp"
-            android:text="This a sample of your memo content, use action button to create your own" />
+            tools:text="This a sample of your memo content, use action button to create your own" />
     </android.support.v4.widget.NestedScrollView>
 
 

@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_margin="5dp"
-        android:text="Memo will be expired after"
+        android:text="@string/dialog_push_memo_expire"
         android:textColor="@android:color/black"
         android:textSize="20sp" />
 
@@ -23,7 +23,8 @@
         android:text="1"
         android:textColor="@android:color/black"
         android:textSize="25sp"
-        tools:text="20" />
+        tools:text="20"
+        tools:ignore="HardcodedText" />
 
     <RadioGroup
         android:id="@+id/rg_expire"
@@ -41,28 +42,29 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="min" />
+            android:text="@string/dialog_push_memo_expire_min" />
 
         <RadioButton
             android:id="@+id/rb_hr"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="hr" />
+            android:text="@string/dialog_push_memo_expire_hr" />
 
         <RadioButton
             android:id="@+id/rb_day"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="day" />
+            android:text="@string/dialog_push_memo_expire_day" />
 
         <RadioButton
             android:id="@+id/rb_infi"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="∞" />
+            android:text="∞"
+            tools:ignore="HardcodedText" />
     </RadioGroup>
 
     <SeekBar
@@ -90,7 +92,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_margin="5dp"
-            android:text="or after checked"
+            android:text="@string/dialog_push_memo_after_checked"
             android:textColor="@android:color/black"
             android:textSize="20sp" />
 
@@ -104,7 +106,8 @@
             android:text="20"
             android:textColor="@android:color/black"
             android:textSize="25sp"
-            tools:text="20" />
+            tools:text="20"
+            tools:ignore="HardcodedText" />
 
         <TextView
             android:id="@+id/tv_allowance_suf"
@@ -112,7 +115,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_margin="5dp"
-            android:text="times"
+            android:text="@string/dialog_push_memo_after_checked_times"
             android:textColor="@android:color/black"
             android:textSize="20sp" />
 

@@ -177,7 +177,7 @@ public class PushConfigDialog extends DialogFragment {
                     cbAllowance.setChecked(true);
                 }
             }
-            edtAllowance.setText(""+count);
+            edtAllowance.setText(String.valueOf(count));
         }
     }
 

@@ -42,4 +42,27 @@
     <string name="shortcut_pull_short">Pull</string>
     <string name="shortcut_pull_long">Create a pull</string>
 
+    <string name="bottom_sheet_memo_id">Memo id:</string>
+    <string name="bottom_sheet_memo_created_by">This memo is created by push</string>
+
+    <string name="dialog_push_memo_expire">Memo will be expired after</string>
+    <string name="dialog_push_memo_expire_min">min</string>
+    <string name="dialog_push_memo_expire_hr">hr</string>
+    <string name="dialog_push_memo_expire_day">day</string>
+    <string name="dialog_push_memo_after_checked">or after checked</string>
+    <string name="dialog_push_memo_after_checked_times">times</string>
+
+    <string name="input_area_hint_pull">Input the memo id</string>
+    <string name="input_area_hint_push">Input your memo</string>
+    <string name="input_area_create_a_pull">Create a pull</string>
+    <string name="input_area_create_a_push">Create a push</string>
+
+    <string name="toast_create_pull_failed">Create pull failed</string>
+    <string name="toast_create_push_failed">Create push failed</string>
+    <string name="toast_input_correct_id">Please input correct memo id</string>
+    <string name="toast_input_correct_memo">Please input some contents</string>
+    <string name="toast_memo_content_copied">Memo content copied to clipboard</string>
+    <string name="toast_memo_id_copied">id copied to clipboard</string>
+    <string name="toast_memo_link_copied">Share link copied to clipboard</string>
+
 </resources>

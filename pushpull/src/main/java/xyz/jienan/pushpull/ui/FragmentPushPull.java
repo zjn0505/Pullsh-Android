@@ -207,10 +207,10 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
                 if (sharedPref.getBoolean(PREF_KEY_COPY, true)) {
                     String host = sharedPref.getString(PREF_KEY_PULLSH_HOST, "https://pullsh.me/");
                     clip = ClipData.newPlainText("url", host + entity.getId());
-                    ToastUtils.showToast(getActivity(), "Share link copied to clipboard");
+                    ToastUtils.showToast(getActivity(), getString(R.string.toast_memo_link_copied));
                 } else {
                     clip = ClipData.newPlainText("id", entity.getId());
-                    ToastUtils.showToast(getActivity(), "id copied to clipboard");
+                    ToastUtils.showToast(getActivity(), getString(R.string.toast_memo_id_copied));
                 }
                 clipboard.setPrimaryClip(clip);
             }
@@ -243,7 +243,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
             public void onClick(View v) {
                 ClipData clip = ClipData.newPlainText("msg", msg);
                 clipboard.setPrimaryClip(clip);
-                ToastUtils.showToast(getActivity(), "Memo content copied to clipboard");
+                ToastUtils.showToast(getActivity(), getString(R.string.toast_memo_content_copied));
             }
         });
         tvBsbMemoContent.setTag(entity);
@@ -335,7 +335,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
             fontMonaco = Typeface.createFromAsset(getContext().getAssets(), "Monaco.ttf");
         }
         this.setHasOptionsMenu(true);
-        View view = inflater.inflate(R.layout.fragment_pushpull, null, false);
+        View view = inflater.inflate(R.layout.fragment_pushpull, container, false);
         coordiLayout = view.findViewById(R.id.coordi_layout);
         recyclerView = view.findViewById(R.id.recycler_view);
         bottomLayout = view.findViewById(R.id.bottom_sheet);
@@ -356,7 +356,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         try {
             checkFRE();
         } catch (IOException e) {
-
+            e.printStackTrace();
         }
         return view;
     }
@@ -599,8 +599,8 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
             bottomHeader.setVisibility(View.VISIBLE);
             reversed = sharedPref.getBoolean(PREF_KEY_REVERSE, false);
             if ((i == 1) != reversed) {
-                tvSwipeHint.setText("Create a pull");
-                edtMemo.setHint("Input the memo id");
+                tvSwipeHint.setText(getString(R.string.input_area_create_a_pull));
+                edtMemo.setHint(getString(R.string.input_area_hint_pull));
                 edtMemo.setMaxEms(10);
                 InputFilter[] filters = new InputFilter[1];
                 filters[0] = new InputFilter.LengthFilter(10);
@@ -608,8 +608,8 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
                 edtMemo.setSingleLine(true);
                 edtMemo.setGravity(Gravity.CENTER);
             } else {
-                tvSwipeHint.setText("Create a push");
-                edtMemo.setHint("Input your memo");
+                tvSwipeHint.setText(getString(R.string.input_area_create_a_push));
+                edtMemo.setHint(getString(R.string.input_area_hint_push));
                 edtMemo.setSingleLine(false);
                 edtMemo.setMaxEms(Integer.MAX_VALUE);
                 String align = sharedPref.getString(PREF_KEY_ALIGN, "align_center");
@@ -671,7 +671,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
     private void pushMemo() {
         String memoContent = edtMemo.getText().toString();
         if (TextUtils.isEmpty(memoContent)) {
-            ToastUtils.showToast(getActivity(), "Please input some contents");
+            ToastUtils.showToast(getActivity(), getString(R.string.toast_input_correct_memo));
         } else {
             fabSwipe.setClickable(false);
             int time = sharedPref.getInt(PREF_KEY_PUSH_EXPIRED_TIME, 1);
@@ -715,7 +715,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
                     fabSwipe.setClickable(true);
                     fabWrapper.hide();
                     Log.e("Request", t.getLocalizedMessage());
-                    ToastUtils.showToast(getActivity(), "Create push failed");
+                    ToastUtils.showToast(getActivity(), getString(R.string.toast_create_push_failed));
                 }
             });
         }
@@ -724,7 +724,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
     private void pullMemo() {
         String memoId = edtMemo.getText().toString();
         if (TextUtils.isEmpty(memoId)) {
-            ToastUtils.showToast(getActivity(), "Please input correct memo id");
+            ToastUtils.showToast(getActivity(), getString(R.string.toast_input_correct_id));
         } else {
             if (mAdapter.checkExistMeme(memoId)) {
                 swipeBackFromCheck();
@@ -752,7 +752,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
                     fabSwipe.setClickable(true);
                     fabWrapper.hide();
                     Log.e("Request", t.getLocalizedMessage());
-                    ToastUtils.showToast(getActivity(), "Create pull failed");
+                    ToastUtils.showToast(getActivity(), getString(R.string.toast_create_pull_failed));
                 }
             });
         }
