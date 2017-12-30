@@ -722,7 +722,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
     }
 
     private void pullMemo() {
-        String memoId = edtMemo.getText().toString();
+        String memoId = edtMemo.getText().toString().trim();
         if (TextUtils.isEmpty(memoId)) {
             ToastUtils.showToast(getActivity(), getString(R.string.toast_input_correct_id));
         } else {
