@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -65,27 +64,23 @@ public class PushConfigDialog extends DialogFragment {
                         sbPeriod.setMax(59);
                         tvExpire.setEnabled(true);
                         sbPeriod.setEnabled(true);
-                        tvExpire.setTextColor(Color.BLACK);
                         editor.putInt("EXPIRED_TYPE", 0);
                         break;
                     case R.id.rb_hr:
                         sbPeriod.setMax(47);
                         tvExpire.setEnabled(true);
                         sbPeriod.setEnabled(true);
-                        tvExpire.setTextColor(Color.BLACK);
                         editor.putInt("EXPIRED_TYPE", 1);
                         break;
                     case R.id.rb_day:
                         sbPeriod.setMax(29);
                         tvExpire.setEnabled(true);
                         sbPeriod.setEnabled(true);
-                        tvExpire.setTextColor(Color.BLACK);
                         editor.putInt("EXPIRED_TYPE", 2);
                         break;
                     case R.id.rb_infi:
                         tvExpire.setEnabled(false);
                         sbPeriod.setEnabled(false);
-                        tvExpire.setTextColor(Color.GRAY);
                         editor.putInt("EXPIRED_TYPE", 3);
                         break;
                 }
@@ -115,13 +110,13 @@ public class PushConfigDialog extends DialogFragment {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 edtAllowance.setEnabled(isChecked);
                 if (isChecked) {
-                    tvAllowancePre.setTextColor(Color.BLACK);
-                    edtAllowance.setTextColor(Color.BLACK);
-                    tvAllowanceSuf.setTextColor(Color.BLACK);
+                    tvAllowancePre.setEnabled(true);
+                    edtAllowance.setEnabled(true);
+                    tvAllowanceSuf.setEnabled(true);
                 } else {
-                    tvAllowancePre.setTextColor(Color.GRAY);
-                    edtAllowance.setTextColor(Color.GRAY);
-                    tvAllowanceSuf.setTextColor(Color.GRAY);
+                    tvAllowancePre.setEnabled(false);
+                    edtAllowance.setEnabled(false);
+                    tvAllowanceSuf.setEnabled(false);
                 }
             }
         });
