@@ -578,6 +578,8 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    if (getActivity() == null || !isAdded())
+                        return;
                     foreground.setVisibility(View.GONE);
                     View view = getActivity().getCurrentFocus();
                     if (view == null && getView() != null) {
@@ -700,16 +702,20 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
                     MemoEntity entity = response.body().getMemo();
                     entity.createdFromPush = true;
                     mAdapter.addMemo(entity);
-                    swipeBackFromCheck();
-                    fabWrapper.hide();
+                    if (getActivity() != null && isAdded()) {
+                        swipeBackFromCheck();
+                        fabWrapper.hide();
+                    }
                 }
 
                 @Override
                 public void onFailure(Call<CommonResponse> call, Throwable t) {
-                    fabSwipe.setClickable(true);
-                    fabWrapper.hide();
-                    Log.e("Request", t.getLocalizedMessage());
-                    ToastUtils.showToast(getActivity(), getString(R.string.toast_create_push_failed));
+                    if (getActivity() != null && isAdded()) {
+                        fabSwipe.setClickable(true);
+                        fabWrapper.hide();
+                        Log.e("Request", t.getLocalizedMessage());
+                        ToastUtils.showToast(getActivity(), getString(R.string.toast_create_push_failed));
+                    }
                 }
             });
         }
@@ -732,21 +738,27 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
                 @Override
                 public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
                     if (response.body().getMemo() == null) {
-                        ToastUtils.showToast(getActivity(), response.body().getMsg());
+                        if (getActivity() != null && isAdded()) {
+                            ToastUtils.showToast(getActivity(), response.body().getMsg());
                         fabSwipe.setClickable(true);
+                        }
                     } else {
                         mAdapter.addMemo(response.body().getMemo());
-                        swipeBackFromCheck();
+                        if (getActivity() != null && isAdded())
+                            swipeBackFromCheck();
                     }
-                    fabWrapper.hide();
+                    if (getActivity() != null && isAdded())
+                        fabWrapper.hide();
                 }
 
                 @Override
                 public void onFailure(Call<CommonResponse> call, Throwable t) {
-                    fabSwipe.setClickable(true);
-                    fabWrapper.hide();
-                    Log.e("Request", t.getLocalizedMessage());
-                    ToastUtils.showToast(getActivity(), getString(R.string.toast_create_pull_failed));
+                    if (getActivity() != null && isAdded()) {
+                        fabSwipe.setClickable(true);
+                        fabWrapper.hide();
+                        Log.e("Request", t.getLocalizedMessage());
+                        ToastUtils.showToast(getActivity(), getString(R.string.toast_create_pull_failed));
+                    }
                 }
             });
         }
@@ -759,6 +771,9 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+                if (getActivity() == null || !isAdded()) {
+                    return;
+                }
                 ArrayList<ObjectAnimator> objectAnimatorsArray = new ArrayList<ObjectAnimator>();
                 ObjectAnimator animatorCover = ObjectAnimator.ofFloat(foreground, "alpha", 1, 0);
                 animatorCover.setInterpolator(new AccelerateInterpolator());
@@ -786,6 +801,9 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+                if (getActivity() == null || !isAdded()) {
+                    return;
+                }
                 ArrayList<ObjectAnimator> objectAnimatorsArray = new ArrayList<ObjectAnimator>();
                 ObjectAnimator animatorHintTransX = ObjectAnimator.ofFloat(tvSwipeHint, "translationX", 0);
                 animatorHintTransX.setInterpolator(new AccelerateInterpolator());
