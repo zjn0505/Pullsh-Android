@@ -26,6 +26,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -70,6 +72,8 @@ import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Vector;
 
 import io.realm.Case;
 import io.realm.Realm;
@@ -126,6 +130,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
     private FrameLayout foreground;
     private InputMethodManager imm;
     private ClipboardManager clipboard;
+    private ViewPager viewPagerInput;
 
     // START views in bottom sheet
     private View bsbShadow;
@@ -359,6 +364,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         bsbShadow = view.findViewById(R.id.bottom_sheet_shadow);
         mDetector = new GestureDetectorCompat(getActivity(), mFabGestureListener);
         clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+        viewPagerInput = (ViewPager) view.findViewById(R.id.viewpager_input);
         setupView();
         if (memoAPI == null) {
             memoAPI = MemoService.getMemoAPI();
@@ -580,6 +586,13 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
                 return !(v.getAlpha() == 0);
             }
         });
+
+
+        List<Fragment> fragments = new Vector<Fragment>();
+        fragments.add(new FragmentInput());
+        fragments.add(new FragmentPushConfig());
+        PagerAdapter pagerAdapter = new InputPagerAdapter(getChildFragmentManager(), fragments);
+        viewPagerInput.setAdapter(pagerAdapter);
 
         bottomSheetBehavior = BottomSheetBehavior.from(bottomLayout);
         bottomSheetBehavior.setBottomSheetCallback(bottomSheetCallback);
