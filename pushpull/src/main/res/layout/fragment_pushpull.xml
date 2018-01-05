@@ -19,6 +19,7 @@
         android:visibility="gone"/>
 
     <RelativeLayout
+        android:id="@+id/rl_bottom_input_wrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
@@ -43,15 +44,14 @@
                     android:id="@+id/tv_swipe_hint"
                     android:layout_width="wrap_content"
                     android:layout_height="60dp"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
-                    android:padding="5dp"
-                    android:textColor="@color/white"
-                    tools:text="Create a push"
+                    android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true"
                     android:gravity="center_vertical"
+                    android:padding="5dp"
+                    android:textColor="@color/white"
+                    android:textSize="24sp"
                     android:textStyle="bold"
-                    android:textSize="24sp" />
+                    tools:text="Create a push" />
 
             </RelativeLayout>
 

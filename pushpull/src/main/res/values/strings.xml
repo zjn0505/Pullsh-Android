@@ -65,6 +65,7 @@
     <string name="toast_memo_content_copied">Memo content copied to clipboard</string>
     <string name="toast_memo_id_copied">id copied to clipboard</string>
     <string name="toast_memo_link_copied">Share link copied to clipboard</string>
+    <string name="toast_item_already_in_list">item already in list</string>
 
-    <string name="search_hint">Search memo content or note</string>
+    <string name="search_hint">Search id, content or note</string>
 </resources>

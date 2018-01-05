@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import xyz.jienan.pushpull.R;
+import xyz.jienan.pushpull.database.DatabaseManager;
 
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_NIGHT;
 
@@ -30,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private final static String TAG = MainActivity.class.getSimpleName();
     private OnBackPressedListener mListener;
     private IPullshAction fragment;
+    private DatabaseManager dbMgr;
 
     static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
@@ -38,12 +40,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        dbMgr = new DatabaseManager(this);
         setupNightMode();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragment = (IPullshAction) fragmentManager.findFragmentById(R.id.fragment_pushpull);
 
@@ -65,6 +67,12 @@ public class MainActivity extends AppCompatActivity {
         super.onNewIntent(intent);
         setIntent(intent);
         handleShareIntent();
+    }
+
+    @Override
+    protected void onDestroy() {
+        dbMgr.close();
+        super.onDestroy();
     }
 
     private void setupNightMode() {

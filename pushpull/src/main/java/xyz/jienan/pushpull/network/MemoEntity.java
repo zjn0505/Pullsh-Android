@@ -1,12 +1,15 @@
 package xyz.jienan.pushpull.network;
 
-import java.io.Serializable;
+import io.realm.MutableRealmInteger;
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
+import io.realm.annotations.Required;
 
 /**
  * Created by Jienan on 2017/10/30.
  */
 
-public class MemoEntity implements Serializable {
+public class MemoEntity extends RealmObject {
 
 
     /**
@@ -16,8 +19,10 @@ public class MemoEntity implements Serializable {
      * created_date : 2017-10-31T06:08:38.388Z
      * expired_on : 2017-10-31T07:08:38.374Z
      */
-
+    @PrimaryKey
+    @Required
     private String _id;
+    @Required
     private String msg;
     private int access_count;
     private String created_date;
@@ -25,6 +30,7 @@ public class MemoEntity implements Serializable {
     private String expired_on;
     public boolean hasExpired = false;
     public boolean createdFromPush = false;
+    public final MutableRealmInteger index = MutableRealmInteger.valueOf(0);
 
     public String getId() {
         return _id;

@@ -71,6 +71,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import io.realm.Case;
+import io.realm.Realm;
+import io.realm.RealmResults;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -114,6 +117,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
     private FloatingActionButton fabSwipe;
     private FABProgressCircle fabWrapper;
     private RelativeLayout bottomHeader;
+    private RelativeLayout bottomInputWrapper;
     private RelativeLayout bottomWrapper;
     private ImageView ivSwipeLeft;
     private ImageView ivSwipeRight;
@@ -145,6 +149,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
     private Typeface fontMonaco;
     private boolean reversed;
     private int oldNightMode;
+    private Realm realm;
 
     BottomSheetBehavior.BottomSheetCallback bottomSheetCallback =
             new BottomSheetBehavior.BottomSheetCallback() {
@@ -172,6 +177,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
                 }
             };
     private ItemInteractionCallback itemInteractionCallback = new ItemInteractionCallback() {
+
         @Override
         public void onClick(final MemoEntity entity) {
             inflateBsb(entity);
@@ -348,6 +354,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         edtMemo = view.findViewById(R.id.edt_memo2);
         foreground = view.findViewById(R.id.foreground);
         bottomWrapper = view.findViewById(R.id.bottom_wrapper);
+        bottomInputWrapper = view.findViewById(R.id.rl_bottom_input_wrapper);
         bottomHeader = view.findViewById(R.id.bottom_header);
         bsbShadow = view.findViewById(R.id.bottom_sheet_shadow);
         mDetector = new GestureDetectorCompat(getActivity(), mFabGestureListener);
@@ -377,7 +384,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
             MemoEntity entity = (MemoEntity)tvBsbMemoContent.getTag();
             if (entity != null) {
-                outState.putSerializable("memo", entity);
+                outState.putString("memo_id", entity.getId());
                 tvBsbMemoContent.setTag(null);
             }
         }
@@ -393,8 +400,12 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
         if (savedInstanceState != null) {
-            if (savedInstanceState.getSerializable("memo") != null) {
-                MemoEntity entity = (MemoEntity) savedInstanceState.getSerializable("memo");
+            String memoId = savedInstanceState.getString("memo_id");
+            if (!TextUtils.isEmpty(memoId)) {
+                if (realm == null) {
+                    realm = Realm.getDefaultInstance();
+                }
+                MemoEntity entity = realm.where(MemoEntity.class).equalTo("_id", memoId).findFirst();
                 inflateBsb(entity);
             }
             int fabRestoredPosition = savedInstanceState.getInt("fab_position", 0);
@@ -420,10 +431,63 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         inflater.inflate(R.menu.menu_memo, menu);
         SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
-        searchView.setIconified(false);
-        searchView.setIconifiedByDefault(false);
         searchView.setQueryHint(getString(R.string.search_hint));
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (realm == null) {
+                    realm = Realm.getDefaultInstance();
+                }
+                RealmResults<MemoEntity> results = realm.where(MemoEntity.class)
+                        .contains("msg", newText, Case.INSENSITIVE)
+                        .or().contains("_id", newText, Case.INSENSITIVE).findAll()
+                        .sort("index");
+                mAdapter.showQueryResult(results);
+                Log.d(TAG, "search " + newText + " with result length " + results.size());
+                return false;
+            }
+        });
+
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                mAdapter.leaveQueryMode();
+                return false;
+            }
+        });
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mAdapter.enterQueryMode();
+            }
+        });
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            int foregroundVisibility;
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                mAdapter.enterQueryMode();
+                bottomInputWrapper.setVisibility(View.GONE);
+                foregroundVisibility = foreground.getVisibility();
+                foreground.setVisibility(View.GONE);
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                Log.e(TAG, "onMenuItemActionCollapse: ");
+                mAdapter.leaveQueryMode();
+                bottomInputWrapper.setVisibility(View.VISIBLE);
+                foreground.setVisibility(foregroundVisibility);
+                return true;
+            }
+        });
     }
 
     @Override
@@ -492,6 +556,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
 
             String jsonString = writer.toString();
             MemoEntity helpEntity = new Gson().fromJson(jsonString, MemoEntity.class);
+            helpEntity.index.set(0);
             helpEntity.setCreatedDate(DateUtils.convertToMongoUTC(new Date()));
             if (mAdapter != null) {
                 mAdapter.addMemo(helpEntity);

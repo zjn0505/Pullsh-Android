@@ -9,6 +9,7 @@ import android.graphics.Typeface;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,21 +18,21 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import io.realm.Realm;
+import io.realm.RealmList;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
 import xyz.jienan.pushpull.DateUtils;
 import xyz.jienan.pushpull.R;
 import xyz.jienan.pushpull.ToastUtils;
 import xyz.jienan.pushpull.network.MemoEntity;
 
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_COPY;
-import static xyz.jienan.pushpull.base.Const.PREF_KEY_MEMO;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_PULLSH_HOST;
 
 /**
@@ -44,12 +45,15 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
     private ClipboardManager clipboard;
     private List<MemoEntity> mList;
     private Context mContext;
-    private SharedPreferences.Editor editor;
-    private Gson gson;
     private RecyclerView recyclerView;
     private ItemInteractionCallback mCallback;
     private Typeface fontMonaco;
     private SharedPreferences sharedPref;
+    private List<MemoEntity> queryList = new LinkedList<MemoEntity>();
+
+    private boolean inQueryMode = false;
+    private Realm realm;
+
 
     PushPullAdapter(Context context, ItemInteractionCallback itemInteractionCallback) {
         mList = new LinkedList<MemoEntity>();
@@ -60,25 +64,17 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
         if (fontMonaco == null) {
             fontMonaco = Typeface.createFromAsset(mContext.getAssets(), "Monaco.ttf");
         }
-        gson = new Gson();
         sharedPref = PreferenceManager.getDefaultSharedPreferences(mContext);
-        String json = sharedPref.getString(PREF_KEY_MEMO, null);
-        if (!TextUtils.isEmpty(json)) {
-            try {
-                JSONArray a = new JSONArray(json);
-                for (int i = 0; i < a.length(); i++) {
-                    String item = a.optString(i);
-                    MemoEntity entity = gson.fromJson(item, MemoEntity.class);
-                    if (entity != null)
-                        mList.add(entity);
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-        }
-        editor = sharedPref.edit();
+        Realm realm = Realm.getDefaultInstance();
+        RealmQuery<MemoEntity> query = realm.where(MemoEntity.class);
+        RealmResults<MemoEntity> results = query.sort("index").findAll();
+        mList.addAll(results);
         mCallback = itemInteractionCallback;
+    }
+
+    @Override
+    public boolean isActivate() {
+        return !inQueryMode;
     }
 
     public void onItemMove(int from, int to) {
@@ -157,7 +153,7 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        final MemoEntity memo = mList.get(position);
+        final MemoEntity memo = inQueryMode ? queryList.get(position) : mList.get(position);
         holder.tvId.setText(memo.getId());
         holder.tvId.setTypeface(fontMonaco, Typeface.BOLD);
         holder.tvMsg.setText(memo.getMsg());
@@ -213,11 +209,27 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
                 }
             }
         });
+        Log.e("Memo", memo.getId() + " " + memo.index.get());
     }
 
     @Override
     public int getItemCount() {
-        return mList.size();
+        return inQueryMode ? queryList.size() : mList.size();
+    }
+
+    public void showQueryResult(List<MemoEntity> queryList) {
+        this.queryList = queryList;
+        inQueryMode = true;
+        notifyDataSetChanged();
+    }
+
+    public void enterQueryMode() {
+        this.inQueryMode = true;
+    }
+
+    public void leaveQueryMode() {
+        inQueryMode = false;
+        notifyDataSetChanged();
     }
 
     public void addMemo(MemoEntity memo) {
@@ -225,7 +237,7 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
             int index = mList.indexOf(memo);
             Collections.swap(mList, index, 0);
             this.notifyItemMoved(index, 0);
-            ToastUtils.showToast(mContext, "item already in list");
+            ToastUtils.showToast(mContext, mContext.getString(R.string.toast_item_already_in_list));
         } else {
             mList.add(0, memo);
             notifyItemInserted(0);
@@ -237,7 +249,7 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
     public boolean checkExistMeme(String id) {
         for (int i = 0; i < mList.size(); i++) {
             if (mList.get(i).getId().equals(id)) {
-                ToastUtils.showToast(mContext, "item already in list");
+                ToastUtils.showToast(mContext, mContext.getString(R.string.toast_item_already_in_list));
                 recyclerView.scrollToPosition(i);
                 return true;
             }
@@ -246,13 +258,21 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
     }
 
     private void saveToPreference() {
-        JSONArray a = new JSONArray();
-        for (MemoEntity entity : mList) {
-            a.put(gson.toJson(entity));
+        if (realm == null) {
+            realm = Realm.getDefaultInstance();
         }
-
-        editor.putString(PREF_KEY_MEMO, a.toString());
-        editor.commit();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                RealmList<MemoEntity> realmList = new RealmList<MemoEntity>();
+                int size = mList.size();
+                for (int i = 0; i< size; i++) {
+                    mList.get(i).index.set(i);
+                }
+                realmList.addAll(mList);
+                realm.insertOrUpdate(realmList);
+            }
+        });
     }
 
     private void setItemExpiredView(ViewHolder holder) {

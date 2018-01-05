@@ -5,6 +5,7 @@ package xyz.jienan.pushpull.ui;
  */
 
 interface TouchHelperAdapter {
+    boolean isActivate();
     void onItemMove(int from, int to);
     void onItemDismiss(int position);
 }
