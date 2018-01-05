@@ -103,10 +103,9 @@ import static xyz.jienan.pushpull.base.Const.PREF_KEY_REVERSE;
 public class FragmentPushPull extends Fragment implements IPullshAction{
 
     private final static String TAG = FragmentPushPull.class.getSimpleName();
-    private final static String BASE_URL = "https://api.jienan.xyz/";
     private static final int REQUEST_SETTINGS = 100;
 
-    private MemoService memoService;
+    private MemoService.MemoAPI memoAPI;
     private CoordinatorLayout coordiLayout;
     private RecyclerView recyclerView;
     private BottomSheetBehavior bottomSheetBehavior;
@@ -354,7 +353,9 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         mDetector = new GestureDetectorCompat(getActivity(), mFabGestureListener);
         clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
         setupView();
-        setupService();
+        if (memoAPI == null) {
+            memoAPI = MemoService.getMemoAPI();
+        }
         try {
             checkFRE();
         } catch (IOException e) {
@@ -496,21 +497,6 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
                 mAdapter.addMemo(helpEntity);
             }
         }
-    }
-
-
-    private void setupService() {
-        Retrofit.Builder builder = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create());
-        if (BuildConfig.DEBUG) {
-            OkHttpClient client = new OkHttpClient.Builder()
-                    .addNetworkInterceptor(new StethoInterceptor()).build();
-            builder.client(client);
-        }
-
-        Retrofit retrofit = builder.build();
-        memoService = retrofit.create(MemoService.class);
     }
 
     private void setupView() {
@@ -706,7 +692,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
             entity.setMsg(memoContent);
             entity.setMaxAccessCount(count);
             entity.setExpiredOn(expiredArg);
-            Call<CommonResponse> call = memoService.createMemo(entity);
+            Call<CommonResponse> call = memoAPI.createMemo(entity);
             call.enqueue(new Callback<CommonResponse>() {
 
                 @Override
@@ -740,7 +726,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
             }
             fabSwipe.setClickable(false);
             fabWrapper.show();
-            Call<CommonResponse> call = memoService.readMemo(memoId.trim());
+            Call<CommonResponse> call = memoAPI.readMemo(memoId.trim());
             call.enqueue(new Callback<CommonResponse>() {
 
                 @Override
