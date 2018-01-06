@@ -6,4 +6,5 @@
     <color name="green">#0F0</color>
     <color name="gray">#BDBDBD</color>
     <color name="ic_copy_color">#000</color>
+    <color name="background">#FFFFFF</color>
 </resources>

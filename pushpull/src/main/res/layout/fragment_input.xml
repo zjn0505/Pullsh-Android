@@ -1,15 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<EditText xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/edt_memo2"
-    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_below="@id/bottom_header"
-    android:background="?android:attr/colorBackground"
-    tools:hint="@string/input_area_hint_push"
-    android:inputType="textMultiLine|textNoSuggestions"
-    android:maxLines="5"
-    android:padding="20dp"
-    android:gravity="center_horizontal"
-    android:visibility="gone"
-    tools:visibility="visible" />
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/background">
+
+    <EditText
+        android:id="@+id/edt_memo"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_below="@id/bottom_header"
+        tools:hint="@string/input_area_hint_push"
+        android:inputType="textMultiLine|textNoSuggestions"
+        android:maxLines="5"
+        android:gravity="center_horizontal"/>
+
+    <ImageView
+        android:id="@+id/iv_push_config_notice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_notice_yellow"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginEnd="20dp"
+        android:visibility="gone"/>
+</RelativeLayout>

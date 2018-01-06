@@ -1,5 +1,6 @@
 package xyz.jienan.pushpull.ui;
 
+import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
@@ -125,12 +126,11 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
     private RelativeLayout bottomWrapper;
     private ImageView ivSwipeLeft;
     private ImageView ivSwipeRight;
-    private EditText edtMemo;
     private TextView tvSwipeHint;
     private FrameLayout foreground;
     private InputMethodManager imm;
     private ClipboardManager clipboard;
-    private ViewPager viewPagerInput;
+    private InputViewPager viewPagerInput;
 
     // START views in bottom sheet
     private View bsbShadow;
@@ -338,6 +338,12 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         }
     };
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -356,7 +362,6 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         ivSwipeLeft = view.findViewById(R.id.iv_swipe_left);
         ivSwipeRight = view.findViewById(R.id.iv_swipe_right);
         tvSwipeHint = view.findViewById(R.id.tv_swipe_hint);
-        edtMemo = view.findViewById(R.id.edt_memo2);
         foreground = view.findViewById(R.id.foreground);
         bottomWrapper = view.findViewById(R.id.bottom_wrapper);
         bottomInputWrapper = view.findViewById(R.id.rl_bottom_input_wrapper);
@@ -364,7 +369,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         bsbShadow = view.findViewById(R.id.bottom_sheet_shadow);
         mDetector = new GestureDetectorCompat(getActivity(), mFabGestureListener);
         clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
-        viewPagerInput = (ViewPager) view.findViewById(R.id.viewpager_input);
+        viewPagerInput = view.findViewById(R.id.viewpager_input);
         setupView();
         if (memoAPI == null) {
             memoAPI = MemoService.getMemoAPI();
@@ -396,10 +401,8 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         }
         if (fabPosition != 0) {
             outState.putInt("fab_position", fabPosition);
-            outState.putString("edit_content", edtMemo.getText().toString() + "");
-            outState.putInt("edit_content_selection_start", edtMemo.getSelectionStart());
-            outState.putInt("edit_content_selection_end", edtMemo.getSelectionEnd());
         }
+        outState.putInt("viewpager_position", viewPagerInput.getCurrentItem());
     }
 
     @Override
@@ -417,11 +420,8 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
             int fabRestoredPosition = savedInstanceState.getInt("fab_position", 0);
             if (fabRestoredPosition != 0) {
                 swipeTo(fabRestoredPosition);
-                edtMemo.setText(savedInstanceState.getString("edit_content", ""));
-                int startSelection = savedInstanceState.getInt("edit_content_selection_start", 0);
-                int endSelection = savedInstanceState.getInt("edit_content_selection_end", 0);
-                edtMemo.setSelection(startSelection, endSelection);
             }
+            viewPagerInput.setCurrentItem(savedInstanceState.getInt("viewpager_position", 0));
         }
     }
 
@@ -429,6 +429,12 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         ((MainActivity) getActivity()).setBackPressListener(mBackPressListener);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("zjn", "onResume: FragmentPushPull");
     }
 
     @Override
@@ -478,6 +484,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
             int foregroundVisibility;
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 mAdapter.enterQueryMode();
                 bottomInputWrapper.setVisibility(View.GONE);
                 foregroundVisibility = foreground.getVisibility();
@@ -525,11 +532,11 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
 
             if ("align_center".equals(align)) {
                 if (fabPosition == -1)
-                    edtMemo.setGravity(Gravity.CENTER);
+                    fragmentInput.setEdtGravity(Gravity.CENTER);
                 tvBsbMemoContent.setGravity(Gravity.CENTER);
             } else if ("align_left".equals(align)) {
                 if (fabPosition == -1)
-                    edtMemo.setGravity(Gravity.START);
+                    fragmentInput.setEdtGravity(Gravity.START);
                 tvBsbMemoContent.setGravity(Gravity.START);
 
             }
@@ -570,6 +577,8 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         }
     }
 
+    private FragmentInput fragmentInput;
+
     private void setupView() {
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         mAdapter = new PushPullAdapter(getActivity(), itemInteractionCallback);
@@ -587,13 +596,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
             }
         });
 
-
-        List<Fragment> fragments = new Vector<Fragment>();
-        fragments.add(new FragmentInput());
-        fragments.add(new FragmentPushConfig());
-        PagerAdapter pagerAdapter = new InputPagerAdapter(getChildFragmentManager(), fragments);
-        viewPagerInput.setAdapter(pagerAdapter);
-
+        setupNestedViewpager();
         bottomSheetBehavior = BottomSheetBehavior.from(bottomLayout);
         bottomSheetBehavior.setBottomSheetCallback(bottomSheetCallback);
         tvBsbMemoId = bottomLayout.findViewById(R.id.bsb_memo_id);
@@ -647,12 +650,36 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         fabSwipe.setOnClickListener(mClickListener);
     }
 
+    private void setupNestedViewpager() {
+        List<Fragment> fragments = new Vector<Fragment>();
+        if (fragmentInput == null)
+            fragmentInput = new FragmentInput();
+        fragments.add(fragmentInput);
+        fragments.add(new FragmentPushConfig());
+        pagerAdapter = new InputPagerAdapter(getChildFragmentManager(), fragments);
+        viewPagerInput.setAdapter(pagerAdapter);
+        viewPagerInput.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                fragmentInput.setPushNoticeVisibility();
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+    }
+
+    private PagerAdapter pagerAdapter;
     private void swipeTo(int i) {
         fabPosition = i;
         if (i == 0) {
-            edtMemo.setVisibility(View.GONE);
-            edtMemo.setText("");
-            edtMemo.clearComposingText();
+            fragmentInput.clearTextView();
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -672,41 +699,20 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
             swipeDirectShown(false);
             bottomHeader.setVisibility(View.VISIBLE);
             reversed = sharedPref.getBoolean(PREF_KEY_REVERSE, false);
+            viewPagerInput.setCurrentItem(0);
             if ((i == 1) != reversed) {
                 tvSwipeHint.setText(getString(R.string.input_area_create_a_pull));
-                edtMemo.setHint(getString(R.string.input_area_hint_pull));
-                edtMemo.setMaxEms(10);
-                InputFilter[] filters = new InputFilter[1];
-                filters[0] = new InputFilter.LengthFilter(10);
-                edtMemo.setFilters(filters);
-                edtMemo.setSingleLine(true);
-                edtMemo.setGravity(Gravity.CENTER);
+                fragmentInput.setupPull();
             } else {
                 tvSwipeHint.setText(getString(R.string.input_area_create_a_push));
-                edtMemo.setHint(getString(R.string.input_area_hint_push));
-                edtMemo.setSingleLine(false);
-                edtMemo.setMaxEms(Integer.MAX_VALUE);
-                String align = sharedPref.getString(PREF_KEY_ALIGN, "align_center");
-                edtMemo.setFilters(new InputFilter[0]);
-                if ("align_center".equals(align)) {
-                    edtMemo.setGravity(Gravity.CENTER);
-                } else if ("align_left".equals(align)) {
-                    edtMemo.setGravity(Gravity.START);
-                }
+                fragmentInput.setupPush();
             }
             fabAnim(R.drawable.anim_swipe_to_add, R.drawable.ic_add);
-            edtMemo.setVisibility(View.VISIBLE);
+
             foreground.setVisibility(View.VISIBLE);
             foreground.setAlpha(0);
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    edtMemo.requestFocus();
-                    imm.showSoftInput(edtMemo, InputMethodManager.SHOW_IMPLICIT);
-                }
-            }, 500);
-            ColorDrawable drawable = new ColorDrawable();
-            drawable.setColor(0x33000000);
+            fragmentInput.setupInput();
+
         }
         int width = getActivity().getWindowManager().getDefaultDisplay().getWidth();
         swipeTransDistanceX = width / 3 * fabPosition;
@@ -731,6 +737,9 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         if (fabPosition == 0) {
             animatorHint.setInterpolator(new DecelerateInterpolator());
         }
+        if (fabPosition != 0) {
+            bottomWrapper.setVisibility(View.VISIBLE);
+        }
         objectAnimatorsArray.add(animatorHint);
         ObjectAnimator animatorCover = ObjectAnimator.ofFloat(foreground, "alpha", from, to);
         animatorCover.setInterpolator(new AccelerateInterpolator());
@@ -740,10 +749,34 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         animSet.playTogether(objectAnimators);
         animSet.setDuration(500);
         animSet.start();
+        animSet.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                if (fabPosition == 0) {
+                    bottomWrapper.setVisibility(View.GONE);
+                }
+
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
     }
 
     private void pushMemo() {
-        String memoContent = edtMemo.getText().toString();
+        String memoContent = fragmentInput.getInput();
         if (TextUtils.isEmpty(memoContent)) {
             ToastUtils.showToast(getActivity(), getString(R.string.toast_input_correct_memo));
         } else {
@@ -800,7 +833,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
     }
 
     private void pullMemo() {
-        String memoId = edtMemo.getText().toString().trim();
+        String memoId = fragmentInput.getInput().trim();
         if (TextUtils.isEmpty(memoId)) {
             ToastUtils.showToast(getActivity(), getString(R.string.toast_input_correct_id));
         } else {
@@ -864,9 +897,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
                 animSet.playTogether(objectAnimators);
                 animSet.setDuration(500);
                 animSet.start();
-                edtMemo.setVisibility(View.GONE);
-                edtMemo.setText("");
-                edtMemo.clearComposingText();
+                fragmentInput.clearTextView();
                 View view = getActivity().getCurrentFocus();
                 if (view == null && getView() != null) {
                     view = getView().getRootView();
@@ -894,6 +925,30 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
                 animSet.playTogether(objectAnimators);
                 animSet.setDuration(500);
                 animSet.start();
+                animSet.addListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        if (fabPosition == 0) {
+                            bottomWrapper.setVisibility(View.GONE);
+                        }
+
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                });
                 fabAnim(R.drawable.anim_check_to_swipe, R.drawable.ic_swipe);
                 fabSwipe.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorAccent)));
                 fabSwipe.setClickable(true);
@@ -966,8 +1021,8 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
     public void goPushState(String s) {
         Log.d(TAG, "goPushState: " + s);
         swipeTo(-1);
-        if (edtMemo != null) {
-            edtMemo.setText(s);
+        if (fragmentInput != null) {
+            fragmentInput.setEdtText(s);
         }
     }
 

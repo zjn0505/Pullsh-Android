@@ -34,7 +34,6 @@ public class InputPagerAdapter extends FragmentPagerAdapter {
     @Override
     public void setPrimaryItem(ViewGroup container, int position, Object object) {
         super.setPrimaryItem(container, position, object);
-        super.setPrimaryItem(container, position, object);
         if (position != mCurrentPosition) {
             Fragment fragment = (Fragment) object;
             InputViewPager pager = (InputViewPager) container;

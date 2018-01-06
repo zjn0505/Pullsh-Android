@@ -44,6 +44,8 @@
     rx.internal.util.atomic.LinkedQueueNode consumerNode;
 }
 
+-keep class android.support.v7.widget.SearchView { *; }
+
 # Gson
 -keep class com.google.gson.stream.** { *; }
 -keepattributes EnclosingMethod

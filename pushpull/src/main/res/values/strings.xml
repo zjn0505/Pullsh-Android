@@ -66,6 +66,7 @@
     <string name="toast_memo_id_copied">id copied to clipboard</string>
     <string name="toast_memo_link_copied">Share link copied to clipboard</string>
     <string name="toast_item_already_in_list">item already in list</string>
+    <string name="toast_push_config_notice">Memo access control enabled.\nSwipe left to change push config.</string>
 
     <string name="search_hint">Search id, content or note</string>
 </resources>

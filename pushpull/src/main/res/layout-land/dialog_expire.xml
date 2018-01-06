@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/background">
+    android:background="?android:attr/colorBackground">
 
     <TextView
         android:layout_width="wrap_content"
@@ -15,62 +15,72 @@
         android:textColor="?android:attr/textColorPrimary"
         android:textSize="20sp" />
 
-    <TextView
-        android:id="@+id/tv_expire"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="5dp"
-        android:text="1"
-        android:textColor="?android:attr/textColorPrimary"
-        android:textSize="25sp"
-        tools:text="20"
-        tools:ignore="HardcodedText" />
-
-    <RadioGroup
-        android:id="@+id/rg_expire"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
         android:orientation="horizontal"
-        android:weightSum="4">
+        android:gravity="center_horizontal">
 
-        <RadioButton
-            android:id="@+id/rb_min"
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/tv_expire"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/dialog_push_memo_expire_min" />
-
-        <RadioButton
-            android:id="@+id/rb_hr"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/dialog_push_memo_expire_hr" />
-
-        <RadioButton
-            android:id="@+id/rb_day"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/dialog_push_memo_expire_day" />
-
-        <RadioButton
-            android:id="@+id/rb_infi"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="∞"
+            android:layout_gravity="center"
+            android:layout_margin="5dp"
+            android:text="1"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textSize="25sp"
+            tools:text="20"
             tools:ignore="HardcodedText" />
-    </RadioGroup>
+
+        <RadioGroup
+            android:id="@+id/rg_expire"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:checkedButton="@+id/rb_day"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:orientation="horizontal"
+            android:weightSum="4">
+
+            <RadioButton
+                android:id="@+id/rb_min"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/dialog_push_memo_expire_min" />
+
+            <RadioButton
+                android:id="@+id/rb_hr"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/dialog_push_memo_expire_hr" />
+
+            <RadioButton
+                android:id="@+id/rb_day"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/dialog_push_memo_expire_day" />
+
+            <RadioButton
+                android:id="@+id/rb_infi"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="∞"
+                tools:ignore="HardcodedText" />
+        </RadioGroup>
+
+    </LinearLayout>
 
     <SeekBar
         android:id="@+id/sb_period"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:maxWidth="20dp"
         android:layout_margin="10dp"/>
 
     <LinearLayout
@@ -83,7 +93,8 @@
             android:id="@+id/cb_allowance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"/>
+            android:layout_gravity="center_vertical"
+            android:checked="true"/>
 
         <TextView
             android:id="@+id/tv_allowance_pre"
