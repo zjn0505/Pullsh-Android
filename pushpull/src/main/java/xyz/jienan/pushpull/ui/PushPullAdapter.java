@@ -88,7 +88,7 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
         cache = mList.get(position);
         mList.remove(position);
         notifyItemRemoved(position);
-        saveToPreference();
+        removeFromPreference(cache.getId());
         mCallback.onDismiss(position);
     }
 
@@ -107,6 +107,7 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
             MemoEntity entity = (MemoEntity) iterator.next();
             if (entity.hasExpired && !entity.createdFromPush) {
                 iterator.remove();
+                removeFromPreference(entity.getId());
                 i++;
             }
         }
@@ -117,7 +118,6 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
         }
 
         notifyDataSetChanged();
-        saveToPreference();
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -126,6 +126,7 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
         final TextView tvMsg;
         final ImageView ivAction;
         final ImageView ivNotice;
+        final TextView tvNote;
         final View mView;
 
         public ViewHolder(View itemView) {
@@ -135,6 +136,7 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
             tvMsg = itemView.findViewById(R.id.tv_push_content);
             ivAction = itemView.findViewById(R.id.iv_action);
             ivNotice = itemView.findViewById(R.id.iv_notice);
+            tvNote = itemView.findViewById(R.id.tv_memo_note);
         }
     }
 
@@ -153,7 +155,8 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        final MemoEntity memo = inQueryMode ? queryList.get(position) : mList.get(position);
+        final MemoEntity memo =
+                inQueryMode ? queryList.get(position) : realm.where(MemoEntity.class).equalTo("_id", mList.get(position).getId()).findFirst();
         holder.tvId.setText(memo.getId());
         holder.tvId.setTypeface(fontMonaco, Typeface.BOLD);
         holder.tvMsg.setText(memo.getMsg());
@@ -190,7 +193,12 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
         } else {
             holder.ivNotice.setVisibility(View.GONE);
         }
-
+        String note = memo.getNote();
+        if (!TextUtils.isEmpty(note)) {
+            holder.tvNote.setText(String.format("- %s", note));
+        } else {
+            holder.tvNote.setText("");
+        }
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -209,7 +217,6 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
                 }
             }
         });
-        Log.e("Memo", memo.getId() + " " + memo.index.get());
     }
 
     @Override
@@ -271,6 +278,22 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
                 }
                 realmList.addAll(mList);
                 realm.insertOrUpdate(realmList);
+            }
+        });
+    }
+
+    private void removeFromPreference(final String memoId) {
+        if (realm == null) {
+            realm = Realm.getDefaultInstance();
+        }
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                MemoEntity result = realm.where(MemoEntity.class).equalTo("_id", memoId).findFirst();
+                if (result != null) {
+                    result.deleteFromRealm();
+                }
+                saveToPreference();
             }
         });
     }

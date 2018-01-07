@@ -26,6 +26,10 @@ import io.reactivex.functions.Consumer;
 import xyz.jienan.pushpull.MemoApplication;
 import xyz.jienan.pushpull.R;
 
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_PUSH_ACCESS_COUNT;
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_PUSH_EXPIRED_TIME;
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_PUSH_EXPIRED_TYPE;
+
 /**
  * Created by Jienan on 2018/1/5.
  */
@@ -49,7 +53,7 @@ public class FragmentPushConfig extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.dialog_expire, container, false);
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         editor = sharedPreferences.edit();
 
         rgExpired = view.findViewById(R.id.rg_expire);
@@ -68,24 +72,24 @@ public class FragmentPushConfig extends Fragment {
                         sbPeriod.setMax(59);
                         tvExpire.setEnabled(true);
                         sbPeriod.setEnabled(true);
-                        editor.putInt("EXPIRED_TYPE", 0);
+                        editor.putInt(PREF_KEY_PUSH_EXPIRED_TYPE, 0);
                         break;
                     case R.id.rb_hr:
                         sbPeriod.setMax(47);
                         tvExpire.setEnabled(true);
                         sbPeriod.setEnabled(true);
-                        editor.putInt("EXPIRED_TYPE", 1);
+                        editor.putInt(PREF_KEY_PUSH_EXPIRED_TYPE, 1);
                         break;
                     case R.id.rb_day:
                         sbPeriod.setMax(29);
                         tvExpire.setEnabled(true);
                         sbPeriod.setEnabled(true);
-                        editor.putInt("EXPIRED_TYPE", 2);
+                        editor.putInt(PREF_KEY_PUSH_EXPIRED_TYPE, 2);
                         break;
                     case R.id.rb_infi:
                         tvExpire.setEnabled(false);
                         sbPeriod.setEnabled(false);
-                        editor.putInt("EXPIRED_TYPE", 3);
+                        editor.putInt(PREF_KEY_PUSH_EXPIRED_TYPE, 3);
                         break;
                 }
                 editor.apply();
@@ -105,7 +109,7 @@ public class FragmentPushConfig extends Fragment {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                editor.putInt("EXPIRED_TIME", seekBar.getProgress()+1);
+                editor.putInt(PREF_KEY_PUSH_EXPIRED_TIME, seekBar.getProgress()+1);
                 editor.apply();
             }
         });
@@ -113,23 +117,18 @@ public class FragmentPushConfig extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 int allowance;
-                edtAllowance.setEnabled(isChecked);
                 if (isChecked) {
-                    tvAllowancePre.setEnabled(true);
-                    edtAllowance.setEnabled(true);
-                    tvAllowanceSuf.setEnabled(true);
+                    changeAllowance(true);
                     try {
                         allowance = Integer.valueOf(edtAllowance.getText().toString());
                     } catch (NumberFormatException e) {
                         allowance = 0;
                     }
                 } else {
-                    tvAllowancePre.setEnabled(false);
-                    edtAllowance.setEnabled(false);
-                    tvAllowanceSuf.setEnabled(false);
+                    changeAllowance(false);
                     allowance = 0;
                 }
-                editor.putInt("ACCESS_COUNT", allowance);
+                editor.putInt(PREF_KEY_PUSH_ACCESS_COUNT, allowance);
                 editor.apply();
             }
         });
@@ -152,7 +151,10 @@ public class FragmentPushConfig extends Fragment {
                 } catch (NumberFormatException e) {
                     allowance = 0;
                 }
-                editor.putInt("ACCESS_COUNT", allowance);
+                if (!cbAllowance.isChecked()) {
+                    allowance = 0;
+                }
+                editor.putInt(PREF_KEY_PUSH_ACCESS_COUNT, allowance);
                 editor.apply();
 
             }
@@ -177,9 +179,9 @@ public class FragmentPushConfig extends Fragment {
 
     private void updateUI() {
         if (sharedPreferences != null) {
-            int time = sharedPreferences.getInt("EXPIRED_TIME", 1);
-            int type = sharedPreferences.getInt("EXPIRED_TYPE", 3);
-            int count = sharedPreferences.getInt("ACCESS_COUNT", 0);
+            int time = sharedPreferences.getInt(PREF_KEY_PUSH_EXPIRED_TIME, 1);
+            int type = sharedPreferences.getInt(PREF_KEY_PUSH_EXPIRED_TYPE, 3);
+            int count = sharedPreferences.getInt(PREF_KEY_PUSH_ACCESS_COUNT, 0);
 
             switch (type) {
                 case 0:
@@ -201,21 +203,12 @@ public class FragmentPushConfig extends Fragment {
             }
             sbPeriod.setProgress(time-1);
             if (count == 0) {
-                cbAllowance.setChecked(false);
-                tvAllowancePre.setEnabled(false);
-                edtAllowance.setEnabled(false);
-                tvAllowanceSuf.setEnabled(false);
+                changeAllowance(false);
                 if (savedStateCbAllowance) {
-                    cbAllowance.setChecked(true);
-                    tvAllowancePre.setEnabled(true);
-                    edtAllowance.setEnabled(true);
-                    tvAllowanceSuf.setEnabled(true);
+                    changeAllowance(true);
                 }
             } else {
-                cbAllowance.setChecked(true);
-                tvAllowancePre.setEnabled(true);
-                edtAllowance.setEnabled(true);
-                tvAllowanceSuf.setEnabled(true);
+                changeAllowance(true);
             }
             edtAllowance.setText(String.valueOf(count));
         }
@@ -234,5 +227,13 @@ public class FragmentPushConfig extends Fragment {
         if (savedInstanceState != null) {
             savedStateCbAllowance = savedInstanceState.getBoolean("check_allowance", false);
         }
+        setRetainInstance(true);
+    }
+
+    private void changeAllowance(boolean enabled) {
+        cbAllowance.setChecked(enabled);
+        tvAllowancePre.setEnabled(enabled);
+        edtAllowance.setEnabled(enabled);
+        tvAllowanceSuf.setEnabled(enabled);
     }
 }

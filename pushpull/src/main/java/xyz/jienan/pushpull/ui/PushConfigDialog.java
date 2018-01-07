@@ -22,6 +22,10 @@ import android.widget.TextView;
 import xyz.jienan.pushpull.MemoApplication;
 import xyz.jienan.pushpull.R;
 
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_PUSH_ACCESS_COUNT;
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_PUSH_EXPIRED_TIME;
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_PUSH_EXPIRED_TYPE;
+
 /**
  * Created by Jienan on 2017/11/7.
  */
@@ -137,7 +141,7 @@ public class PushConfigDialog extends DialogFragment {
                         } else  {
                             allowance = 0;
                         }
-                        editor.putInt("ACCESS_COUNT", allowance);
+                        editor.putInt(PREF_KEY_PUSH_ACCESS_COUNT, allowance);
                         editor.commit();
                         ((MemoApplication)getActivity().getApplication()).bus().send(new Object());
                     }
@@ -149,9 +153,9 @@ public class PushConfigDialog extends DialogFragment {
     public void onStart() {
         super.onStart();
         if (sharedPreferences != null) {
-            int time = sharedPreferences.getInt("EXPIRED_TIME", 1);
-            int type = sharedPreferences.getInt("EXPIRED_TYPE", 3);
-            int count = sharedPreferences.getInt("ACCESS_COUNT", 0);
+            int time = sharedPreferences.getInt(PREF_KEY_PUSH_EXPIRED_TIME, 1);
+            int type = sharedPreferences.getInt(PREF_KEY_PUSH_EXPIRED_TYPE, 3);
+            int count = sharedPreferences.getInt(PREF_KEY_PUSH_ACCESS_COUNT, 0);
 
             switch (type) {
                 case 0:

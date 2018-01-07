@@ -5,4 +5,7 @@
     <string name="path_add">M6,12 l6,0 l0,6 M12,6 l0,6 l6,0</string>
     <string name="path_swipe_left">M8,16.6 l-5,-5 l5,-5</string>
     <string name="path_swipe_right">M16, 16.6 l5,-5 l-5,-5</string>
+    <string name="path_edit_done">M 11 17.8 L 9 20 L 5 16 L 2.5 13.4 L 4.8 11.2 L 4.8 11.2 L 9 15.3 M 9 15.3 L 11 17.8 L 21.2 7 L 21.2 7 C 21.2 7 21.2 7 21.2 7 L 18.9 4.8 C 18.9 4.8 18.9 4.8 18.9 4.8 L 9 15.3</string>
+    <string name="path_edit">M 3 17.25 L 14.06 6.19 L 17.81 9.94 L 6.75 21 L 3 21 L 3 17.25 L 3 17.25 M 15.13 5.12 L 18.88 8.87 L 20.71 7.04 L 20.71 7.04 C 21.1 6.65 21.1 6.02 20.71 5.63 L 18.37 3.29 C 17.98 2.9 17.35 2.9 16.96 3.29 L 15.13 5.12</string>
+
 </resources>

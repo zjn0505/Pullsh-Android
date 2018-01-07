@@ -171,15 +171,4 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d("zjn", "onPause: activity");
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d("zjn", "onResume: activity");
-    }
 }

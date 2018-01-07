@@ -17,11 +17,11 @@
             android:id="@+id/tv_push_short_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:letterSpacing="0.1"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:letterSpacing="0.1"
-            tools:text="SID1THUD"
-            tools:targetApi="lollipop" />
+            tools:targetApi="lollipop"
+            tools:text="SID1THUD" />
 
         <ImageView
             android:id="@+id/iv_action"
@@ -31,17 +31,37 @@
             android:layout_centerVertical="true"
             android:layout_margin="10dp"
             android:contentDescription="@string/copy"
-            app:srcCompat="@drawable/ic_item_action" />
+            app:srcCompat="@drawable/ic_item_action"
+            android:layout_alignParentEnd="true" />
+
+        <TextView
+            android:id="@+id/tv_memo_note"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/tv_push_short_id"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_toEndOf="@id/tv_push_short_id"
+            android:layout_toLeftOf="@id/iv_action"
+            android:layout_toRightOf="@id/tv_push_short_id"
+            android:layout_toStartOf="@id/iv_action"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            tools:text="- this is the memo note"
+            android:layout_alignBottom="@id/tv_push_short_id"
+            android:gravity="center_vertical"/>
 
         <ImageView
             android:id="@+id/iv_notice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_notice_yellow"
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@id/iv_action"
             android:layout_toStartOf="@id/iv_action"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            app:srcCompat="@drawable/ic_notice_yellow" />
 
         <TextView
             android:id="@+id/tv_push_content"

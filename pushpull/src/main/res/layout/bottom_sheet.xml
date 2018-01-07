@@ -95,21 +95,81 @@
     </LinearLayout>
 
     <android.support.v4.widget.NestedScrollView
+        android:id="@+id/bsb_scroll"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:scrollbars="vertical">
-        <TextView
-            android:id="@+id/tv_memo"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginTop="10dp"
-            android:autoLink="web"
-            android:paddingBottom="40dp"
-            android:textSize="18sp"
-            tools:text="This a sample of your memo content, use action button to create your own" />
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_memo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:text="This a sample of your memo content, use action button to create your own"
+                style="@style/tv_bsb"/>
+
+            <Button
+                android:id="@+id/btn_add_note"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/btn_add_note"
+                tools:targetApi="lollipop"
+                style="@style/btn_add_memo" />
+
+            <RelativeLayout
+                android:id="@+id/rl_note_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:visibility="gone">
+                <View
+                    android:id="@+id/note_divider"
+                    android:layout_height="1dp"
+                    android:layout_width="match_parent"
+                    android:background="?attr/colorPrimary"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/note_header"
+                    android:layout_below="@id/note_divider"
+                    android:layout_marginTop="5dp"
+                    android:textSize="20sp"/>
+
+                <ImageView
+                    android:id="@+id/iv_note_edit_done"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/note_divider"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    app:srcCompat="@drawable/ic_edit_done"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginEnd="20dp"/>
+
+
+                <EditText
+                    android:id="@+id/edt_note"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="40dp"
+                    tools:text="This is a sample note for this memo"
+                    style="@style/tv_bsb"
+                    android:hint=""
+                    android:inputType="none"/>
+
+            </RelativeLayout>
+
+
+        </LinearLayout>
 
     </android.support.v4.widget.NestedScrollView>
 

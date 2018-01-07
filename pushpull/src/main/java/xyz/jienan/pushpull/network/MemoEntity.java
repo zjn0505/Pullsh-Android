@@ -32,6 +32,8 @@ public class MemoEntity extends RealmObject {
     public boolean createdFromPush = false;
     public final MutableRealmInteger index = MutableRealmInteger.valueOf(0);
 
+    private String note;
+
     public String getId() {
         return _id;
     }
@@ -70,6 +72,15 @@ public class MemoEntity extends RealmObject {
 
     public void setExpiredOn(String expired_on) {
         this.expired_on = expired_on;
+    }
+
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 
     @Override

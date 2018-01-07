@@ -13,7 +13,6 @@ import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Typeface;
 import android.graphics.drawable.Animatable;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,14 +28,15 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.text.InputFilter;
 import android.text.TextUtils;
+import android.text.method.KeyListener;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
@@ -52,6 +52,7 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AnticipateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -59,7 +60,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.github.jorgecastilloprz.FABProgressCircle;
 import com.google.gson.Gson;
 
@@ -79,13 +79,9 @@ import java.util.Vector;
 import io.realm.Case;
 import io.realm.Realm;
 import io.realm.RealmResults;
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import xyz.jienan.pushpull.BuildConfig;
 import xyz.jienan.pushpull.DateUtils;
 import xyz.jienan.pushpull.R;
 import xyz.jienan.pushpull.ToastUtils;
@@ -141,6 +137,12 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
     private TextView tvBsbMemoAccess;
     private TextView tvBsbMemoContent;
     private TextView tvBsbIsAuthor;
+    private Button btnBsbAddMemo;
+    private ImageView ivBsbNoteControl;
+    private EditText edtBsbMemoNote;
+    private RelativeLayout rlBsbNoteContainer;
+    private NestedScrollView bsbScrollView;
+    private KeyListener mKeyListener;
     // END views in bottom sheet
 
     private int swipeTransDistanceX = 0;
@@ -167,6 +169,9 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
                             break;
                         case BottomSheetBehavior.STATE_DRAGGING:
                             foreground.setVisibility(View.VISIBLE);
+                            if (edtBsbMemoNote.hasFocus()) {
+                                imm.hideSoftInputFromWindow(edtBsbMemoNote.getWindowToken(), 0);
+                            }
                             break;
                         case BottomSheetBehavior.STATE_EXPANDED:
                             foreground.setVisibility(View.VISIBLE);
@@ -210,6 +215,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         } else if ("align_left".equals(align)) {
             tvBsbMemoContent.setGravity(Gravity.START);
         }
+        bsbScrollView.scrollTo(0, 0);
         tvBsbMemoId.setTypeface(fontMonaco,Typeface.BOLD);
         tvBsbMemoId.setText(entity.getId());
         ivBsbIdCopy.setOnClickListener(new View.OnClickListener() {
@@ -258,7 +264,20 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
                 ToastUtils.showToast(getActivity(), getString(R.string.toast_memo_content_copied));
             }
         });
-        tvBsbMemoContent.setTag(entity);
+        tvBsbMemoContent.setTag(entity.getId());
+        String note = entity.getNote();
+        if (TextUtils.isEmpty(note)) {
+            btnBsbAddMemo.setVisibility(View.VISIBLE);
+            rlBsbNoteContainer.setVisibility(View.GONE);
+        } else {
+            btnBsbAddMemo.setVisibility(View.GONE);
+            rlBsbNoteContainer.setVisibility(View.VISIBLE);
+            ivBsbNoteControl.requestFocus();
+            edtBsbMemoNote.setText(note);
+            ivBsbNoteControl.setTag(true);
+            ivBsbNoteControl.setImageResource(R.drawable.ic_edit);
+            edtBsbMemoNote.setKeyListener(null);
+        }
     }
 
 
@@ -393,16 +412,24 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
-            MemoEntity entity = (MemoEntity)tvBsbMemoContent.getTag();
-            if (entity != null) {
-                outState.putString("memo_id", entity.getId());
-                tvBsbMemoContent.setTag(null);
+            String memoId = (String)tvBsbMemoContent.getTag();
+            if (!TextUtils.isEmpty(memoId)) {
+                outState.putString("memo_id", memoId);
             }
         }
         if (fabPosition != 0) {
             outState.putInt("fab_position", fabPosition);
         }
-        outState.putInt("viewpager_position", viewPagerInput.getCurrentItem());
+        if (viewPagerInput != null) {
+            outState.putInt("viewpager_position", viewPagerInput.getCurrentItem());
+        }
+        if (ivBsbNoteControl != null && ivBsbNoteControl.getTag() != null) {
+            boolean isEditModeOnClick = (Boolean) ivBsbNoteControl.getTag();
+            if (!isEditModeOnClick) {
+                outState.putBoolean("memo_note_in_edited", true);
+                outState.putString("memo_note_editable", edtBsbMemoNote.getText().toString());
+            }
+        }
     }
 
     @Override
@@ -422,6 +449,19 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
                 swipeTo(fabRestoredPosition);
             }
             viewPagerInput.setCurrentItem(savedInstanceState.getInt("viewpager_position", 0));
+            if (savedInstanceState.getBoolean("memo_note_in_edited", false)) {
+                String memoNoteEditable = savedInstanceState.getString("memo_note_editable");
+                edtBsbMemoNote.setText(memoNoteEditable);
+                btnBsbAddMemo.setVisibility(View.INVISIBLE);
+                rlBsbNoteContainer.setVisibility(View.VISIBLE);
+                ivBsbNoteControl.setImageResource(R.drawable.ic_edit_done);
+                ivBsbNoteControl.setTag(false);
+                if (mKeyListener != null) {
+                    edtBsbMemoNote.setKeyListener(mKeyListener);
+                }
+                edtBsbMemoNote.requestFocus();
+            }
+
         }
     }
 
@@ -429,12 +469,6 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         ((MainActivity) getActivity()).setBackPressListener(mBackPressListener);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.d("zjn", "onResume: FragmentPushPull");
     }
 
     @Override
@@ -458,7 +492,8 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
                 }
                 RealmResults<MemoEntity> results = realm.where(MemoEntity.class)
                         .contains("msg", newText, Case.INSENSITIVE)
-                        .or().contains("_id", newText, Case.INSENSITIVE).findAll()
+                        .or().contains("_id", newText, Case.INSENSITIVE)
+                        .or().contains("note", newText, Case.INSENSITIVE).findAll()
                         .sort("index");
                 mAdapter.showQueryResult(results);
                 Log.d(TAG, "search " + newText + " with result length " + results.size());
@@ -484,7 +519,11 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
             int foregroundVisibility;
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
-                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                if (bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_COLLAPSED) {
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                    bsbShadow.setVisibility(View.GONE);
+                    foreground.setVisibility(View.GONE);
+                }
                 mAdapter.enterQueryMode();
                 bottomInputWrapper.setVisibility(View.GONE);
                 foregroundVisibility = foreground.getVisibility();
@@ -498,6 +537,9 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
                 mAdapter.leaveQueryMode();
                 bottomInputWrapper.setVisibility(View.VISIBLE);
                 foreground.setVisibility(foregroundVisibility);
+                if (foregroundVisibility == View.VISIBLE) {
+                    foreground.setAlpha(1);
+                }
                 return true;
             }
         });
@@ -606,6 +648,83 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         tvBsbMemoAccess = bottomLayout.findViewById(R.id.bsb_memo_allowance);
         tvBsbMemoContent = bottomLayout.findViewById(R.id.tv_memo);
         tvBsbIsAuthor = bottomLayout.findViewById(R.id.bsb_memo_create_by_push);
+        btnBsbAddMemo = bottomLayout.findViewById(R.id.btn_add_note);
+        rlBsbNoteContainer = bottomLayout.findViewById(R.id.rl_note_container);
+        edtBsbMemoNote = bottomLayout.findViewById(R.id.edt_note);
+        mKeyListener = edtBsbMemoNote.getKeyListener();
+        ivBsbNoteControl = bottomLayout.findViewById(R.id.iv_note_edit_done);
+        bsbScrollView = bottomLayout.findViewById(R.id.bsb_scroll);
+        ivBsbNoteControl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean isEditModeOnClick = (Boolean) ivBsbNoteControl.getTag();
+                if (!isEditModeOnClick) {
+                    ivBsbNoteControl.setTag(true);
+                    noteControlAnim(R.drawable.anim_done_to_edit, R.drawable.ic_edit);
+                    String memoId = (String)tvBsbMemoContent.getTag();
+                    if (!TextUtils.isEmpty(memoId)) {
+                        if (realm == null) {
+                            realm = Realm.getDefaultInstance();
+                        }
+                        final MemoEntity entity = realm.where(MemoEntity.class).equalTo("_id", memoId).findFirst();
+                        realm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                entity.setNote(edtBsbMemoNote.getText().toString());
+                                realm.copyToRealmOrUpdate(entity);
+                            }
+                        });
+                        if (TextUtils.isEmpty(edtBsbMemoNote.getText().toString())) {
+                            rlBsbNoteContainer.setVisibility(View.GONE);
+                            btnBsbAddMemo.setVisibility(View.VISIBLE);
+                        }
+                    }
+                    edtBsbMemoNote.setKeyListener(null);
+                    ivBsbNoteControl.requestFocus();
+                    if (v != null)
+                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    mAdapter.expireItems();
+                } else {
+                    ivBsbNoteControl.setTag(false);
+                    noteControlAnim(R.drawable.anim_edit_to_done, R.drawable.ic_edit_done);
+                    edtBsbMemoNote.setKeyListener(mKeyListener);
+                    edtBsbMemoNote.requestFocus();
+                    edtBsbMemoNote.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            imm.showSoftInput(edtBsbMemoNote, InputMethodManager.SHOW_IMPLICIT);
+                        }
+                    });
+                }
+            }
+        });
+        btnBsbAddMemo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                btnBsbAddMemo.setVisibility(View.GONE);
+                rlBsbNoteContainer.setVisibility(View.VISIBLE);
+                edtBsbMemoNote.requestFocus();
+                edtBsbMemoNote.setFocusableInTouchMode(true);
+                edtBsbMemoNote.clearComposingText();
+                edtBsbMemoNote.setText("");
+                edtBsbMemoNote.setKeyListener(mKeyListener);
+                ivBsbNoteControl.setTag(false);
+                ivBsbNoteControl.setImageResource(R.drawable.ic_edit_done);
+            }
+        });
+        edtBsbMemoNote.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    edtBsbMemoNote.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            imm.showSoftInput(edtBsbMemoNote, InputMethodManager.SHOW_IMPLICIT);
+                        }
+                    });
+                }
+            }
+        });
         fabSwipe.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -759,6 +878,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
             public void onAnimationEnd(Animator animation) {
                 if (fabPosition == 0) {
                     bottomWrapper.setVisibility(View.GONE);
+                    foreground.setVisibility(View.GONE);
                 }
 
             }
@@ -932,9 +1052,10 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
                     }
 
                     @Override
-                    public void onAnimationEnd(Animator animation) {
+                  public void onAnimationEnd(Animator animation) {
                         if (fabPosition == 0) {
                             bottomWrapper.setVisibility(View.GONE);
+                            foreground.setVisibility(View.GONE);
                         }
 
                     }
@@ -967,6 +1088,18 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
             fabSwipe.setImageResource(fallbackResId);
         }
 
+    }
+
+    private void noteControlAnim(int animId, int fallbackResId) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            ivBsbNoteControl.setImageResource(animId);
+            Drawable drawable = ivBsbNoteControl.getDrawable();
+            if (drawable instanceof Animatable) {
+                ((Animatable) drawable).start();
+            }
+        } else {
+            ivBsbNoteControl.setImageResource(fallbackResId);
+        }
     }
 
     private AnimatorSet animatorSet;

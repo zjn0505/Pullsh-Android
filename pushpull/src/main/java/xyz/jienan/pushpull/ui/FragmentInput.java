@@ -25,6 +25,8 @@ import xyz.jienan.pushpull.R;
 import xyz.jienan.pushpull.ToastUtils;
 
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_ALIGN;
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_PUSH_ACCESS_COUNT;
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_PUSH_EXPIRED_TYPE;
 
 /**
  * Created by Jienan on 2018/1/5.
@@ -120,7 +122,6 @@ public class FragmentInput extends Fragment {
         if (!isAdded()) {
             return;
         }
-        Log.d("zjn", "setupPush: ");
         edtMemo.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
         edtMemo.setPadding(dp2px(20), dp2px(20), dp2px(20), dp2px(20));
         edtMemo.setHint(getString(R.string.input_area_hint_push));
@@ -170,8 +171,8 @@ public class FragmentInput extends Fragment {
             ivPushNotice.setVisibility(View.GONE);
             return;
         }
-        int type = sharedPref.getInt("EXPIRED_TYPE", 3);
-        int count = sharedPref.getInt("ACCESS_COUNT", 0);
+        int type = sharedPref.getInt(PREF_KEY_PUSH_EXPIRED_TYPE, 3);
+        int count = sharedPref.getInt(PREF_KEY_PUSH_ACCESS_COUNT, 0);
 
         if (count != 0 || type != 3) {
             ivPushNotice.setVisibility(View.VISIBLE);
