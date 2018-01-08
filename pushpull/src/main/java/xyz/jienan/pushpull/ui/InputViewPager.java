@@ -1,9 +1,11 @@
 package xyz.jienan.pushpull.ui;
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.View;
 
 /**
@@ -12,12 +14,15 @@ import android.view.View;
 
 public class InputViewPager extends ViewPager {
     private View mCurrentView;
+    private Context mContext;
 
     public InputViewPager(@NonNull Context context) {
         super(context);
+        mContext = context;
     }
     public InputViewPager(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mContext = context;
     }
 
     @Override
@@ -29,7 +34,23 @@ public class InputViewPager extends ViewPager {
         int height = 0;
         mCurrentView.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
         int h = mCurrentView.getMeasuredHeight();
+
+        DisplayMetrics metrics = mContext.getResources().getDisplayMetrics();
+        int screenHeight = metrics.heightPixels;
+        int screenWidth = metrics.widthPixels;
+
+        if (screenWidth > screenHeight) {
+            if (h > screenHeight / 2) {
+                h = screenHeight / 2;
+            }
+        } else {
+            if (h > screenHeight / 3.5) {
+                h = (int) (screenHeight / 3.5);
+            }
+        }
+
         if (h > height) height = h;
+
         heightMeasureSpec = MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY);
 
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
