@@ -9,14 +9,11 @@ import android.graphics.Typeface;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.google.gson.Gson;
 
 import java.util.Collections;
 import java.util.Iterator;

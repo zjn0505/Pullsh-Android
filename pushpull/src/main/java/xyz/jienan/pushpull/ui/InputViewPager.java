@@ -1,7 +1,6 @@
 package xyz.jienan.pushpull.ui;
 
 import android.content.Context;
-import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
