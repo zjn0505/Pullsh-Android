@@ -31,17 +31,19 @@
         android:id="@+id/rg_expire"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_marginLeft="30dp"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:orientation="horizontal"
-        android:weightSum="4">
+        android:weightSum="4"
+        android:gravity="center_vertical">
 
         <RadioButton
             android:id="@+id/rb_min"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:textSize="18sp"
             android:text="@string/dialog_push_memo_expire_min" />
 
         <RadioButton
@@ -49,6 +51,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:textSize="18sp"
             android:text="@string/dialog_push_memo_expire_hr" />
 
         <RadioButton
@@ -56,6 +59,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:textSize="18sp"
             android:text="@string/dialog_push_memo_expire_day" />
 
         <RadioButton
@@ -64,6 +68,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="∞"
+            android:textSize="25sp"
             tools:ignore="HardcodedText" />
     </RadioGroup>
 
@@ -77,6 +82,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <CheckBox
@@ -105,6 +111,7 @@
             android:text="20"
             android:textColor="?android:attr/textColorPrimary"
             android:textSize="25sp"
+            android:padding="5dp"
             tools:text="20"
             tools:ignore="HardcodedText" />
 
