@@ -155,6 +155,9 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
+        if (realm == null) {
+            realm = Realm.getDefaultInstance();
+        }
         final MemoEntity memo =
                 inQueryMode ? queryList.get(position) : realm.where(MemoEntity.class).equalTo("_id", mList.get(position).getId()).findFirst();
         holder.tvId.setText(memo.getId());
