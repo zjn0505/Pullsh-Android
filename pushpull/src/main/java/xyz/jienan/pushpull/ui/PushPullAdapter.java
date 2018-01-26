@@ -293,7 +293,13 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
                 if (result != null) {
                     result.deleteFromRealm();
                 }
-                saveToPreference();
+                RealmList<MemoEntity> realmList = new RealmList<MemoEntity>();
+                int size = mList.size();
+                for (int i = 0; i< size; i++) {
+                    mList.get(i).index.set(i);
+                }
+                realmList.addAll(mList);
+                realm.insertOrUpdate(realmList);
             }
         });
     }
