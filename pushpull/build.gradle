@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'realm-android'
+apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -77,4 +78,9 @@ dependencies {
     implementation 'com.facebook.stetho:stetho:1.5.0'
     implementation 'com.facebook.stetho:stetho-okhttp3:1.5.0'
     implementation 'io.reactivex.rxjava2:rxjava:2.1.8'
+    compile('com.crashlytics.sdk.android:crashlytics:2.7.1@aar') {
+        transitive = true
+    }
+    compile 'com.google.firebase:firebase-core:11.4.2'
 }
+apply plugin: 'com.google.gms.google-services'

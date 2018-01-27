@@ -82,17 +82,62 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
 
     @Override
     public void onItemDismiss(int position) {
-        cache = mList.get(position);
+        MemoEntity entity = mList.get(position);
+        cache = new MemoEntityCache(entity);
         mList.remove(position);
         notifyItemRemoved(position);
-        removeFromPreference(cache.getId());
+        removeFromPreference(entity.getId());
         mCallback.onDismiss(position);
     }
 
-    private MemoEntity cache;
+    private void fullClone(MemoEntity memoEntity) {
+
+    }
+
+    private MemoEntityCache cache;
+
+    private class MemoEntityCache {
+
+        String _id;
+        String msg;
+        int access_count;
+        String created_date;
+        int max_access_count;
+        String expired_on;
+        boolean hasExpired = false;
+        boolean createdFromPush = false;
+        String note;
+
+        MemoEntityCache(MemoEntity memoEntity) {
+            this._id = memoEntity.getId();
+            this.msg = memoEntity.getMsg();
+            this.access_count = memoEntity.getAccessCount();
+            this.created_date = memoEntity.getCreatedDate();
+            this.max_access_count = memoEntity.getMaxAccessCount();
+            this.expired_on = memoEntity.getExpiredOn();
+            this.hasExpired = memoEntity.hasExpired;
+            this.createdFromPush = memoEntity.createdFromPush;
+            this.note = memoEntity.getNote();
+        }
+
+        MemoEntity dump() {
+            MemoEntity entity = new MemoEntity();
+            entity.setId(_id);
+            entity.setMsg(msg);
+            entity.setAccessCount(access_count);
+            entity.setCreatedDate(created_date);
+            entity.setMaxAccessCount(max_access_count);
+            entity.setExpiredOn(expired_on);
+            entity.hasExpired = hasExpired;
+            entity.createdFromPush = createdFromPush;
+            entity.setNote(note);
+            return entity;
+        }
+    }
 
     public void undoItemDismiss(int position) {
-        mList.add(position, cache);
+        MemoEntity entity = cache.dump();
+        mList.add(position, entity);
         notifyItemInserted(position);
         saveToPreference();
     }
