@@ -11,7 +11,6 @@ import io.realm.annotations.Required;
 
 public class MemoEntity extends RealmObject {
 
-
     /**
      * _id : unWi
      * msg : ooooo11
@@ -38,6 +37,10 @@ public class MemoEntity extends RealmObject {
         return _id;
     }
 
+    public void setId(String _id) {
+        this._id = _id;
+    }
+
     public String getMsg() {
         return msg;
     }
@@ -48,6 +51,10 @@ public class MemoEntity extends RealmObject {
 
     public int getAccessCount() {
         return access_count;
+    }
+
+    public void setAccessCount(int access_count) {
+        this.access_count = access_count;
     }
 
     public String getCreatedDate() {

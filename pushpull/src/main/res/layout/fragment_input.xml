@@ -6,15 +6,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/background">
 
-    <EditText
-        android:id="@+id/edt_memo"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_below="@id/bottom_header"
-        tools:hint="@string/input_area_hint_push"
-        android:inputType="textMultiLine|textNoSuggestions"
-        android:maxLines="5"
-        android:gravity="center_horizontal"/>
+        android:layout_height="wrap_content"
+        android:isScrollContainer="true">
+
+        <EditText
+            android:id="@+id/edt_memo"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_below="@id/bottom_header"
+            tools:hint="@string/input_area_hint_push"
+            android:inputType="textMultiLine|textNoSuggestions"
+            android:maxLines="5"
+            android:gravity="center_horizontal"/>
+
+    </ScrollView>
+
 
     <ImageView
         android:id="@+id/iv_push_config_notice"

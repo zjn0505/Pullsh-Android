@@ -10,3 +10,5 @@
 /.idea/
 key.jks
 */build/
+release/
+google-services.json

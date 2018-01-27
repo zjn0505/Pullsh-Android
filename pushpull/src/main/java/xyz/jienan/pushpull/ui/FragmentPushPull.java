@@ -166,6 +166,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
                         case BottomSheetBehavior.STATE_COLLAPSED:
                             bsbShadow.setVisibility(View.GONE);
                             foreground.setVisibility(View.GONE);
+                            recyclerView.requestFocus();
                             break;
                         case BottomSheetBehavior.STATE_DRAGGING:
                             foreground.setVisibility(View.VISIBLE);
@@ -215,7 +216,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         } else if ("align_left".equals(align)) {
             tvBsbMemoContent.setGravity(Gravity.START);
         }
-        bsbScrollView.scrollTo(0, 0);
+
         tvBsbMemoId.setTypeface(fontMonaco,Typeface.BOLD);
         tvBsbMemoId.setText(entity.getId());
         ivBsbIdCopy.setOnClickListener(new View.OnClickListener() {
@@ -272,12 +273,12 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         } else {
             btnBsbAddMemo.setVisibility(View.GONE);
             rlBsbNoteContainer.setVisibility(View.VISIBLE);
-            ivBsbNoteControl.requestFocus();
             edtBsbMemoNote.setText(note);
             ivBsbNoteControl.setTag(true);
             ivBsbNoteControl.setImageResource(R.drawable.ic_edit);
             edtBsbMemoNote.setKeyListener(null);
         }
+        bsbScrollView.scrollTo(0, 0);
     }
 
 
@@ -289,6 +290,9 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
                 return true;
             } else if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                bsbShadow.setVisibility(View.GONE);
+                foreground.setVisibility(View.GONE);
+                recyclerView.requestFocus();
                 return true;
             } else {
                 return false;

@@ -9,14 +9,11 @@ import android.graphics.Typeface;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.google.gson.Gson;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -85,17 +82,62 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
 
     @Override
     public void onItemDismiss(int position) {
-        cache = mList.get(position);
+        MemoEntity entity = mList.get(position);
+        cache = new MemoEntityCache(entity);
         mList.remove(position);
         notifyItemRemoved(position);
-        removeFromPreference(cache.getId());
+        removeFromPreference(entity.getId());
         mCallback.onDismiss(position);
     }
 
-    private MemoEntity cache;
+    private void fullClone(MemoEntity memoEntity) {
+
+    }
+
+    private MemoEntityCache cache;
+
+    private class MemoEntityCache {
+
+        String _id;
+        String msg;
+        int access_count;
+        String created_date;
+        int max_access_count;
+        String expired_on;
+        boolean hasExpired = false;
+        boolean createdFromPush = false;
+        String note;
+
+        MemoEntityCache(MemoEntity memoEntity) {
+            this._id = memoEntity.getId();
+            this.msg = memoEntity.getMsg();
+            this.access_count = memoEntity.getAccessCount();
+            this.created_date = memoEntity.getCreatedDate();
+            this.max_access_count = memoEntity.getMaxAccessCount();
+            this.expired_on = memoEntity.getExpiredOn();
+            this.hasExpired = memoEntity.hasExpired;
+            this.createdFromPush = memoEntity.createdFromPush;
+            this.note = memoEntity.getNote();
+        }
+
+        MemoEntity dump() {
+            MemoEntity entity = new MemoEntity();
+            entity.setId(_id);
+            entity.setMsg(msg);
+            entity.setAccessCount(access_count);
+            entity.setCreatedDate(created_date);
+            entity.setMaxAccessCount(max_access_count);
+            entity.setExpiredOn(expired_on);
+            entity.hasExpired = hasExpired;
+            entity.createdFromPush = createdFromPush;
+            entity.setNote(note);
+            return entity;
+        }
+    }
 
     public void undoItemDismiss(int position) {
-        mList.add(position, cache);
+        MemoEntity entity = cache.dump();
+        mList.add(position, entity);
         notifyItemInserted(position);
         saveToPreference();
     }
@@ -155,6 +197,9 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
+        if (realm == null) {
+            realm = Realm.getDefaultInstance();
+        }
         final MemoEntity memo =
                 inQueryMode ? queryList.get(position) : realm.where(MemoEntity.class).equalTo("_id", mList.get(position).getId()).findFirst();
         holder.tvId.setText(memo.getId());
@@ -293,7 +338,13 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
                 if (result != null) {
                     result.deleteFromRealm();
                 }
-                saveToPreference();
+                RealmList<MemoEntity> realmList = new RealmList<MemoEntity>();
+                int size = mList.size();
+                for (int i = 0; i< size; i++) {
+                    mList.get(i).index.set(i);
+                }
+                realmList.addAll(mList);
+                realm.insertOrUpdate(realmList);
             }
         });
     }
