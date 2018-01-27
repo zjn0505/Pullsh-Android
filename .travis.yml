@@ -13,7 +13,7 @@ android:
   - android-26
 before_install:
 - openssl aes-256-cbc -K $encrypted_f34edbc5345a_key -iv $encrypted_f34edbc5345a_iv
-  -in google-services.json.enc -out google-services.json -d
+  -in pushpull/google-services.json.enc -out pushpull/google-services.json -d
 - openssl aes-256-cbc -K $encrypted_775ae62386c6_key -iv $encrypted_775ae62386c6_iv
   -in key.jks.enc -out key.jks -d
 - rvm install 2.2.6
