@@ -85,11 +85,29 @@ import retrofit2.Response;
 import xyz.jienan.pushpull.DateUtils;
 import xyz.jienan.pushpull.R;
 import xyz.jienan.pushpull.ToastUtils;
+import xyz.jienan.pushpull.base.AnalyticsManager;
 import xyz.jienan.pushpull.network.CommonResponse;
 import xyz.jienan.pushpull.network.MemoEntity;
 import xyz.jienan.pushpull.network.MemoService;
 import xyz.jienan.pushpull.ui.settings.SettingsActivity;
 
+import static xyz.jienan.pushpull.base.Const.EVENT_BSB_OPEN;
+import static xyz.jienan.pushpull.base.Const.EVENT_CONFIG_DIALOG_OPEN;
+import static xyz.jienan.pushpull.base.Const.EVENT_CONFIG_FRAGMENT_OPEN;
+import static xyz.jienan.pushpull.base.Const.EVENT_FAB_CLICKED;
+import static xyz.jienan.pushpull.base.Const.EVENT_FAB_PULL;
+import static xyz.jienan.pushpull.base.Const.EVENT_FAB_PUSH;
+import static xyz.jienan.pushpull.base.Const.EVENT_NOTE_ADDED;
+import static xyz.jienan.pushpull.base.Const.EVENT_PULL_DONE;
+import static xyz.jienan.pushpull.base.Const.EVENT_PULL_FAILED;
+import static xyz.jienan.pushpull.base.Const.EVENT_PUSH_DONE;
+import static xyz.jienan.pushpull.base.Const.EVENT_PUSH_FAILED;
+import static xyz.jienan.pushpull.base.Const.EVENT_SEARCH_CLICKED;
+import static xyz.jienan.pushpull.base.Const.EVENT_SHARECOMPAT;
+import static xyz.jienan.pushpull.base.Const.EVENT_SHORTCUT_PULL;
+import static xyz.jienan.pushpull.base.Const.EVENT_SHORTCUT_PUSH;
+import static xyz.jienan.pushpull.base.Const.PARAM_ERROR;
+import static xyz.jienan.pushpull.base.Const.PARAM_PUSH_WITH_CONFIG;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_ALIGN;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_CLICK;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_COPY;
@@ -157,6 +175,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
     private boolean reversed;
     private int oldNightMode;
     private Realm realm;
+    private AnalyticsManager analytics;
 
     BottomSheetBehavior.BottomSheetCallback bottomSheetCallback =
             new BottomSheetBehavior.BottomSheetCallback() {
@@ -193,6 +212,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         public void onClick(final MemoEntity entity) {
             inflateBsb(entity);
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            analytics.logEvent(EVENT_BSB_OPEN);
         }
 
         @Override
@@ -305,11 +325,24 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             if (Math.abs(velocityX) > 500) {
+                reversed = sharedPref.getBoolean("pref_reverse", false);
                 if (velocityX > 0) {
+                    if (fabPosition == 0) {
+                        if (!reversed)
+                            analytics.logEvent(EVENT_FAB_PULL);
+                        else
+                            analytics.logEvent(EVENT_FAB_PUSH);
+                    }
                     if (fabPosition < 1) {
                         swipeTo(++fabPosition);
                     }
                 } else if (velocityX < 0) {
+                    if (fabPosition == 0) {
+                        if (!reversed)
+                            analytics.logEvent(EVENT_FAB_PUSH);
+                        else
+                            analytics.logEvent(EVENT_FAB_PULL);
+                    }
                     if (fabPosition > -1) {
                         swipeTo(--fabPosition);
                     }
@@ -355,6 +388,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
                             swipeTo(++fabPosition);
                         }
                     }
+                    analytics.logEvent(EVENT_FAB_CLICKED);
                     break;
             }
 
@@ -365,6 +399,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+        analytics = AnalyticsManager.getInstance();
     }
 
     @Nullable
@@ -516,6 +551,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
             @Override
             public void onClick(View v) {
                 mAdapter.enterQueryMode();
+                analytics.logEvent(EVENT_SEARCH_CLICKED);
             }
         });
         MenuItem searchItem = menu.findItem(R.id.action_search);
@@ -556,6 +592,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         if (id == R.id.action_push_config) {
             PushConfigDialog dialog = new PushConfigDialog();
             dialog.show(getFragmentManager(), null);
+            analytics.logEvent(EVENT_CONFIG_DIALOG_OPEN);
             return true;
         } else if (id == R.id.action_settings) {
             oldNightMode = AppCompatDelegate.getDefaultNightMode();
@@ -714,6 +751,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
                 edtBsbMemoNote.setKeyListener(mKeyListener);
                 ivBsbNoteControl.setTag(false);
                 ivBsbNoteControl.setImageResource(R.drawable.ic_edit_done);
+                analytics.logEvent(EVENT_NOTE_ADDED);
             }
         });
         edtBsbMemoNote.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -789,6 +827,9 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
 
             @Override
             public void onPageSelected(int position) {
+                if (position == 1) {
+                    analytics.logEvent(EVENT_CONFIG_FRAGMENT_OPEN);
+                }
             }
 
             @Override
@@ -929,6 +970,15 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
             entity.setMsg(memoContent);
             entity.setMaxAccessCount(count);
             entity.setExpiredOn(expiredArg);
+
+            final Bundle bundle = new Bundle();
+            if (count == 0 && !TextUtils.isEmpty(expiredArg)) {
+                bundle.putString(PARAM_PUSH_WITH_CONFIG, "expire time");
+            } else if (count != 0 && TextUtils.isEmpty(expiredArg)) {
+                bundle.putString(PARAM_PUSH_WITH_CONFIG, "access count");
+            } else if (count != 0 && !TextUtils.isEmpty(expiredArg)) {
+                bundle.putString(PARAM_PUSH_WITH_CONFIG, "access count & expire time");
+            }
             Call<CommonResponse> call = memoAPI.createMemo(entity);
             call.enqueue(new Callback<CommonResponse>() {
 
@@ -937,6 +987,10 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
                     MemoEntity entity = response.body().getMemo();
                     entity.createdFromPush = true;
                     mAdapter.addMemo(entity);
+                    if (TextUtils.isEmpty(bundle.getString(PARAM_PUSH_WITH_CONFIG)))
+                        analytics.logEvent(EVENT_PUSH_DONE);
+                    else
+                        analytics.logEvent(EVENT_PUSH_DONE, bundle);
                     if (getActivity() != null && isAdded()) {
                         swipeBackFromCheck();
                         fabWrapper.hide();
@@ -949,11 +1003,15 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
                         fabSwipe.setClickable(true);
                         fabWrapper.hide();
                         Log.e("Request", t.getLocalizedMessage());
+                        Bundle b = new Bundle();
+                        b.putString(PARAM_ERROR, t.getLocalizedMessage());
+                        analytics.logEvent(EVENT_PUSH_FAILED, b);
                         ToastUtils.showToast(getActivity(), getString(R.string.toast_create_push_failed));
                     }
                 }
             });
         }
+
     }
 
     private void pullMemo() {
@@ -981,6 +1039,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
                         mAdapter.addMemo(response.body().getMemo());
                         if (getActivity() != null && isAdded())
                             swipeBackFromCheck();
+                        analytics.logEvent(EVENT_PULL_DONE);
                     }
                     if (getActivity() != null && isAdded())
                         fabWrapper.hide();
@@ -992,6 +1051,9 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
                         fabSwipe.setClickable(true);
                         fabWrapper.hide();
                         Log.e("Request", t.getLocalizedMessage());
+                        Bundle b = new Bundle();
+                        b.putString(PARAM_ERROR, t.getLocalizedMessage());
+                        analytics.logEvent(EVENT_PULL_FAILED, b);
                         ToastUtils.showToast(getActivity(), getString(R.string.toast_create_pull_failed));
                     }
                 }
@@ -1152,6 +1214,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
     @Override
     public void goPushState() {
         swipeTo(-1);
+        analytics.logEvent(EVENT_SHORTCUT_PUSH);
     }
 
     @Override
@@ -1161,10 +1224,12 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         if (fragmentInput != null) {
             fragmentInput.setEdtText(s);
         }
+        analytics.logEvent(EVENT_SHARECOMPAT);
     }
 
     @Override
     public void goPullState() {
         swipeTo(1);
+        analytics.logEvent(EVENT_SHORTCUT_PULL);
     }
 }

@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.facebook.stetho.Stetho;
 
+import xyz.jienan.pushpull.base.AnalyticsManager;
 import xyz.jienan.pushpull.base.RxBus;
 
 /**
@@ -21,6 +22,7 @@ public class MemoApplication extends Application {
             Stetho.initializeWithDefaults(this);
         }
         bus = new RxBus();
+        AnalyticsManager.getInstance().setContext(this);
     }
 
     public RxBus bus() {
