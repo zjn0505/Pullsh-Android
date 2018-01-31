@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals
+        name="toast_expire_notice">
+        <item quantity="one">This memo will be expired within %d minute.</item>
+        <item quantity="other">This memo will be expired within %d minutes.</item>
+    </plurals>
+</resources>

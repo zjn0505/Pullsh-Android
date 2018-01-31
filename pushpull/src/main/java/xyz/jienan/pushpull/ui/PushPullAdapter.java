@@ -64,7 +64,9 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
         sharedPref = PreferenceManager.getDefaultSharedPreferences(mContext);
         Realm realm = Realm.getDefaultInstance();
         RealmQuery<MemoEntity> query = realm.where(MemoEntity.class);
-        RealmResults<MemoEntity> results = query.sort("index").findAll();
+        RealmResults<MemoEntity> results = query.sort("index").equalTo("createdFromPush", true)
+                .or().beginGroup().equalTo("hasExpired", false).equalTo("createdFromPush", false).endGroup()
+                .findAll();
         mList.addAll(results);
         mCallback = itemInteractionCallback;
     }
@@ -209,7 +211,13 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
         if (!TextUtils.isEmpty(memo.getExpiredOn())) {
             lifeSpan = DateUtils.getTimeDiffFromNow(memo.getExpiredOn());
             if (lifeSpan < 0) {
-                memo.hasExpired = true;
+                realm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        memo.hasExpired = true;
+                        realm.insertOrUpdate(memo);
+                    }
+                });
             }
         }
         holder.ivAction.setEnabled(!memo.hasExpired);
@@ -230,11 +238,21 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
         });
 
         if (!memo.createdFromPush && memo.hasExpired) {
-            setItemExpiredView(holder);
+            setItemExpiredView(holder, true);
+        } else {
+            setItemExpiredView(holder, false);
         }
 
         if (lifeSpan > 0 && lifeSpan <= 1000 * 60 * 5){
             holder.ivNotice.setVisibility(View.VISIBLE);
+            holder.ivNotice.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    double min = Math.ceil(DateUtils.getTimeDiffFromNow(memo.getExpiredOn()) / 1000.0 / 60);
+                    min = min < 0 ?  1 : min;
+                    ToastUtils.showToast(mContext, mContext.getResources().getQuantityString(R.plurals.toast_expire_notice, 1, (int)min));
+                }
+            });
         } else {
             holder.ivNotice.setVisibility(View.GONE);
         }
@@ -250,13 +268,19 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
                 long lifeSpanInClick = 0;
                 if (!TextUtils.isEmpty(memo.getExpiredOn())) {
                     lifeSpanInClick = DateUtils.getTimeDiffFromNow(memo.getExpiredOn());
-                    if (lifeSpanInClick < 0) {
-                        memo.hasExpired = true;
+                    if (lifeSpanInClick < 0 && !memo.hasExpired) {
+                        realm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                memo.hasExpired = true;
+                                realm.insertOrUpdate(memo);
+                            }
+                        });
                     }
                 }
                 if (!memo.createdFromPush && memo.hasExpired) {
-                    ToastUtils.showToast(mContext, "This memo has been expired");
-                    setItemExpiredView(holder);
+                    ToastUtils.showToast(mContext, mContext.getString(R.string.toast_expired_notice));
+                    setItemExpiredView(holder, true);
                 } else {
                     mCallback.onClick(memo);
                 }
@@ -349,9 +373,16 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
         });
     }
 
-    private void setItemExpiredView(ViewHolder holder) {
-        holder.ivNotice.setVisibility(View.GONE);
-        holder.ivAction.setEnabled(false);
-        holder.tvMsg.setPaintFlags(holder.tvMsg.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+    private void setItemExpiredView(ViewHolder holder, boolean expired) {
+        if (expired) {
+            holder.ivNotice.setVisibility(View.GONE);
+            holder.ivAction.setEnabled(false);
+            holder.tvMsg.setPaintFlags(holder.tvMsg.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        } else {
+            holder.ivNotice.setVisibility(View.VISIBLE);
+            holder.ivAction.setEnabled(true);
+            holder.tvMsg.setPaintFlags(0);
+        }
+
     }
 }

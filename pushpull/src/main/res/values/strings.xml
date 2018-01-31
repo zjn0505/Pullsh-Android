@@ -73,4 +73,9 @@
     <string name="btn_add_note">Add a note</string>
     <string name="note_header">Note:</string>
     <string name="note_hint">Add note to this memo, which is stored locally and eligible for search</string>
+    <plurals
+        name="toast_expire_notice">
+        <item quantity="one">This memo will be expired within %d minute.</item>
+        <item quantity="other">This memo will be expired within %d minutes.</item>
+    </plurals>
 </resources>
