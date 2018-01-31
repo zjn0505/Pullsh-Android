@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingTranslation">
     <string name="path_swipe">M8,16.6 l-5,-5 l5,-5  M16, 16.6 l5,-5 l-5,-5</string>
     <string name="path_check">M4.8,13.4 l2.1, 2.1 l2.1,2.1 M10.4,16.2 l4.3, -4.6,l 4.3, -4.6</string>
     <string name="path_add">M6,12 l6,0 l0,6 M12,6 l0,6 l6,0</string>
