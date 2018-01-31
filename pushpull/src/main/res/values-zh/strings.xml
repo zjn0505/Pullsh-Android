@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pullsh</string>
+    <string name="action_push_config">Push设置</string>
+    <string name="action_search">搜索</string>
+    <string name="action_settings">设置</string>
+    <string name="action_restore">重置</string>
+    <string name="btn_confirm">确定</string>
+
+    <string name="pref_control">控制</string>
+    <string name="pref_appearance">外观</string>
+    <string name="pref_click">点击悬浮按键将触发</string>
+    <string name="click_push">Push</string>
+    <string name="click_pull">Pull</string>
+    <string name="click_nothing">无操作</string>
+    <string name="pref_reverse">反转悬浮按键操作</string>
+    <string name="pref_swipe_default">左划Push，右划Pull</string>
+    <string name="pref_swipe_reverse">左划Pull，右划Push</string>
+    <string name="pref_copy">复制完整路径</string>
+    <string name="pref_copy_full">将复制完整路径， 如 %s</string>
+    <string name="pref_copy_id">仅复制id，如 %s</string>
+    <string name="pref_night">切换为夜间模式</string>
+    <string name="pref_memo_align">记事文字对齐</string>
+    <string name="align_center">居中</string>
+    <string name="align_left">局左</string>
+
+    <string name="restore_alert_title">重置</string>
+    <string name="restore_alert_msg">即将重置全部设置项，请确认。</string>
+
+    <string name="memo_create">创建于 :   %s</string>
+    <string name="memo_expire">过期于 :   %s</string>
+    <string name="memo_allowance_user">剩余访问次数 :  %d</string>
+    <string name="memo_allowance_author">制定访问次数 :  %d</string>
+
+    <string name="snackbar_delete">这条记事已被清除</string>
+    <string name="snackbar_undo">撤销</string>
+    <string name="copy">复制</string>
+    <string name="swipe_left">左滑</string>
+    <string name="swipe_right">右滑</string>
+
+    <string name="shortcut_push_short">Push</string>
+    <string name="shortcut_push_long">创建Push</string>
+
+    <string name="shortcut_pull_short">Pull</string>
+    <string name="shortcut_pull_long">创建Pull</string>
+
+    <string name="bottom_sheet_memo_id">记事id:</string>
+    <string name="bottom_sheet_memo_created_by">当前记事通过Push创建</string>
+
+    <string name="dialog_push_memo_expire">设置记事过期时间：</string>
+    <string name="dialog_push_memo_expire_min">分钟</string>
+    <string name="dialog_push_memo_expire_hr">小时</string>
+    <string name="dialog_push_memo_expire_day">天</string>
+    <string name="dialog_push_memo_after_checked">或，在访问</string>
+    <string name="dialog_push_memo_after_checked_times">次后过期</string>
+
+    <string name="input_area_hint_pull">请输入记事id</string>
+    <string name="input_area_hint_push">请输入记事内容</string>
+    <string name="input_area_create_a_pull">创建Pull</string>
+    <string name="input_area_create_a_push">创建Push</string>
+
+    <string name="toast_create_pull_failed">创建Pull失败</string>
+    <string name="toast_create_push_failed">创建Push失败</string>
+    <string name="toast_input_correct_id">请输入正确记事id</string>
+    <string name="toast_input_correct_memo">请为记事增加内容</string>
+    <string name="toast_memo_content_copied">记事内容已复制到剪贴板</string>
+    <string name="toast_memo_id_copied">记事id已复制到剪贴板</string>
+    <string name="toast_memo_link_copied">记事链接已复制到剪贴板</string>
+    <string name="toast_item_already_in_list">记事已在列表当中</string>
+    <string name="toast_push_config_notice">记事访问控制已开启，\n左滑输入区开始配置。</string>
+    <string name="toast_expired_notice">当前记事已过期</string>
+
+    <string name="search_hint">搜索id，内容或笔记</string>
+
+    <string name="btn_add_note">添加笔记</string>
+    <string name="note_header">笔记:</string>
+    <string name="note_hint">为当前记事添加笔记，笔记保存于本地并可被搜索</string>
+
+    <plurals
+        name="toast_expire_notice">
+        <item quantity="one">这条记事将于%d分钟内失效</item>
+        <item quantity="other">这条记事将于%d分钟内失效</item>
+    </plurals>
+</resources>

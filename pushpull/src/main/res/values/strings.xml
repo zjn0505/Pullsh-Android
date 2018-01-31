@@ -67,12 +67,14 @@
     <string name="toast_memo_link_copied">Share link copied to clipboard</string>
     <string name="toast_item_already_in_list">item already in list</string>
     <string name="toast_push_config_notice">Memo access control enabled.\nSwipe left to change push config.</string>
+    <string name="toast_expired_notice">This memo has been expired</string>
 
     <string name="search_hint">Search id, content or note</string>
 
     <string name="btn_add_note">Add a note</string>
     <string name="note_header">Note:</string>
     <string name="note_hint">Add note to this memo, which is stored locally and eligible for search</string>
+
     <plurals
         name="toast_expire_notice">
         <item quantity="one">This memo will be expired within %d minute.</item>
