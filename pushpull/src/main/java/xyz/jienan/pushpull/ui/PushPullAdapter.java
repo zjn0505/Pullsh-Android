@@ -77,7 +77,9 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
     }
 
     public void onItemMove(int from, int to) {
-        Collections.swap(mList, from, to);
+        MemoEntity memo = mList.get(from);
+        mList.remove(from);
+        mList.add(to, memo);
         notifyItemMoved(from, to);
         saveToPreference();
     }
