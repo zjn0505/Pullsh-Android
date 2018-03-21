@@ -10,8 +10,8 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         applicationId "xyz.jienan.pushpull"
-        versionCode 5
-        versionName "1.4"
+        versionCode 6
+        versionName "1.5"
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -32,6 +32,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            applicationIdSuffix ".debug"
+        }
         release {
             minifyEnabled true
             zipAlignEnabled true

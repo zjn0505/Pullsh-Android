@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Pullsh</string>
+    <string name="app_name" translatable="false">Pullsh</string>
     <string name="action_push_config">Push Config</string>
     <string name="action_search">Search</string>
     <string name="action_settings">Settings</string>

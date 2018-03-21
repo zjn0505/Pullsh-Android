@@ -12,10 +12,9 @@ android:
   - build-tools-26.0.2
   - android-26
 before_install:
-- openssl aes-256-cbc -K $encrypted_759b08866d4e_key -iv $encrypted_759b08866d4e_iv
-  -in pushpull/google-services.json.enc -out pushpull/google-services.json -d
-- openssl aes-256-cbc -K $encrypted_775ae62386c6_key -iv $encrypted_775ae62386c6_iv
-  -in key.jks.enc -out key.jks -d
+- openssl aes-256-cbc -K $encrypted_5845add3179d_key -iv $encrypted_5845add3179d_iv -in secrets.tar.enc -out secrets.tar -d
+- tar xvf secrets.tar
+- mv google-services.json pushpull/google-services.json
 - rvm install 2.2.6
 - gem install dropbox-deployment
 script:
