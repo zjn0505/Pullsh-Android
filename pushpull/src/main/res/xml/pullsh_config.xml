@@ -16,8 +16,12 @@
             android:summaryOff="@string/pref_swipe_default"
             android:summaryOn="@string/pref_swipe_reverse"/>
         <SwitchPreference
-            android:key="pref_copy"
-            android:title="@string/pref_copy"
+            android:key="pref_copy_icon"
+            android:title="@string/pref_copy_icon"
+            android:defaultValue="true" />
+        <SwitchPreference
+            android:key="pref_copy_pull"
+            android:title="@string/pref_copy_pull"
             android:defaultValue="true" />
     </PreferenceCategory>
 

@@ -21,7 +21,8 @@ import xyz.jienan.pushpull.R;
 
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_ALIGN;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_CLICK;
-import static xyz.jienan.pushpull.base.Const.PREF_KEY_COPY;
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_COPY_ICON;
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_COPY_PULL;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_NIGHT;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_PULLSH_HOST;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_REVERSE;
@@ -33,7 +34,8 @@ import static xyz.jienan.pushpull.base.Const.PREF_KEY_REVERSE;
 public class SettingsFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener {
 
     private ListPreference clickPref;
-    private SwitchPreference copyPref;
+    private SwitchPreference copyIconPref;
+    private SwitchPreference copyPullPref;
     private SwitchPreference reversePref;
     private SwitchPreference nightPref;
     private ListPreference alignPref;
@@ -49,15 +51,16 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         clickPref = (ListPreference) findPreference(PREF_KEY_CLICK);
         reversePref = (SwitchPreference) findPreference(PREF_KEY_REVERSE);
         nightPref = (SwitchPreference) findPreference(PREF_KEY_NIGHT);
-        copyPref = (SwitchPreference) findPreference(PREF_KEY_COPY);
+        copyIconPref = (SwitchPreference) findPreference(PREF_KEY_COPY_ICON);
+        copyPullPref = (SwitchPreference) findPreference(PREF_KEY_COPY_PULL);
         alignPref = (ListPreference) findPreference(PREF_KEY_ALIGN);
 
         clickPref.setSummary(clickPref.getEntry());
         clickPref.setOnPreferenceChangeListener(this);
         reversePref.setOnPreferenceChangeListener(this);
-        copyPref.setOnPreferenceChangeListener(this);
+        copyIconPref.setOnPreferenceChangeListener(this);
         nightPref.setOnPreferenceChangeListener(this);
-        setCopyPref(copyPref.isChecked());
+        setCopyPref(copyIconPref.isChecked());
         alignPref.setSummary(alignPref.getEntry());
         alignPref.setOnPreferenceChangeListener(this);
     }
@@ -70,7 +73,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
                 ((ListPreference) preference).setValue(newValue.toString());
                 preference.setSummary(((ListPreference) preference).getEntry());
                 break;
-            case PREF_KEY_COPY:
+            case PREF_KEY_COPY_ICON:
                 setCopyPref((boolean) newValue);
                 break;
             case PREF_KEY_NIGHT:
@@ -122,7 +125,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
 
     private void reset() {
         String click = sharedPreferences.getString(PREF_KEY_CLICK ,"click_push");
-        boolean copy = sharedPreferences.getBoolean(PREF_KEY_COPY,true);
+        boolean copy = sharedPreferences.getBoolean(PREF_KEY_COPY_ICON,true);
         boolean reverse = sharedPreferences.getBoolean(PREF_KEY_REVERSE ,false);
         boolean night = sharedPreferences.getBoolean(PREF_KEY_NIGHT, false);
         String align = sharedPreferences.getString(PREF_KEY_ALIGN ,"align_center");
@@ -130,7 +133,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         int resClick = getResources().getIdentifier(click, "string", getActivity().getPackageName());
         clickPref.setSummary(getString(resClick));
         clickPref.setValue(click);
-        copyPref.setChecked(copy);
+        copyIconPref.setChecked(copy);
         reversePref.setChecked(reverse);
         if (night != nightPref.isChecked()) {
             nightPref.setChecked(night);
@@ -149,9 +152,9 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     private void setCopyPref(boolean isChecked) {
         if (isChecked) {
             String url = sharedPreferences.getString(PREF_KEY_PULLSH_HOST, "https://pullsh.me/");
-            copyPref.setSummary(String.format(getString(R.string.pref_copy_full), url + randId(4)));
+            copyIconPref.setSummary(String.format(getString(R.string.pref_copy_full), url + randId(4)));
         } else {
-            copyPref.setSummary(String.format(getString(R.string.pref_copy_id), randId(4)));
+            copyIconPref.setSummary(String.format(getString(R.string.pref_copy_id), randId(4)));
         }
     }
 

@@ -110,7 +110,8 @@ import static xyz.jienan.pushpull.base.Const.PARAM_ERROR;
 import static xyz.jienan.pushpull.base.Const.PARAM_PUSH_WITH_CONFIG;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_ALIGN;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_CLICK;
-import static xyz.jienan.pushpull.base.Const.PREF_KEY_COPY;
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_COPY_ICON;
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_COPY_PULL;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_FRE;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_PULLSH_HOST;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_PUSH_ACCESS_COUNT;
@@ -243,7 +244,7 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
             @Override
             public void onClick(View v) {
                 ClipData clip;
-                if (sharedPref.getBoolean(PREF_KEY_COPY, true)) {
+                if (sharedPref.getBoolean(PREF_KEY_COPY_ICON, true)) {
                     String host = sharedPref.getString(PREF_KEY_PULLSH_HOST, "https://pullsh.me/");
                     clip = ClipData.newPlainText("url", host + entity.getId());
                     ToastUtils.showToast(getActivity(), getString(R.string.toast_memo_link_copied));
@@ -1036,10 +1037,16 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
                         fabSwipe.setClickable(true);
                         }
                     } else {
-                        mAdapter.addMemo(response.body().getMemo());
+                        MemoEntity memo = response.body().getMemo();
+                        mAdapter.addMemo(memo);
                         if (getActivity() != null && isAdded())
                             swipeBackFromCheck();
                         analytics.logEvent(EVENT_PULL_DONE);
+                        if (sharedPref.getBoolean(PREF_KEY_COPY_PULL, true)) {
+                            ClipData clip = ClipData.newPlainText("memo", memo.getMsg());
+                            ToastUtils.showToast(getActivity(), getString(R.string.toast_memo_content_copied));
+                            clipboard.setPrimaryClip(clip);
+                        }
                     }
                     if (getActivity() != null && isAdded())
                         fabWrapper.hide();

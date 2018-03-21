@@ -16,9 +16,10 @@
     <string name="pref_reverse">反转悬浮按键操作</string>
     <string name="pref_swipe_default">左划Push，右划Pull</string>
     <string name="pref_swipe_reverse">左划Pull，右划Push</string>
-    <string name="pref_copy">复制完整路径</string>
+    <string name="pref_copy_icon">点击复制图标</string>
     <string name="pref_copy_full">将复制完整路径， 如 %s</string>
     <string name="pref_copy_id">仅复制id，如 %s</string>
+    <string name="pref_copy_pull">Pull之后自动复制内容</string>
     <string name="pref_night">切换为夜间模式</string>
     <string name="pref_memo_align">记事文字对齐</string>
     <string name="align_center">居中</string>

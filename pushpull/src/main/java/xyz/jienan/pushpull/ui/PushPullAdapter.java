@@ -29,7 +29,7 @@ import xyz.jienan.pushpull.R;
 import xyz.jienan.pushpull.ToastUtils;
 import xyz.jienan.pushpull.network.MemoEntity;
 
-import static xyz.jienan.pushpull.base.Const.PREF_KEY_COPY;
+import static xyz.jienan.pushpull.base.Const.PREF_KEY_COPY_ICON;
 import static xyz.jienan.pushpull.base.Const.PREF_KEY_PULLSH_HOST;
 
 /**
@@ -227,13 +227,13 @@ public class PushPullAdapter extends RecyclerView.Adapter<PushPullAdapter.ViewHo
             @Override
             public void onClick(View v) {
                 ClipData clip;
-                if (sharedPref.getBoolean(PREF_KEY_COPY, true)) {
+                if (sharedPref.getBoolean(PREF_KEY_COPY_ICON, true)) {
                     String host = sharedPref.getString(PREF_KEY_PULLSH_HOST, "https://pullsh.me/");
                     clip = ClipData.newPlainText("url", host + memo.getId());
-                    ToastUtils.showToast(mContext, "Share link copied to clipboard");
+                    ToastUtils.showToast(mContext, mContext.getResources().getString(R.string.toast_memo_link_copied));
                 } else {
                     clip = ClipData.newPlainText("id", memo.getId());
-                    ToastUtils.showToast(mContext, "id copied to clipboard");
+                    ToastUtils.showToast(mContext, mContext.getResources().getString(R.string.toast_memo_id_copied));
                 }
                 clipboard.setPrimaryClip(clip);
             }

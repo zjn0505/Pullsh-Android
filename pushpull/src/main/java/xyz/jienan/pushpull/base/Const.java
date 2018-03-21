@@ -7,7 +7,8 @@ package xyz.jienan.pushpull.base;
 public class Const {
     public final static String PREF_KEY_PULLSH_HOST = "pullsh_host";
     public final static String PREF_KEY_MEMO = "memo_key";
-    public final static String PREF_KEY_COPY = "pref_copy";
+    public final static String PREF_KEY_COPY_ICON = "pref_copy_icon";
+    public final static String PREF_KEY_COPY_PULL = "pref_copy_pull";
     public final static String PREF_KEY_CLICK = "pref_click";
     public final static String PREF_KEY_REVERSE = "pref_reverse";
     public final static String PREF_KEY_NIGHT = "pref_night";
