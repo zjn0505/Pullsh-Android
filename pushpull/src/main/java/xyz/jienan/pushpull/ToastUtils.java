@@ -9,8 +9,14 @@ import android.widget.Toast;
  */
 
 public class ToastUtils {
+    private static Toast toast;
     public final static void showToast(Context context, String text) {
-        Toast toast = Toast.makeText(context, text, Toast.LENGTH_SHORT);
+        try{
+            toast.getView().isShown();
+            toast.setText(text);
+        } catch (Exception e) {
+            toast = Toast.makeText(context.getApplicationContext(), text, Toast.LENGTH_SHORT);
+        }
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
     }
