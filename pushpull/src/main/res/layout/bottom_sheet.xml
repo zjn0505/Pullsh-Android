@@ -113,6 +113,7 @@
                 android:id="@+id/tv_memo"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:textIsSelectable="true"
                 tools:text="This a sample of your memo content, use action button to create your own"
                 style="@style/tv_bsb"/>
 
