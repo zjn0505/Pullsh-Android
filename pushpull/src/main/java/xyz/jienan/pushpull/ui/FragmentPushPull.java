@@ -823,7 +823,9 @@ public class FragmentPushPull extends Fragment implements IPullshAction{
         viewPagerInput.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                fragmentInput.setPushNoticeVisibility();
+                if (fragmentInput != null && fragmentInput.isAdded()) {
+                    fragmentInput.setPushNoticeVisibility();
+                }
             }
 
             @Override
