@@ -166,6 +166,9 @@ public class FragmentInput extends Fragment {
     }
 
     public void setPushNoticeVisibility() {
+        if (ivPushNotice == null) {
+            return;
+        }
         if (!isPush) {
             ivPushNotice.setVisibility(View.GONE);
             return;
