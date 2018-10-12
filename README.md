@@ -1,6 +1,8 @@
 # Pullsh-Android   [![Build Status](https://travis-ci.org/zjn0505/Pullsh-Android.svg?branch=master)](https://travis-ci.org/zjn0505/Pullsh-Android/)
 This reposistory is the source code for Pullsh Android app.
 
+<a href='https://play.google.com/store/apps/details?id=xyz.jienan.pushpull&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png' width="240" height="93"/></a>
+
 Pullsh - a short id memo app, turning your memo into a short id and storing it on cloud to be accessed anywhere.
 
 You can download it on Android, Chrome Extension, or use the webapp on https://pullsh.me
